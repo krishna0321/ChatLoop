@@ -1,0 +1,37 @@
+<div class="auth-container">
+  <h2>Create Account</h2>
+
+  <input
+    type="email"
+    placeholder="Email"
+    [(ngModel)]="email"
+  />
+
+  <!-- ✅ PHONE INPUT ADDED -->
+  <input
+    type="tel"
+    placeholder="Phone Number"
+    [(ngModel)]="phone"
+  />
+
+  <input
+    type="password"
+    placeholder="Password"
+    [(ngModel)]="password"
+  />
+
+  <input
+    type="password"
+    placeholder="Confirm Password"
+    [(ngModel)]="confirmPassword"
+  />
+
+  <button (click)="register()">Register</button>
+
+  <p class="error" *ngIf="error">{{ error }}</p>
+
+  <p class="link">
+    Already have an account?
+    <a routerLink="/login">Login</a>
+  </p>
+</div>

@@ -1,0 +1,49 @@
+
+.chat-header-name-date{
+    width: 85%;
+    display: flex;
+    flex-direction: column;   
+    justify-content: space-around;    
+    font-size: 85%;   
+    padding: 2%;   
+   
+}
+.chat-header-name{
+    letter-spacing: 0.4pt;
+    font-weight: 500;
+    
+}   
+.chat-header-date{    
+    padding-top: 1%;
+    color: #7f91a4;
+   
+}
+.chat-header-buttons{    
+    width: 15%;
+    min-width: 135px ;
+    display: flex;
+    flex-direction: row;
+   /* padding-right: 0.05%;*/
+    justify-content: space-between;
+    color: gray ;   
+}
+.chat-header-button{ 
+    display: flex;
+    padding-top: 1%;
+    font-size: 1.3em;
+    width: 25%;
+   /* margin-left: 1%;*/
+   margin: auto;
+    align-self: center;
+    align-items: center;
+    justify-content: center;
+    background-color:#17212b;
+}
+.chat-header-button-image{   
+    width: 65%;
+}
+.chat-header-button:hover{ 
+    transition: 0.3s;
+    color: white;
+    cursor: pointer;    
+}

@@ -1,0 +1,41 @@
+<div class="chat-wrapper">
+
+  <!-- HEADER -->
+  <header class="chat-header">
+    <div class="title">💬 Chatloop</div>
+
+    <div class="user-info">
+      <span>{{ authService.currentUser?.email }}</span>
+      <button (click)="logout()">Logout</button>
+    </div>
+  </header>
+
+  <!-- CHAT BODY -->
+  <div class="chat-body" #messageContainer>
+
+    <div
+      *ngFor="let m of messages"
+      class="message"
+      [class.mine]="m.sender === authService.currentUser?.email"
+    >
+      <div class="bubble">
+        <div class="sender" *ngIf="m.sender !== authService.currentUser?.email">
+          {{ m.sender }}
+        </div>
+        <div class="text">{{ m.message }}</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- INPUT -->
+  <div class="input-bar">
+    <input
+      [(ngModel)]="text"
+      placeholder="Type a message..."
+      (keyup.enter)="send()"
+    />
+    <button (click)="send()">Send</button>
+  </div>
+
+</div>

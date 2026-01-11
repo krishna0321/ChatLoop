@@ -1,0 +1,27 @@
+<div class="auth-container">
+  <h2>Welcome back</h2>
+  <p class="subtitle">Login to continue to Chatloop</p>
+
+  <label>Email</label>
+  <input
+    type="email"
+    [(ngModel)]="email"
+    placeholder="you@example.com"
+  />
+
+  <label>Password</label>
+  <input
+    type="password"
+    [(ngModel)]="password"
+    placeholder="Enter your password"
+  />
+
+  <button (click)="login()">Login</button>
+
+  <p class="error" *ngIf="error">{{ error }}</p>
+
+  <p class="link">
+    Don’t have an account?
+    <a routerLink="/register">Create one</a>
+  </p>
+</div>
