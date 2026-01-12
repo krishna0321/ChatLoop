@@ -1,1 +1,73 @@
-<p>users works!</p>
+<div class="wrap">
+  <div class="header">
+    <h2>👥 Users</h2>
+
+    <input
+      class="search"
+      placeholder="Search by name / email / phone..."
+      [(ngModel)]="searchText"
+      (input)="onSearch()"
+    />
+  </div>
+
+  <div *ngIf="loading" class="loading">Loading users...</div>
+
+  <div class="grid" *ngIf="!loading">
+    <!-- USERS LIST -->
+    <div class="card">
+      <h3>All Users ({{ filtered.length }})</h3>
+
+      <div class="userList">
+        <div class="userRow" *ngFor="let u of filtered">
+          <div class="left" (click)="openDetails(u)">
+            <div class="avatar">
+              {{ (u.name || 'U')[0] }}
+            </div>
+            <div class="info">
+              <div class="name">{{ u.name }}</div>
+              <div class="sub">{{ u.email || 'No Email' }}</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn" (click)="openEdit(u)">✏ Edit</button>
+            <button class="btn danger" (click)="deleteUser(u)">🗑 Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETAILS -->
+    <div class="card" *ngIf="selectedUser">
+      <h3>📌 Details</h3>
+
+      <div class="detail">
+        <p><b>UID:</b> {{ selectedUser.uid }}</p>
+        <p><b>Name:</b> {{ selectedUser.name }}</p>
+        <p><b>Email:</b> {{ selectedUser.email || '-' }}</p>
+        <p><b>Phone:</b> {{ selectedUser.phone || '-' }}</p>
+      </div>
+
+      <button class="btn full" (click)="closeDetails()">Close</button>
+    </div>
+
+    <!-- EDIT -->
+    <div class="card" *ngIf="editUser">
+      <h3>✏ Edit User</h3>
+
+      <label>Name</label>
+      <input [(ngModel)]="editUser.name" />
+
+      <label>Email</label>
+      <input [(ngModel)]="editUser.email" />
+
+      <label>Phone</label>
+      <input [(ngModel)]="editUser.phone" />
+
+      <div class="rowBtns">
+        <button class="btn full" (click)="saveEdit()">✅ Save</button>
+        <button class="btn full outline" (click)="closeEdit()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>

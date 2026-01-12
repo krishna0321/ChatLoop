@@ -1,19 +1,21 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { Auth, onAuthStateChanged } from '@angular/fire/auth';
+import { Auth } from '@angular/fire/auth';
+import { authState } from '@angular/fire/auth';
+import { map, take } from 'rxjs/operators';
 
 export const authGuard: CanActivateFn = () => {
   const auth = inject(Auth);
   const router = inject(Router);
 
-  return new Promise<boolean>((resolve) => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        resolve(true);
-      } else {
-        router.navigate(['/login']);
-        resolve(false);
-      }
-    });
-  });
+  // ✅ Wait for authState only ONCE, then allow/deny
+  return authState(auth).pipe(
+    take(1),
+    map((user) => {
+      if (user) return true;
+
+      router.navigate(['/login']);
+      return false;
+    })
+  );
 };

@@ -5,15 +5,25 @@ import {
   signInWithEmailAndPassword,
   signOut,
   UserCredential,
+  setPersistence,
+  browserLocalPersistence
 } from '@angular/fire/auth';
 
-import { Firestore, doc, setDoc, serverTimestamp } from '@angular/fire/firestore';
+import {
+  Firestore,
+  doc,
+  setDoc,
+  serverTimestamp
+} from '@angular/fire/firestore';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  constructor(private auth: Auth, private firestore: Firestore) {}
+  constructor(private auth: Auth, private firestore: Firestore) {
+    // ✅ KEEP USER LOGGED IN (important)
+    setPersistence(this.auth, browserLocalPersistence);
+  }
 
-  // ✅ Register + Save phone in Firestore
+  // ✅ Register + save phone in Firestore
   async register(email: string, password: string, phone: string): Promise<UserCredential> {
     const cred = await createUserWithEmailAndPassword(this.auth, email, password);
 
@@ -26,7 +36,7 @@ export class AuthService {
   async login(email: string, password: string): Promise<UserCredential> {
     const cred = await signInWithEmailAndPassword(this.auth, email, password);
 
-    // phone unknown in login, so don't overwrite it
+    // phone unknown in login, so don't overwrite
     await this.saveUserToFirestore(cred.user.uid, email);
 
     return cred;
@@ -36,7 +46,7 @@ export class AuthService {
     return signOut(this.auth);
   }
 
-  // ✅ Creates/updates user document in Firestore
+  // ✅ Creates/updates user doc in Firestore
   private async saveUserToFirestore(uid: string, email: string, phone?: string) {
     const ref = doc(this.firestore, `users/${uid}`);
 
@@ -46,8 +56,11 @@ export class AuthService {
         uid,
         email,
         name: email.split('@')[0], // username
-        phone: phone ?? '',         // ✅ phone added
+        phone: phone ?? '',
+
+        // ✅ keep createdAt for first time only (merge true prevents overwrite)
         createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
       },
       { merge: true }
     );

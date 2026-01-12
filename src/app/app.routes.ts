@@ -7,8 +7,11 @@ import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
 
 import { authGuard } from './core/guards/auth.guard';
+
 import { ProfileComponent } from './features/profile/profile.component';
 import { SettingsComponent } from './features/settings/settings.component';
+import { UsersComponent } from './features/users/users.component';
+import { ChatsComponent } from './features/chats/chats.component';
 
 export const routes: Routes = [
   {
@@ -18,9 +21,6 @@ export const routes: Routes = [
       { path: '', redirectTo: 'login', pathMatch: 'full' },
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
-      { path: 'profile', component: ProfileComponent },
-      { path: 'settings', component: SettingsComponent },
-
     ],
   },
 
@@ -28,6 +28,15 @@ export const routes: Routes = [
     path: 'app',
     component: AppLayoutComponent,
     canActivate: [authGuard],
+    children: [
+      { path: '', redirectTo: 'chats', pathMatch: 'full' },
+      { path: 'chats', component: ChatsComponent },
+
+      { path: 'chats', component: ChatsComponent },
+      { path: 'users', component: UsersComponent },
+      { path: 'profile', component: ProfileComponent },
+      { path: 'settings', component: SettingsComponent },
+    ],
   },
 
   { path: '**', redirectTo: 'login' },
