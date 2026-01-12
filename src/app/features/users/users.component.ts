@@ -1,92 +1,269 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Auth, onAuthStateChanged } from '@angular/fire/auth';
+import { Router } from '@angular/router';
+
 import { UserService, AppUser } from '../../core/services/user.service';
+import { ChatService } from '../../core/services/chat.service';
 
 @Component({
   selector: 'app-users',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './users.component.html',
-  styleUrl: './users.component.css',
-})
-export class UsersComponent implements OnInit {
-  users: AppUser[] = [];
-  filtered: AppUser[] = [];
+  template: `
+    <div class="page">
 
+      <div class="topbar">
+        <div>
+          <div class="title">Users</div>
+          <div class="sub">Start a new chat with any user</div>
+        </div>
+
+        <input
+          class="search"
+          [(ngModel)]="searchText"
+          (input)="applyFilter()"
+          placeholder="Search users..."
+        />
+      </div>
+
+      <div class="list">
+        <div
+          class="user"
+          *ngFor="let u of filteredUsers"
+          (click)="startChat(u)"
+        >
+          <div class="avatar">{{ (u.name || u.email || 'U')[0] }}</div>
+
+          <div class="info">
+            <div class="name">{{ u.name || u.email }}</div>
+            <div class="meta">
+              <span>{{ u.phone || 'No phone' }}</span>
+              <span class="dot">•</span>
+              <span>{{ u.email }}</span>
+            </div>
+          </div>
+
+          <button class="btn" (click)="startChat(u); $event.stopPropagation()">
+            Message
+          </button>
+        </div>
+
+        <div *ngIf="filteredUsers.length === 0" class="empty">
+          No users found 😢
+        </div>
+      </div>
+
+    </div>
+  `,
+  styles: [`
+    :host{
+      display:flex;
+      flex:1;
+      width:100%;
+      height:100%;
+      min-width:0;
+      overflow:hidden;
+    }
+
+    .page{
+      width:100%;
+      height:100%;
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      overflow:hidden;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      padding:14px 16px;
+      border-radius:18px;
+      background: rgba(15,23,42,0.65);
+      border: 1px solid rgba(255,255,255,0.07);
+      backdrop-filter: blur(10px);
+    }
+
+    .title{
+      font-size:18px;
+      font-weight:900;
+      color:white;
+    }
+
+    .sub{
+      font-size:12px;
+      opacity:.7;
+      color:white;
+      margin-top:2px;
+    }
+
+    .search{
+      width: 320px;
+      max-width: 45vw;
+      height: 44px;
+      border-radius: 14px;
+      padding: 0 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(2,6,23,0.6);
+      color:white;
+      outline:none;
+    }
+
+    .list{
+      flex:1;
+      overflow:auto;
+      padding:10px;
+      border-radius:18px;
+      background: rgba(2,6,23,0.35);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .user{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      padding:12px;
+      border-radius:16px;
+      cursor:pointer;
+      transition:.15s;
+      border: 1px solid transparent;
+      color:white;
+    }
+
+    .user:hover{
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.06);
+    }
+
+    .avatar{
+      width:46px;
+      height:46px;
+      border-radius:50%;
+      background: linear-gradient(135deg,#2563eb,#60a5fa);
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      flex-shrink:0;
+      text-transform: uppercase;
+    }
+
+    .info{
+      flex:1;
+      min-width:0;
+    }
+
+    .name{
+      font-weight:900;
+      font-size:14px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .meta{
+      margin-top:4px;
+      font-size:12px;
+      opacity:.75;
+      display:flex;
+      gap:8px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .dot{ opacity:.55; }
+
+    .btn{
+      height:38px;
+      padding: 0 14px;
+      border:none;
+      border-radius: 12px;
+      font-weight:900;
+      cursor:pointer;
+      color:white;
+      background: rgba(37,99,235,0.9);
+      flex-shrink:0;
+    }
+
+    .btn:hover{ opacity:0.95; }
+
+    .empty{
+      margin-top: 18px;
+      text-align:center;
+      opacity:.7;
+      font-size:14px;
+      padding: 20px 0;
+    }
+  `]
+})
+export class UsersComponent implements OnInit, OnDestroy {
+  myUid = '';
   searchText = '';
 
-  selectedUser: AppUser | null = null;
+  users: AppUser[] = [];
+  filteredUsers: AppUser[] = [];
 
-  // edit model
-  editUser: AppUser | null = null;
+  private unsubAuth: any;
+  private usersSub: any;
 
-  loading = true;
-
-  constructor(private userService: UserService) {}
+  constructor(
+    private auth: Auth,
+    private router: Router,
+    private userService: UserService,
+    private chatService: ChatService
+  ) {}
 
   ngOnInit(): void {
-    this.userService.getUsers().subscribe((data) => {
-      this.users = data || [];
-      this.filtered = [...this.users];
-      this.loading = false;
+    this.unsubAuth = onAuthStateChanged(this.auth, (u) => {
+      if (!u) return;
+      this.myUid = u.uid;
+
+      this.usersSub = this.userService.getUsers().subscribe((list) => {
+        // show everyone except me
+        this.users = (list || []).filter(x => x.uid !== this.myUid);
+        this.filteredUsers = [...this.users];
+        this.applyFilter();
+      });
     });
   }
 
-  // ✅ SEARCH
-  onSearch() {
-    const t = this.searchText.toLowerCase().trim();
+  ngOnDestroy(): void {
+    if (this.unsubAuth) this.unsubAuth();
+    if (this.usersSub) this.usersSub.unsubscribe?.();
+  }
+
+  applyFilter() {
+    const t = this.searchText.trim().toLowerCase();
     if (!t) {
-      this.filtered = [...this.users];
+      this.filteredUsers = [...this.users];
       return;
     }
 
-    this.filtered = this.users.filter((u) => {
-      return (
-        (u.name || '').toLowerCase().includes(t) ||
-        (u.email || '').toLowerCase().includes(t) ||
-        (u.phone || '').toLowerCase().includes(t)
-      );
+    this.filteredUsers = this.users.filter(u => {
+      const name = (u.name || '').toLowerCase();
+      const email = (u.email || '').toLowerCase();
+      const phone = (u.phone || '').toLowerCase();
+      return name.includes(t) || email.includes(t) || phone.includes(t);
     });
   }
 
-  // ✅ DETAILS VIEW
-  openDetails(user: AppUser) {
-    this.selectedUser = user;
-  }
+async startChat(user: AppUser) {
+  if (!this.myUid || !user?.uid) return;
 
-  closeDetails() {
-    this.selectedUser = null;
-  }
+  const chatId = this.chatService.getChatId(this.myUid, user.uid);
 
-  // ✅ EDIT
-  openEdit(user: AppUser) {
-    this.editUser = { ...user };
-  }
+  // ✅ ensure chat exists
+  await this.chatService.ensureChat(chatId, [this.myUid, user.uid]);
 
-  closeEdit() {
-    this.editUser = null;
-  }
+  // ✅ open chats page AND auto-select this user
+  await this.router.navigate(['/app/chats'], {
+    queryParams: { uid: user.uid }
+  });
+}
 
-  async saveEdit() {
-    if (!this.editUser) return;
-
-    const { uid, name, email, phone } = this.editUser;
-    await this.userService.updateUser(uid, { name, email, phone });
-
-    alert('✅ User updated successfully!');
-    this.editUser = null;
-  }
-
-  // ✅ DELETE
-  async deleteUser(user: AppUser) {
-    if (!confirm(`Delete user: ${user.name}?`)) return;
-
-    await this.userService.deleteUser(user.uid);
-    alert('🗑️ User deleted successfully!');
-
-    // close panels if deleted user was open
-    if (this.selectedUser?.uid === user.uid) this.selectedUser = null;
-    if (this.editUser?.uid === user.uid) this.editUser = null;
-  }
 }

@@ -12,7 +12,7 @@ import { ProfileService, ProfileUser } from '../../core/services/profile.service
 
       <!-- LEFT PANEL (Telegram) -->
       <aside class="left">
-        <div class="avatar">{{ u.name?.[0] || 'U' }}</div>
+        <div class="avatar">{{ u.name[0] || 'U' }}</div>
 
         <div class="name">{{ u.name }}</div>
         <div class="phone">{{ u.phone || 'No phone' }}</div>

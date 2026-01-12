@@ -12,6 +12,8 @@ import { ProfileComponent } from './features/profile/profile.component';
 import { SettingsComponent } from './features/settings/settings.component';
 import { UsersComponent } from './features/users/users.component';
 import { ChatsComponent } from './features/chats/chats.component';
+import { ContactComponent } from './features/contact/contact.component';
+
 
 export const routes: Routes = [
   {
@@ -36,6 +38,8 @@ export const routes: Routes = [
       { path: 'users', component: UsersComponent },
       { path: 'profile', component: ProfileComponent },
       { path: 'settings', component: SettingsComponent },
+      { path: 'contact', component: ContactComponent },
+
     ],
   },
 

@@ -8,7 +8,9 @@ import {
   setDoc,
   updateDoc,
   deleteDoc,
-  serverTimestamp
+  serverTimestamp,
+  arrayUnion,
+  arrayRemove,
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
@@ -18,7 +20,9 @@ export interface AppUser {
   phone?: string;
   email?: string;
 
-  // optional meta
+  // ✅ block list (uids)
+  blocked?: string[];
+
   createdAt?: any;
   updatedAt?: any;
 }
@@ -39,11 +43,12 @@ export class UserService {
     return docData(ref, { idField: 'uid' }) as Observable<AppUser>;
   }
 
-  // ✅ CREATE USER (if you want admin to create new user manually)
+  // ✅ CREATE USER
   async createUser(user: AppUser) {
     const ref = doc(this.firestore, `users/${user.uid}`);
     return setDoc(ref, {
       ...user,
+      blocked: user.blocked ?? [],
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
@@ -62,5 +67,23 @@ export class UserService {
   async deleteUser(uid: string) {
     const ref = doc(this.firestore, `users/${uid}`);
     return deleteDoc(ref);
+  }
+
+  // ✅ BLOCK USER
+  async blockUser(myUid: string, targetUid: string) {
+    const ref = doc(this.firestore, `users/${myUid}`);
+    return updateDoc(ref, {
+      blocked: arrayUnion(targetUid),
+      updatedAt: serverTimestamp(),
+    });
+  }
+
+  // ✅ UNBLOCK USER
+  async unblockUser(myUid: string, targetUid: string) {
+    const ref = doc(this.firestore, `users/${myUid}`);
+    return updateDoc(ref, {
+      blocked: arrayRemove(targetUid),
+      updatedAt: serverTimestamp(),
+    });
   }
 }

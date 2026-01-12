@@ -12,6 +12,9 @@ import { RouterModule } from '@angular/router';
       <a routerLink="/app/chats" routerLinkActive="active">💬</a>
       <a routerLink="/app/profile" routerLinkActive="active">👤</a>
       <a routerLink="/app/settings" routerLinkActive="active">⚙</a>
+      <a routerLink="/app/contact" routerLinkActive="active">⚙</a>
+
+
 
       <div class="bottom">🚪</div>
     </div>
