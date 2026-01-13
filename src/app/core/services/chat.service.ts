@@ -15,82 +15,103 @@ import {
   getDocs,
   limit,
   increment,
-  deleteField
+  deleteField,
 } from '@angular/fire/firestore';
+
+import {
+  Storage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} from '@angular/fire/storage';
+
+export type ChatMessageType = 'text' | 'image' | 'file' | 'link';
 
 export interface ChatMessage {
   id?: string;
+
+  // ✅ base fields
+  type?: ChatMessageType;          // text/image/file/link
   text: string;
   senderId: string;
-  createdAt: any;
+  receiverId?: string;
 
+  createdAt: any;
   editedAt?: any;
+
   isDeleted?: boolean;
   deletedAt?: any;
+
+  // ✅ file fields (for image/file)
+  fileUrl?: string;
+  fileName?: string;
+  mimeType?: string;
+  fileSize?: number; // bytes
 }
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
-  constructor(private firestore: Firestore) {}
+  constructor(private firestore: Firestore, private storage: Storage) {}
 
   // ✅ stable chatId for 2 users
   getChatId(uid1: string, uid2: string): string {
     return [uid1, uid2].sort().join('_');
   }
 
+  // ✅ Create chat if missing + patch old chats
   async ensureChat(chatId: string, uids: string[]) {
-  const chatDoc = doc(this.firestore, `chats/${chatId}`);
-  const snap = await getDoc(chatDoc);
+    const chatDoc = doc(this.firestore, `chats/${chatId}`);
+    const snap = await getDoc(chatDoc);
 
-  if (!snap.exists()) {
-    await setDoc(chatDoc, {
-      users: uids,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
+    if (!snap.exists()) {
+      await setDoc(chatDoc, {
+        users: uids,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
 
-      lastMessage: '',
-      lastSenderId: '',
+        lastMessage: '',
+        lastSenderId: '',
+        lastMessageAt: serverTimestamp(),
 
-      unread: {
+        unread: {
+          [uids[0]]: 0,
+          [uids[1]]: 0,
+        },
+
+        muted: {},
+        pinned: {},
+      });
+      return;
+    }
+
+    // ✅ patch old chats WITHOUT touching updatedAt
+    const data: any = snap.data();
+
+    const patch: any = {};
+    if (!data?.muted) patch.muted = {};
+    if (!data?.pinned) patch.pinned = {};
+    if (!data?.unread) {
+      patch.unread = {
         [uids[0]]: 0,
         [uids[1]]: 0,
-      },
+      };
+    }
+    if (!data?.lastMessageAt) patch.lastMessageAt = serverTimestamp();
 
-      muted: {},
-      pinned: {},
-    });
-    return;
+    if (Object.keys(patch).length > 0) {
+      await updateDoc(chatDoc, patch);
+    }
   }
-
-  // ✅ patch old chats WITHOUT touching updatedAt
-  const data: any = snap.data();
-
-  const patch: any = {};
-  if (!data?.muted) patch.muted = {};
-  if (!data?.pinned) patch.pinned = {};
-  if (!data?.unread) {
-    patch.unread = {
-      [uids[0]]: 0,
-      [uids[1]]: 0,
-    };
-  }
-
-  // ✅ update only if required
-  if (Object.keys(patch).length > 0) {
-    await updateDoc(chatDoc, patch);
-  }
-}
-
 
   // ✅ realtime messages listener
   listenMessages(chatId: string, callback: (msgs: ChatMessage[]) => void) {
-    const ref = collection(this.firestore, `chats/${chatId}/messages`);
-    const q = query(ref, orderBy('createdAt', 'asc'));
+    const refCol = collection(this.firestore, `chats/${chatId}/messages`);
+    const q = query(refCol, orderBy('createdAt', 'asc'));
 
     return onSnapshot(q, (snap) => {
       const data = snap.docs.map((d) => ({
         id: d.id,
-        ...d.data(),
+        ...(d.data() as any),
       })) as ChatMessage[];
 
       callback(data);
@@ -127,16 +148,18 @@ export class ChatService {
     }
   }
 
-  // ✅ SEND message (updates unread + preview)
+  // ✅ SEND text message (updates unread + preview)
   async sendMessage(chatId: string, text: string, senderId: string, receiverId: string) {
-    const value = text.trim();
+    const value = (text || '').trim();
     if (!value) return;
 
     const msgRef = collection(this.firestore, `chats/${chatId}/messages`);
 
     await addDoc(msgRef, {
+      type: this.detectMessageType(value),
       text: value,
       senderId,
+      receiverId,
       createdAt: serverTimestamp(),
 
       editedAt: null,
@@ -150,26 +173,84 @@ export class ChatService {
       lastMessage: value,
       lastSenderId: senderId,
       updatedAt: serverTimestamp(),
+      lastMessageAt: serverTimestamp(),
 
       // ✅ increment unread for receiver
       [`unread.${receiverId}`]: increment(1),
     });
   }
 
+  // ✅ Upload file/photo and send message
+  async sendFileMessage(
+    chatId: string,
+    file: File,
+    senderId: string,
+    receiverId: string
+  ) {
+    if (!file) throw new Error('No file selected');
+
+    const isImage = (file.type || '').startsWith('image/');
+    const msgType: ChatMessageType = isImage ? 'image' : 'file';
+
+    // ✅ upload path
+    const safeName = (file.name || 'file').replace(/[^\w.\-]+/g, '_');
+    const path = `chat_uploads/${chatId}/${Date.now()}_${safeName}`;
+
+    const fileRef = ref(this.storage, path);
+
+    // ✅ upload to Firebase Storage
+    await uploadBytes(fileRef, file);
+
+    // ✅ get public url
+    const url = await getDownloadURL(fileRef);
+
+    const msgRef = collection(this.firestore, `chats/${chatId}/messages`);
+
+    // ✅ firestore msg
+    await addDoc(msgRef, {
+      type: msgType,
+      text: isImage ? '📷 Photo' : `📎 ${file.name}`,
+      senderId,
+      receiverId,
+
+      createdAt: serverTimestamp(),
+      editedAt: null,
+
+      isDeleted: false,
+      deletedAt: null,
+
+      fileUrl: url,
+      fileName: file.name,
+      mimeType: file.type || '',
+      fileSize: file.size || 0,
+    });
+
+    // ✅ update chat preview
+    const chatDoc = doc(this.firestore, `chats/${chatId}`);
+    await updateDoc(chatDoc, {
+      lastMessage: isImage ? '📷 Photo' : `📎 ${file.name}`,
+      lastSenderId: senderId,
+      updatedAt: serverTimestamp(),
+      lastMessageAt: serverTimestamp(),
+
+      [`unread.${receiverId}`]: increment(1),
+    });
+  }
+
   // ✅ helper: last message
   private async getLastMessage(chatId: string): Promise<ChatMessage | null> {
-    const ref = collection(this.firestore, `chats/${chatId}/messages`);
-    const q = query(ref, orderBy('createdAt', 'desc'), limit(1));
+    const refCol = collection(this.firestore, `chats/${chatId}/messages`);
+    const q = query(refCol, orderBy('createdAt', 'desc'), limit(1));
     const snap = await getDocs(q);
 
     if (snap.empty) return null;
     const d = snap.docs[0];
-    return { id: d.id, ...d.data() } as ChatMessage;
+    return { id: d.id, ...(d.data() as any) } as ChatMessage;
   }
 
-  // ✅ EDIT message
+  // ✅ EDIT message (text only)
   async editMessage(chatId: string, messageId: string, newText: string) {
-    const value = newText.trim();
+    const value = (newText || '').trim();
     if (!value) return;
 
     const msgDoc = doc(this.firestore, `chats/${chatId}/messages/${messageId}`);
@@ -186,6 +267,7 @@ export class ChatService {
         lastMessage: value,
         lastSenderId: last.senderId,
         updatedAt: serverTimestamp(),
+        lastMessageAt: serverTimestamp(),
       });
     } else {
       await updateDoc(chatDoc, { updatedAt: serverTimestamp() });
@@ -198,6 +280,12 @@ export class ChatService {
 
     await updateDoc(msgDoc, {
       text: 'This message was deleted',
+      type: 'text',
+      fileUrl: deleteField(),
+      fileName: deleteField(),
+      mimeType: deleteField(),
+      fileSize: deleteField(),
+
       isDeleted: true,
       deletedAt: serverTimestamp(),
     });
@@ -210,6 +298,7 @@ export class ChatService {
         lastMessage: 'This message was deleted',
         lastSenderId: last.senderId,
         updatedAt: serverTimestamp(),
+        lastMessageAt: serverTimestamp(),
       });
     } else {
       await updateDoc(chatDoc, { updatedAt: serverTimestamp() });
@@ -227,16 +316,22 @@ export class ChatService {
     );
 
     return onSnapshot(q, (snap) => {
-      let chats = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      let chats = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
 
       // ✅ pinned chats should come first
       chats = chats.sort((a: any, b: any) => {
         const ap = a?.pinned?.[myUid] ? 1 : 0;
         const bp = b?.pinned?.[myUid] ? 1 : 0;
-        return bp - ap; // pinned first
+        return bp - ap;
       });
 
       callback(chats);
     });
+  }
+
+  // ✅ detect links inside messages (for profile "Links tab")
+  private detectMessageType(text: string): ChatMessageType {
+    const hasUrl = /https?:\/\/[^\s]+/i.test(text);
+    return hasUrl ? 'link' : 'text';
   }
 }
