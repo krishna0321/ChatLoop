@@ -1,26 +1,29 @@
 import { bootstrapApplication } from '@angular/platform-browser';
+import { AppComponent } from './app/app.component';
+
 import { provideRouter } from '@angular/router';
+import { routes } from './app/app.routes';
 
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { provideAuth, getAuth } from '@angular/fire/auth';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+import { provideAuth, getAuth } from '@angular/fire/auth';
+import { provideStorage, getStorage } from '@angular/fire/storage';
 
-import { AppComponent } from './app/app.component';
-import { routes } from './app/app.routes';
-import { environment } from './environments/environment';
-
-import { ThemeService } from './app/core/services/theme.service';
-import { getStorage, provideStorage } from '@angular/fire/storage';
-
-const themeService = new ThemeService();
-themeService.initTheme();
-
+const firebaseConfig = {
+   apiKey: "AIzaSyAPF9vlJuj1GMrWZMTz1f1l1PgOYB_2JpU",
+    authDomain: "chatloop-e7f8e.firebaseapp.com",
+    projectId: "chatloop-e7f8e",
+    storageBucket: "chatloop-e7f8e.appspot.com",
+    messagingSenderId: "195312912930",
+    appId: "1:195312912930:web:e171a6e8afc3f5bb80187b"
+};
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(routes),
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideFirebaseApp(() => initializeApp(firebaseConfig)),
+    provideFirestore(() => getFirestore()),
     provideAuth(() => getAuth()),
-    provideFirestore(() => getFirestore()), provideFirebaseApp(() => initializeApp({"projectId":"chatloop-e7f8e","appId":"1:195312912930:web:e171a6e8afc3f5bb80187b","storageBucket":"chatloop-e7f8e.firebasestorage.app","apiKey":"AIzaSyAPF9vlJuj1GMrWZMTz1f1l1PgOYB_2JpU","authDomain":"chatloop-e7f8e.firebaseapp.com","messagingSenderId":"195312912930","measurementId":"G-BRNN63YSF8","projectNumber":"195312912930","version":"2"})), provideAuth(() => getAuth()), provideFirestore(() => getFirestore()), provideStorage(() => getStorage()),
+    provideStorage(() => getStorage()),
   ],
-}).catch(console.error);
+});
