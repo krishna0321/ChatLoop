@@ -1,43 +1,116 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router'; // ✅ add RouterModule
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   standalone: true,
   selector: 'app-register',
-  imports: [CommonModule, FormsModule, RouterModule],   // ✅ add RouterModule
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
-  email: string = '';
-  phone: string = '';
-  password: string = '';
-  confirmPassword: string = '';
-  error: string = '';
+  email = '';
+  phone = '';
+  password = '';
+  confirmPassword = '';
+
+  loading = false;
+  error = '';
+  success = '';
+
+  // ✅ field touch tracking (to show errors only after typing)
+  touched = {
+    email: false,
+    phone: false,
+    password: false,
+    confirmPassword: false
+  };
 
   constructor(private authService: AuthService, private router: Router) {}
 
-  register(): void {
-    if (!this.email || !this.phone || !this.password) {
-      this.error = 'Email, phone and password are required';
-      return;
-    }
+  private cleanPhone(p: string) {
+    return (p || '').replace(/\D/g, '');
+  }
 
-    if (this.password.length < 6) {
-      this.error = 'Password must be at least 6 characters';
-      return;
-    }
+  // ✅ validations
+  get emailError(): string {
+    const value = this.email.trim();
+    if (!this.touched.email) return '';
+    if (!value) return 'Email is required';
+    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    return ok ? '' : 'Enter a valid email address';
+  }
 
-    if (this.password !== this.confirmPassword) {
-      this.error = 'Passwords do not match';
-      return;
-    }
+  get phoneError(): string {
+    const value = this.cleanPhone(this.phone);
+    if (!this.touched.phone) return '';
+    if (!value) return 'Phone number is required';
+    if (value.length !== 10) return 'Phone must be 10 digits';
+    return '';
+  }
 
-    this.authService.register(this.email, this.password, this.phone)
-      .then(() => this.router.navigate(['/app']))
-      .catch((err: Error) => this.error = err.message);
+  get passwordError(): string {
+    if (!this.touched.password) return '';
+    if (!this.password) return 'Password is required';
+    if (this.password.length < 6) return 'Password must be at least 6 characters';
+    return '';
+  }
+
+  get confirmPasswordError(): string {
+    if (!this.touched.confirmPassword) return '';
+    if (!this.confirmPassword) return 'Confirm password is required';
+    if (this.password !== this.confirmPassword) return 'Passwords do not match';
+    return '';
+  }
+
+  // ✅ overall form validity
+  get formValid(): boolean {
+    const phoneDigits = this.cleanPhone(this.phone);
+
+    return (
+      this.email.trim().length > 0 &&
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email.trim()) &&
+      phoneDigits.length === 10 &&
+      this.password.length >= 6 &&
+      this.password === this.confirmPassword
+    );
+  }
+
+  async register() {
+    try {
+      this.error = '';
+      this.success = '';
+
+      // ✅ mark all as touched
+      this.touched.email = true;
+      this.touched.phone = true;
+      this.touched.password = true;
+      this.touched.confirmPassword = true;
+
+      if (!this.formValid) {
+        this.error = 'Please fix errors before submitting ❌';
+        return;
+      }
+
+      this.loading = true;
+
+      const phoneDigits = this.cleanPhone(this.phone);
+
+      await this.authService.register(
+        this.email.trim(),
+        this.password,
+        phoneDigits
+      );
+
+      this.success = 'Account created ✅';
+      this.router.navigate(['/app']);
+    } catch (err: any) {
+      this.error = err?.message || 'Register failed';
+    } finally {
+      this.loading = false;
+    }
   }
 }

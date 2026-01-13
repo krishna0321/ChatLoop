@@ -1,1 +1,182 @@
-<p>settings works!</p>
+<div class="settings-shell">
+
+  <!-- ✅ Mobile Tabs -->
+  <div class="mobile-tabs">
+    <button (click)="selectTab('profile')" [class.active]="activeTab==='profile'">👤</button>
+    <button (click)="selectTab('appearance')" [class.active]="activeTab==='appearance'">🎨</button>
+    <button (click)="selectTab('notifications')" [class.active]="activeTab==='notifications'">🔔</button>
+    <button (click)="selectTab('privacy')" [class.active]="activeTab==='privacy'">🛡️</button>
+    <button (click)="selectTab('account')" [class.active]="activeTab==='account'">🔐</button>
+  </div>
+
+  <!-- LEFT MENU (Desktop only) -->
+  <aside class="settings-nav">
+    <div class="nav-title">
+      <div class="nav-icon">⚙️</div>
+      <div>
+        <h2>Settings</h2>
+        <p>Chatloop preferences</p>
+      </div>
+    </div>
+
+    <button class="nav-item" [class.active]="activeTab==='profile'" (click)="selectTab('profile')">
+      <span class="emoji">👤</span> <span>Profile</span>
+    </button>
+
+    <button class="nav-item" [class.active]="activeTab==='appearance'" (click)="selectTab('appearance')">
+      <span class="emoji">🎨</span> <span>Appearance</span>
+    </button>
+
+    <button class="nav-item" [class.active]="activeTab==='notifications'" (click)="selectTab('notifications')">
+      <span class="emoji">🔔</span> <span>Notifications</span>
+    </button>
+
+    <button class="nav-item" [class.active]="activeTab==='privacy'" (click)="selectTab('privacy')">
+      <span class="emoji">🛡️</span> <span>Privacy</span>
+    </button>
+
+    <button class="nav-item" [class.active]="activeTab==='account'" (click)="selectTab('account')">
+      <span class="emoji">🔐</span> <span>Account</span>
+    </button>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="settings-main">
+    <div class="settings-header">
+      <div>
+        <h1>⚙️ Settings</h1>
+        <p>Manage your Chatloop preferences</p>
+      </div>
+
+      <button class="save-btn" (click)="save()" [disabled]="saving || loading || !hasChanges">
+        {{ saving ? 'Saving...' : (hasChanges ? 'Save ✅' : 'Saved ✅') }}
+      </button>
+    </div>
+
+    <div *ngIf="loading" class="loading">Loading settings...</div>
+
+    <div *ngIf="!loading" class="page">
+
+      <!-- PROFILE -->
+      <section class="card" *ngIf="activeTab==='profile'">
+        <h3>👤 Profile</h3>
+
+        <div class="avatar-row">
+          <div class="avatar">{{ (settings.name || 'U').slice(0,1) }}</div>
+          <div>
+            <div class="big">{{ settings.name || 'User' }}</div>
+            <div class="small">Chatloop Account</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Name</label>
+          <input [(ngModel)]="settings.name" (ngModelChange)="trackChanges()" placeholder="Enter your name" />
+        </div>
+
+        <div class="field">
+          <label>Bio</label>
+          <textarea [(ngModel)]="settings.bio" (ngModelChange)="trackChanges()" placeholder="Write something about you..."></textarea>
+        </div>
+
+        <div class="field">
+          <label>Phone</label>
+          <input [(ngModel)]="settings.phone" (ngModelChange)="trackChanges()" placeholder="Optional phone number" />
+        </div>
+      </section>
+
+      <!-- APPEARANCE -->
+      <section class="card" *ngIf="activeTab==='appearance'">
+        <h3>🎨 Appearance</h3>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-title">Dark Mode</div>
+            <div class="toggle-sub">Reduce eye strain</div>
+          </div>
+
+          <label class="switch">
+            <input type="checkbox" [(ngModel)]="settings.darkMode" (change)="applyTheme(); trackChanges()" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="preview-row">
+          <div class="preview dark"></div>
+          <div class="preview light"></div>
+        </div>
+      </section>
+
+      <!-- NOTIFICATIONS -->
+      <section class="card" *ngIf="activeTab==='notifications'">
+        <h3>🔔 Notifications</h3>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-title">Message Notifications</div>
+            <div class="toggle-sub">Show push alerts</div>
+          </div>
+
+          <label class="switch">
+            <input type="checkbox" [(ngModel)]="settings.notifyMessages" (change)="trackChanges()" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-title">Sound</div>
+            <div class="toggle-sub">Play sound on new message</div>
+          </div>
+
+          <label class="switch">
+            <input type="checkbox" [(ngModel)]="settings.notifySound" (change)="trackChanges()" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </section>
+
+      <!-- PRIVACY -->
+      <section class="card" *ngIf="activeTab==='privacy'">
+        <h3>🛡️ Privacy</h3>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-title">Show Online Status</div>
+            <div class="toggle-sub">Let others see when you're online</div>
+          </div>
+
+          <label class="switch">
+            <input type="checkbox" [(ngModel)]="settings.showOnlineStatus" (change)="trackChanges()" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-title">Allow Friend Requests</div>
+            <div class="toggle-sub">Allow new connections</div>
+          </div>
+
+          <label class="switch">
+            <input type="checkbox" [(ngModel)]="settings.allowFriendRequests" (change)="trackChanges()" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </section>
+
+      <!-- ACCOUNT -->
+      <section class="card danger" *ngIf="activeTab==='account'">
+        <h3>🔐 Account</h3>
+
+        <div class="action-row">
+          <button class="secondary" (click)="logout()">🚪 Logout</button>
+          <button class="danger-btn" (click)="deleteAccount()">🗑 Delete</button>
+        </div>
+
+        <p class="note">⚠ Delete account is permanent.</p>
+      </section>
+
+    </div>
+  </main>
+</div>

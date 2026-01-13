@@ -1,41 +1,189 @@
-<div class="chat-wrapper">
-
+<div class="chat-view" *ngIf="user" (click)="closeAllMenus()">
   <!-- HEADER -->
-  <header class="chat-header">
-    <div class="title">💬 Chatloop</div>
+  <header class="header" (click)="$event.stopPropagation()">
+    <div class="left" (click)="openProfileDrawer()">
+      <div class="avatar">{{ (user.name || 'U')[0] }}</div>
 
-    <div class="user-info">
-      <span>{{ authService.currentUser?.email }}</span>
-      <button (click)="logout()">Logout</button>
-    </div>
-  </header>
-
-  <!-- CHAT BODY -->
-  <div class="chat-body" #messageContainer>
-
-    <div
-      *ngFor="let m of messages"
-      class="message"
-      [class.mine]="m.sender === authService.currentUser?.email"
-    >
-      <div class="bubble">
-        <div class="sender" *ngIf="m.sender !== authService.currentUser?.email">
-          {{ m.sender }}
+      <div class="info">
+        <div class="title">{{ user.name || 'User' }}</div>
+        <div class="sub">
+          {{ user.phone || 'No phone' }}
+          <span *ngIf="isBlocked" class="pill danger">Blocked</span>
         </div>
-        <div class="text">{{ m.message }}</div>
       </div>
     </div>
 
+    <button class="iconBtn" (click)="toggleHeaderMenu($event)">⋮</button>
+
+    <div class="dropdown" *ngIf="showHeaderMenu" (click)="$event.stopPropagation()">
+      <button (click)="toggleMute()">
+        {{ isMuted ? '🔔 Unmute' : '🔕 Mute' }}
+      </button>
+      <button (click)="togglePin()">
+        {{ isPinned ? '📌 Unpin' : '📌 Pin' }}
+      </button>
+      <button class="danger" (click)="toggleBlock()">
+        {{ isBlocked ? '✅ Unblock' : '⛔ Block' }}
+      </button>
+    </div>
+  </header>
+
+  <!-- MESSAGES -->
+  <div class="messages" #messagesBox>
+    <div
+      *ngFor="let m of messages"
+      class="bubble"
+      [class.me]="m.senderId === myUid"
+      [class.deleted]="m.isDeleted"
+      (click)="openMsgMenu($event, m)"
+    >
+      <div class="text">
+        <ng-container *ngIf="!m.isDeleted; else deletedTpl">
+          {{ m.text }}
+        </ng-container>
+
+        <ng-template #deletedTpl>
+          <span class="deletedText">This message was deleted</span>
+        </ng-template>
+      </div>
+
+      <div class="meta" *ngIf="!m.isDeleted">
+        <span *ngIf="m.editedAt">edited</span>
+      </div>
+    </div>
   </div>
 
-  <!-- INPUT -->
-  <div class="input-bar">
+  <!-- MESSAGE MENU -->
+  <div
+    class="msgMenu"
+    *ngIf="menuMessageId"
+    [style.left.px]="menuX"
+    [style.top.px]="menuY"
+    (click)="$event.stopPropagation()"
+  >
+    <button (click)="clickEdit()">✏️ Edit</button>
+    <button class="danger" (click)="clickDelete()">🗑 Delete</button>
+  </div>
+
+  <!-- EDIT BAR -->
+  <div class="editBar" *ngIf="editingId" (click)="$event.stopPropagation()">
+    <div class="editTitle">Editing message</div>
+
+    <div class="editRow">
+      <input [(ngModel)]="editingText" placeholder="Edit message..." />
+      <button (click)="saveEdit()">Save</button>
+      <button class="ghost" (click)="cancelEdit()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- COMPOSER -->
+  <div class="composer" (click)="$event.stopPropagation()">
     <input
       [(ngModel)]="text"
-      placeholder="Type a message..."
-      (keyup.enter)="send()"
+      placeholder="Message..."
+      [disabled]="isBlocked"
+      (keydown.enter)="send()"
     />
-    <button (click)="send()">Send</button>
+    <button (click)="send()" [disabled]="isBlocked || !text.trim()">Send</button>
   </div>
 
+  <div class="blockedInfo" *ngIf="isBlocked">
+    You blocked this user. Unblock to send messages.
+  </div>
+
+  <!-- ✅ TELEGRAM PROFILE DRAWER -->
+  <div class="drawerBackdrop" *ngIf="showUserProfile" (click)="closeProfileDrawer()">
+    <div class="drawer" (click)="$event.stopPropagation()">
+      <!-- header photo -->
+      <div class="dHero">
+        <button class="dClose" (click)="closeProfileDrawer()">✖</button>
+
+        <div class="dAvatar">{{ (user.name || 'U')[0] }}</div>
+        <div class="dName">{{ user.name || 'User' }}</div>
+        <div class="dStatus">
+          {{ user.phone || user.email || 'No info' }}
+        </div>
+
+        <div class="dActions">
+          <button class="act" (click)="callUser()">📞</button>
+          <button class="act" (click)="videoCallUser()">🎥</button>
+          <button class="act" (click)="searchInChat()">🔍</button>
+          <button class="act" (click)="copyText(user.uid)">📋</button>
+        </div>
+      </div>
+
+      <!-- body -->
+      <div class="drawerBody">
+        <!-- Info Card -->
+        <div class="card">
+          <div class="row">
+            <span>Phone</span>
+            <b>{{ user.phone || '-' }}</b>
+          </div>
+          <div class="row">
+            <span>Bio</span>
+            <b>{{ user.bio || 'No bio' }}</b>
+          </div>
+          <div class="row">
+            <span>User ID</span>
+            <b class="mono">{{ user.uid }}</b>
+          </div>
+
+          <div class="btnRow">
+            <button class="btn ghost" (click)="copyText(profileLink)">🔗 Copy link</button>
+            <button class="btn ghost" (click)="copyText(user.uid)">📋 Copy UID</button>
+          </div>
+
+          <div class="btnRow">
+            <button class="btn primary" (click)="addToContacts()" [disabled]="isContact">
+              {{ isContact ? '✅ Added' : '➕ Add Contact' }}
+            </button>
+            <button class="btn danger" (click)="toggleBlock()">
+              {{ isBlocked ? '✅ Unblock' : '⛔ Block' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <button (click)="setTab('media')" [class.active]="profileTab==='media'">Media</button>
+          <button (click)="setTab('files')" [class.active]="profileTab==='files'">Files</button>
+          <button (click)="setTab('links')" [class.active]="profileTab==='links'">Links</button>
+        </div>
+
+        <!-- Tab content -->
+        <div class="tabContent" *ngIf="profileTab==='media'">
+          <div class="mediaGrid">
+            <img *ngFor="let img of sharedMedia" [src]="img" class="mediaImg" />
+          </div>
+        </div>
+
+        <div class="tabContent" *ngIf="profileTab==='files'">
+          <div class="file" *ngFor="let f of sharedFiles">
+            <div class="fileIcon">📄</div>
+            <div class="fileInfo">
+              <div class="fileName">{{ f.name }}</div>
+              <div class="fileSize">{{ f.size }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabContent" *ngIf="profileTab==='links'">
+          <a class="link" *ngFor="let l of sharedLinks" [href]="l.url" target="_blank">
+            🔗 {{ l.title }}
+          </a>
+        </div>
+
+        <!-- QR -->
+        <div class="card qrCard" *ngIf="qrDataUrl">
+          <div>
+            <div class="qrTitle">📷 QR Code</div>
+            <div class="qrSub">Scan to open Chatloop profile</div>
+            <div class="mono small">{{ profileLink }}</div>
+          </div>
+          <img class="qr" [src]="qrDataUrl" />
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

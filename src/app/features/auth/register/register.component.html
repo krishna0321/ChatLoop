@@ -1,37 +1,56 @@
-<div class="auth-container">
+<div class="register-container">
   <h2>Create Account</h2>
 
+  <div *ngIf="error" class="error">{{ error }}</div>
+  <div *ngIf="success" class="success">{{ success }}</div>
+
+  <!-- PHONE -->
+  <label class="label">Phone</label>
   <input
+    [(ngModel)]="phone"
+    (blur)="touched.phone = true"
+    type="text"
+    placeholder="Phone (10 digits)"
+  />
+  <div class="fieldError" *ngIf="phoneError">{{ phoneError }}</div>
+
+  <!-- EMAIL -->
+  <label class="label">Email</label>
+  <input
+    [(ngModel)]="email"
+    (blur)="touched.email = true"
     type="email"
     placeholder="Email"
-    [(ngModel)]="email"
   />
+  <div class="fieldError" *ngIf="emailError">{{ emailError }}</div>
 
-  <!-- ✅ PHONE INPUT ADDED -->
+  <!-- PASSWORD -->
+  <label class="label">Password</label>
   <input
-    type="tel"
-    placeholder="Phone Number"
-    [(ngModel)]="phone"
-  />
-
-  <input
-    type="password"
-    placeholder="Password"
     [(ngModel)]="password"
+    (blur)="touched.password = true"
+    type="password"
+    placeholder="Password (min 6)"
   />
+  <div class="fieldError" *ngIf="passwordError">{{ passwordError }}</div>
 
+  <!-- CONFIRM -->
+  <label class="label">Confirm Password</label>
   <input
+    [(ngModel)]="confirmPassword"
+    (blur)="touched.confirmPassword = true"
     type="password"
     placeholder="Confirm Password"
-    [(ngModel)]="confirmPassword"
   />
+  <div class="fieldError" *ngIf="confirmPasswordError">
+    {{ confirmPasswordError }}
+  </div>
 
-  <button (click)="register()">Register</button>
+  <button class="btn" (click)="register()" [disabled]="loading || !formValid">
+    {{ loading ? 'Creating...' : 'Register' }}
+  </button>
 
-  <p class="error" *ngIf="error">{{ error }}</p>
-
-  <p class="link">
-    Already have an account?
-    <a routerLink="/login">Login</a>
+  <p class="login-link">
+    Already have an account? <a routerLink="/login">Login</a>
   </p>
 </div>

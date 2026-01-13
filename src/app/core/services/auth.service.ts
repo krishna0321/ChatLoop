@@ -4,9 +4,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  UserCredential,
-  setPersistence,
-  browserLocalPersistence
+  UserCredential
 } from '@angular/fire/auth';
 
 import {
@@ -18,51 +16,34 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  constructor(private auth: Auth, private firestore: Firestore) {
-    // ✅ KEEP USER LOGGED IN (important)
-    setPersistence(this.auth, browserLocalPersistence);
-  }
+  constructor(private auth: Auth, private firestore: Firestore) {}
 
-  // ✅ Register + save phone in Firestore
-  async register(email: string, password: string, phone: string): Promise<UserCredential> {
+  // ✅ REGISTER (NO OTP)
+  async register(email: string, password: string, phoneDigits10: string): Promise<UserCredential> {
     const cred = await createUserWithEmailAndPassword(this.auth, email, password);
 
-    await this.saveUserToFirestore(cred.user.uid, email, phone);
-
-    return cred;
-  }
-
-  // ✅ Login + ensure user exists in Firestore
-  async login(email: string, password: string): Promise<UserCredential> {
-    const cred = await signInWithEmailAndPassword(this.auth, email, password);
-
-    // phone unknown in login, so don't overwrite
-    await this.saveUserToFirestore(cred.user.uid, email);
-
-    return cred;
-  }
-
-  logout() {
-    return signOut(this.auth);
-  }
-
-  // ✅ Creates/updates user doc in Firestore
-  private async saveUserToFirestore(uid: string, email: string, phone?: string) {
-    const ref = doc(this.firestore, `users/${uid}`);
-
-    return setDoc(
-      ref,
+    await setDoc(
+      doc(this.firestore, `users/${cred.user.uid}`),
       {
-        uid,
+        uid: cred.user.uid,
         email,
-        name: email.split('@')[0], // username
-        phone: phone ?? '',
-
-        // ✅ keep createdAt for first time only (merge true prevents overwrite)
+        phone: `+91${phoneDigits10}`, // store phone
         createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
       },
       { merge: true }
     );
+
+    return cred;
+  }
+
+  // ✅ LOGIN
+  async login(email: string, password: string): Promise<UserCredential> {
+    return await signInWithEmailAndPassword(this.auth, email, password);
+  }
+
+  // ✅ LOGOUT
+  logout() {
+    return signOut(this.auth);
   }
 }

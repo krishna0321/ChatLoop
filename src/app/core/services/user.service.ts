@@ -20,12 +20,14 @@ export interface AppUser {
   phone?: string;
   email?: string;
 
-  // ✅ block list (uids)
+  bio?: string;   // ✅ ADD THIS
+
   blocked?: string[];
 
   createdAt?: any;
   updatedAt?: any;
 }
+
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -45,17 +47,25 @@ export class UserService {
 
   // ✅ CREATE USER
   async createUser(user: AppUser) {
+    if (!user?.uid) return;
+
     const ref = doc(this.firestore, `users/${user.uid}`);
-    return setDoc(ref, {
-      ...user,
-      blocked: user.blocked ?? [],
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    });
+    return setDoc(
+      ref,
+      {
+        ...user,
+        blocked: user.blocked ?? [],
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
   }
 
   // ✅ UPDATE USER
   async updateUser(uid: string, data: Partial<AppUser>) {
+    if (!uid) return;
+
     const ref = doc(this.firestore, `users/${uid}`);
     return updateDoc(ref, {
       ...data,
@@ -65,12 +75,19 @@ export class UserService {
 
   // ✅ DELETE USER
   async deleteUser(uid: string) {
+    if (!uid) return;
+
     const ref = doc(this.firestore, `users/${uid}`);
     return deleteDoc(ref);
   }
 
-  // ✅ BLOCK USER
+  // ✅ BLOCK USER (BLOCK ONLY THAT ACCOUNT UID)
   async blockUser(myUid: string, targetUid: string) {
+    // ✅ validation (important fix)
+    if (!myUid || !targetUid) return;
+    if (myUid === targetUid) return; // cannot block yourself
+    if (targetUid.trim().length < 5) return; // safety
+
     const ref = doc(this.firestore, `users/${myUid}`);
     return updateDoc(ref, {
       blocked: arrayUnion(targetUid),
@@ -80,6 +97,9 @@ export class UserService {
 
   // ✅ UNBLOCK USER
   async unblockUser(myUid: string, targetUid: string) {
+    if (!myUid || !targetUid) return;
+    if (myUid === targetUid) return;
+
     const ref = doc(this.firestore, `users/${myUid}`);
     return updateDoc(ref, {
       blocked: arrayRemove(targetUid),

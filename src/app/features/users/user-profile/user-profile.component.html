@@ -1,0 +1,83 @@
+<div class="shell" *ngIf="!loading && user as u; else loadingTpl">
+  <!-- HEADER -->
+  <header class="topbar">
+    <button class="back" routerLink="/app/chats">⬅</button>
+
+    <div class="tinfo">
+      <div class="t1">{{ u.name || 'User' }}</div>
+      <div class="t2">{{ u.phone || u.email }}</div>
+    </div>
+
+    <div class="actions">
+      <button class="mini" (click)="copy(profileLink)">🔗</button>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <div class="content">
+    <!-- LEFT -->
+    <aside class="left">
+      <div class="avatar">{{ (u.name || 'U')[0] }}</div>
+
+      <div class="name">{{ u.name || 'User' }}</div>
+      <div class="sub">{{ u.bio || 'No bio available' }}</div>
+
+      <div class="chips">
+        <span class="chip mono">UID: {{ u.uid }}</span>
+        <span class="chip danger" *ngIf="isBlocked">Blocked</span>
+      </div>
+
+      <div class="buttons" *ngIf="!isMe">
+        <button class="btn primary" (click)="message()">💬 Message</button>
+        <button class="btn ghost" (click)="addToContacts()" [disabled]="isContact">
+          {{ isContact ? '✅ Added' : '➕ Add Contact' }}
+        </button>
+        <button class="btn danger" (click)="toggleBlock()">
+          {{ isBlocked ? '✅ Unblock' : '⛔ Block' }}
+        </button>
+      </div>
+
+      <div class="buttons" *ngIf="isMe">
+        <button class="btn primary" routerLink="/app/profile">👤 Edit My Profile</button>
+      </div>
+    </aside>
+
+    <!-- RIGHT -->
+    <main class="right">
+      <section class="card">
+        <h3>📌 Info</h3>
+
+        <div class="row">
+          <span>Phone</span>
+          <b>{{ u.phone || '-' }}</b>
+        </div>
+
+        <div class="row">
+          <span>Email</span>
+          <b>{{ u.email || '-' }}</b>
+        </div>
+
+        <div class="row">
+          <span>Share Link</span>
+          <b class="mono">{{ profileLink }}</b>
+        </div>
+
+        <button class="copyBtn" (click)="copy(profileLink)">📋 Copy link</button>
+      </section>
+
+      <section class="card qrCard">
+        <div class="qrText">
+          <h3>📷 QR Code</h3>
+          <p>Scan to open profile in Chatloop</p>
+          <div class="mono small">{{ profileLink }}</div>
+        </div>
+
+        <img class="qr" [src]="qrDataUrl" alt="QR code" />
+      </section>
+    </main>
+  </div>
+</div>
+
+<ng-template #loadingTpl>
+  <div class="loading">Loading profile...</div>
+</ng-template>

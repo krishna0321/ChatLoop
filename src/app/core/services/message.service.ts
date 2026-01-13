@@ -9,11 +9,13 @@ import {
   orderBy,
   collectionData,
   serverTimestamp,
-  deleteDoc
+  deleteDoc,
+  getDoc,
+  increment,
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
-export interface ChatMessage {
+export interface RoomMessage {
   id?: string;
   text: string;
   senderId: string;
@@ -24,53 +26,82 @@ export interface ChatMessage {
   deletedAt?: any;
 }
 
-
 @Injectable({ providedIn: 'root' })
 export class MessageService {
   constructor(private firestore: Firestore) {}
 
-  // ✅ READ messages realtime
-  getChatMessages(chatId: string): Observable<ChatMessage[]> {
-    const ref = collection(this.firestore, `messages/${chatId}/messages`);
+  getRoomMessages(roomId: string): Observable<RoomMessage[]> {
+    const ref = collection(this.firestore, `rooms/${roomId}/messages`);
     const q = query(ref, orderBy('createdAt', 'asc'));
-    return collectionData(q, { idField: 'id' }) as Observable<ChatMessage[]>;
+    return collectionData(q, { idField: 'id' }) as Observable<RoomMessage[]>;
   }
 
-  // ✅ SEND
-  async sendMessage(chatId: string, senderId: string, text: string) {
-    const ref = collection(this.firestore, `messages/${chatId}/messages`);
-    return addDoc(ref, {
-      text: text.trim(),
+  async sendRoomMessage(roomId: string, senderId: string, text: string) {
+    const value = text.trim();
+    if (!value) return;
+
+    // ✅ check channel rule
+    const roomDoc = doc(this.firestore, `rooms/${roomId}`);
+    const roomSnap = await getDoc(roomDoc);
+    if (!roomSnap.exists()) throw new Error('Room not found');
+
+    const room: any = roomSnap.data();
+    if (room?.type === 'channel') {
+      const admins: string[] = room?.admins || [];
+      if (!admins.includes(senderId)) {
+        throw new Error('Only admins can send messages in channel');
+      }
+    }
+
+    // ✅ add msg
+    const msgRef = collection(this.firestore, `rooms/${roomId}/messages`);
+    await addDoc(msgRef, {
+      text: value,
       senderId,
       createdAt: serverTimestamp(),
       isDeleted: false,
       deletedAt: null,
-      editedAt: null
+      editedAt: null,
+    });
+
+    // ✅ update preview + unread for other members
+    const members: string[] = room?.members || [];
+    const unreadPatch: any = {};
+    members.forEach((uid) => {
+      if (uid !== senderId) unreadPatch[`unread.${uid}`] = increment(1);
+    });
+
+    await updateDoc(roomDoc, {
+      lastMessage: value,
+      lastSenderId: senderId,
+      lastMessageAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      ...unreadPatch,
     });
   }
 
-  // ✅ EDIT
-  async editMessage(chatId: string, messageId: string, newText: string) {
-    const ref = doc(this.firestore, `messages/${chatId}/messages/${messageId}`);
+  async editRoomMessage(roomId: string, messageId: string, newText: string) {
+    const value = newText.trim();
+    if (!value) return;
+
+    const ref = doc(this.firestore, `rooms/${roomId}/messages/${messageId}`);
     return updateDoc(ref, {
-      text: newText.trim(),
-      editedAt: serverTimestamp()
+      text: value,
+      editedAt: serverTimestamp(),
     });
   }
 
-  // ✅ DELETE (Telegram style = soft delete)
-  async deleteMessage(chatId: string, messageId: string) {
-    const ref = doc(this.firestore, `messages/${chatId}/messages/${messageId}`);
+  async deleteRoomMessage(roomId: string, messageId: string) {
+    const ref = doc(this.firestore, `rooms/${roomId}/messages/${messageId}`);
     return updateDoc(ref, {
       text: 'This message was deleted',
       isDeleted: true,
-      deletedAt: serverTimestamp()
+      deletedAt: serverTimestamp(),
     });
   }
 
-  // ❌ HARD DELETE (optional)
-  async hardDeleteMessage(chatId: string, messageId: string) {
-    const ref = doc(this.firestore, `messages/${chatId}/messages/${messageId}`);
+  async hardDeleteRoomMessage(roomId: string, messageId: string) {
+    const ref = doc(this.firestore, `rooms/${roomId}/messages/${messageId}`);
     return deleteDoc(ref);
   }
 }

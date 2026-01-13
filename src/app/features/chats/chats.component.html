@@ -1,1 +1,99 @@
-<p>chats works!</p>
+<div class="layout" (click)="closeAll()">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar" [class.mobileHide]="!mobileListOpen" (click)="$event.stopPropagation()">
+
+    <div class="top">
+      <div class="logoRow">
+        <div class="logo">
+          <span class="logoDot"></span>
+          Chatloop
+        </div>
+        <div class="tag">Telegram UI</div>
+      </div>
+
+      <div class="searchWrap">
+        <span class="sIcon">🔍</span>
+        <input
+          class="search"
+          [(ngModel)]="searchText"
+          (input)="applyFilter()"
+          placeholder="Search chats..."
+        />
+      </div>
+    </div>
+
+    <div class="list">
+      <div
+        *ngFor="let c of filteredChats"
+        class="item"
+        [class.active]="selectedChatId === c.id"
+        (click)="openChat(c)"
+      >
+        <div class="avatar">{{ getChatName(c)[0] || 'U' }}</div>
+
+        <div class="info">
+          <div class="row">
+            <div class="name">{{ getChatName(c) }}</div>
+            <div class="time">{{ formatTime(c.updatedAt) }}</div>
+          </div>
+
+          <div class="row2">
+            <div class="preview">{{ getPreviewText(c) }}</div>
+
+            <div class="right">
+              <span *ngIf="isPinned(c)" class="icon">📌</span>
+              <span *ngIf="isMuted(c)" class="icon">🔕</span>
+
+              <div *ngIf="getUnread(c) > 0" class="badge">
+                {{ getUnread(c) }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="more" (click)="openMenu($event, c)">⋮</button>
+
+        <div class="dropdown" *ngIf="menuChatId === c.id" (click)="$event.stopPropagation()">
+          <button (click)="toggleMute(c)">
+            {{ isMuted(c) ? '🔔 Unmute' : '🔕 Mute' }}
+          </button>
+
+          <button (click)="togglePin(c)">
+            {{ isPinned(c) ? '📌 Unpin' : '📌 Pin' }}
+          </button>
+
+          <button class="danger" (click)="toggleBlock(c)">
+            {{ isBlockedChat(c) ? '✅ Unblock' : '⛔ Block' }}
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="filteredChats.length === 0" class="emptyLeft">
+        No chats found
+      </div>
+    </div>
+  </aside>
+
+  <!-- RIGHT CONTENT -->
+  <main class="content">
+    <ng-container *ngIf="selectedUser; else empty">
+      <!-- ✅ mobile top bar -->
+      <div class="mobileTopBar">
+        <button class="backBtn" (click)="backToList()">⬅</button>
+       <span class="mTitle">{{ selectedUser.name || 'Chat' }}</span>
+      </div>
+
+      <app-chat [user]="selectedUser"></app-chat>
+    </ng-container>
+
+    <ng-template #empty>
+      <div class="empty">
+        <div class="iconBig">💬</div>
+        <div class="t1">Select a chat</div>
+        <div class="t2">Choose from the left panel</div>
+      </div>
+    </ng-template>
+  </main>
+
+</div>

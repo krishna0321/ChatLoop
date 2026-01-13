@@ -1,1 +1,115 @@
-<p>profile works!</p>
+<div class="profile-shell" *ngIf="user as u">
+
+  <!-- ✅ TOP HEADER -->
+  <header class="profile-header">
+    <div class="header-left">
+      <h1>👤 Profile</h1>
+      <p>Your Telegram-style profile with QR sharing</p>
+    </div>
+
+    <button class="btn primary" (click)="toggleEdit()">
+      {{ editMode ? 'Close' : 'Edit Profile' }}
+    </button>
+  </header>
+
+  <!-- ✅ Toast -->
+  <div class="toast ok" *ngIf="msg">{{ msg }}</div>
+  <div class="toast err" *ngIf="err">{{ err }}</div>
+
+  <div class="layout">
+
+    <!-- LEFT CARD (Profile summary) -->
+    <aside class="side">
+      <div class="avatar">{{ (u.name || 'U')[0] }}</div>
+
+      <div class="name">{{ u.name || 'User' }}</div>
+      <div class="sub">{{ u.email }}</div>
+
+      <div class="chip-row">
+        <div class="chip">
+          <span class="dot"></span>
+          Active
+        </div>
+        <div class="chip mono" title="User ID">{{ (u.uid || '').slice(0, 10) }}...</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <button class="btn ghost" (click)="copyText(u.uid)">📋 Copy UID</button>
+      <button class="btn ghost" (click)="copyText(profileLink)">🔗 Copy Share Link</button>
+
+      <div class="divider"></div>
+
+      <div class="info">
+        <div class="row">
+          <span>Phone</span>
+          <b>{{ u.phone || '-' }}</b>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT CONTENT -->
+    <main class="main">
+
+      <!-- ✅ PROFILE DETAILS CARD -->
+      <section class="card">
+        <h3 class="card-title">📌 Profile details</h3>
+
+        <div class="row">
+          <span>Email</span>
+          <b>{{ u.email }}</b>
+        </div>
+
+        <div class="row">
+          <span>Phone</span>
+          <b>{{ u.phone || '-' }}</b>
+        </div>
+
+        <div class="row">
+          <span>User ID</span>
+          <b class="mono">{{ u.uid }}</b>
+        </div>
+      </section>
+
+      <!-- ✅ QR CARD -->
+      <section class="card qr-card">
+        <div class="qr-left">
+          <h3 class="card-title">📷 My QR Code</h3>
+          <p class="muted">Scan this to open my Chatloop profile.</p>
+
+          <div class="qr-link">
+            <span class="mono">{{ profileLink }}</span>
+            <button class="mini" (click)="copyText(profileLink)">Copy</button>
+          </div>
+        </div>
+
+        <div class="qr-right">
+          <img class="qr" [src]="qrDataUrl" alt="QR Code" />
+        </div>
+      </section>
+
+      <!-- ✅ EDIT CARD -->
+      <section class="card" *ngIf="editMode">
+        <h3 class="card-title">✏️ Edit Profile</h3>
+
+        <div class="form">
+          <div class="field">
+            <label>Name</label>
+            <input [(ngModel)]="form.name" placeholder="Enter name" />
+          </div>
+
+          <div class="field">
+            <label>Phone</label>
+            <input [(ngModel)]="form.phone" placeholder="Enter phone" />
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" (click)="save()">✅ Save</button>
+            <button class="btn ghost" (click)="reset(u)">↩ Reset</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>

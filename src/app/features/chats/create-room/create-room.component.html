@@ -1,0 +1,48 @@
+<div class="wrap">
+  <div class="card">
+
+    <!-- Header -->
+    <div class="head">
+      <div>
+        <h2>➕ Create Room</h2>
+        <p class="sub">Create Group / Channel like Telegram</p>
+      </div>
+
+      <a routerLink="/app/chats" class="back">⬅ Back</a>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button type="button" (click)="selectType('group')" [class.active]="type==='group'">
+        👥 Group
+        <span class="tiny">Chat together</span>
+      </button>
+
+      <button type="button" (click)="selectType('channel')" [class.active]="type==='channel'">
+        📢 Channel
+        <span class="tiny">Broadcast only</span>
+      </button>
+    </div>
+
+    <!-- Form -->
+    <div class="field">
+      <label>Name</label>
+      <input [(ngModel)]="name" placeholder="Example: Anime Lovers" />
+      <div class="help">{{ name.trim().length }}/30</div>
+    </div>
+
+    <div class="field">
+      <label>Description (optional)</label>
+      <textarea [(ngModel)]="description" placeholder="Short description..."></textarea>
+      <div class="help">{{ description.trim().length }}/120</div>
+    </div>
+
+    <button class="primary" (click)="create()" [disabled]="loading">
+      {{ loading ? 'Creating...' : '✅ Create Room' }}
+    </button>
+
+    <p class="ok" *ngIf="msg">{{ msg }}</p>
+    <p class="err" *ngIf="err">{{ err }}</p>
+
+  </div>
+</div>

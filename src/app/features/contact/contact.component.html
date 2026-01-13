@@ -1,1 +1,50 @@
-<p>contact works!</p>
+<!-- Header -->
+<div class="header">
+  <div>
+    <div class="title">Contacts</div>
+    <div class="subtitle">{{ filtered.length }} saved contacts</div>
+  </div>
+
+  <div class="header-actions">
+    <button class="btn ghost" (click)="openScanner()">📷 Scan QR</button>
+    <button class="btn primary" (click)="openAdd()">➕ Add</button>
+  </div>
+</div>
+
+<!-- ✅ QR Scanner Modal -->
+<div class="modal" *ngIf="showScanner" (click)="closeScanner()">
+  <div class="box scanner-box" (click)="$event.stopPropagation()">
+    <div class="mTitle">📷 Scan QR</div>
+    <div class="mSub">Scan Chatloop QR / URL</div>
+
+    <div class="scanner">
+      <div id="qr-reader"></div>
+    </div>
+
+    <div class="actions2">
+      <button class="btn ghost" (click)="closeScanner()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ SCAN RESULT -->
+<div class="modal" *ngIf="showScanResult" (click)="closeScanResult()">
+  <div class="box result-box" (click)="$event.stopPropagation()">
+    <div class="mTitle">✅ User Found</div>
+    <div class="mSub">Add friend or open chat</div>
+
+    <div class="result-user" *ngIf="scannedUser as u">
+      <div class="avatar">{{ (u.name || 'U')[0] }}</div>
+      <div class="meta">
+        <div class="name">{{ u.name || 'User' }}</div>
+        <div class="uid">UID: <span>{{ u.uid }}</span></div>
+      </div>
+    </div>
+
+    <div class="actions2">
+      <button class="btn ghost" (click)="closeScanResult()">Cancel</button>
+      <button class="btn ghost" (click)="addFriendFromScan()">➕ Add Friend</button>
+      <button class="btn primary" (click)="openChatFromScan()">💬 Open Chat</button>
+    </div>
+  </div>
+</div>

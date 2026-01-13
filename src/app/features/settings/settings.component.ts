@@ -1,61 +1,153 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
+
+import { Auth, onAuthStateChanged } from '@angular/fire/auth';
+import { signOut, deleteUser } from '@angular/fire/auth';
+
+import { Subscription } from 'rxjs';
+import { SettingsService, UserSettings } from '../../core/services/settings.service';
+
+type TabKey = 'profile' | 'appearance' | 'notifications' | 'privacy' | 'account';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule],
-  template: `
-    <div class="page">
-      <div class="card">
-        <h2>Settings ⚙️</h2>
-
-        <div class="item">
-          <div>
-            <b>Logout</b>
-            <div class="sub">Sign out of your account</div>
-          </div>
-          <button (click)="logout()">Logout</button>
-        </div>
-
-        <div class="note">
-          More settings like theme, notifications, privacy coming soon ✅
-        </div>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .page{height:100%;padding:18px;overflow:auto;color:#e5e7eb;}
-    .card{
-      max-width:520px;
-      background:rgba(15,23,42,0.75);
-      border:1px solid rgba(255,255,255,0.08);
-      border-radius:18px;
-      padding:16px;
-      backdrop-filter: blur(10px);
-    }
-    h2{margin:0 0 14px;font-size:18px;font-weight:900;}
-    .item{
-      display:flex;justify-content:space-between;align-items:center;
-      padding:14px;border-radius:16px;
-      background:rgba(2,6,23,0.45);
-      border:1px solid rgba(255,255,255,0.06);
-    }
-    .sub{opacity:.7;font-size:12px;margin-top:4px;}
-    button{
-      height:40px;padding:0 14px;border:none;border-radius:12px;
-      background:#ef4444;color:white;font-weight:900;cursor:pointer;
-    }
-    .note{margin-top:14px;opacity:.7;font-size:13px;}
-  `]
+  imports: [CommonModule, FormsModule],
+  templateUrl: './settings.component.html',
+  styleUrls: ['./settings.component.css'],
 })
-export class SettingsComponent {
-  constructor(private auth: AuthService, private router: Router) {}
+export class SettingsComponent implements OnInit, OnDestroy {
+  loading = true;
+  saving = false;
+
+  uid: string | null = null;
+
+  activeTab: TabKey = 'profile';
+
+  // ✅ toast
+  toastMsg = '';
+  toastVisible = false;
+
+  // ✅ track unsaved changes
+  hasChanges = false;
+  private originalSettings: UserSettings | null = null;
+
+  settings: UserSettings = {
+    uid: '',
+    name: '',
+    bio: '',
+    phone: '',
+    darkMode: true,
+    notifyMessages: true,
+    notifySound: true,
+    showOnlineStatus: true,
+    allowFriendRequests: true,
+  };
+
+  private sub?: Subscription;
+
+  constructor(
+    private auth: Auth,
+    private router: Router,
+    private settingsService: SettingsService
+  ) {}
+
+  ngOnInit() {
+    onAuthStateChanged(this.auth, async (user) => {
+      if (!user) {
+        this.router.navigate(['/login']);
+        return;
+      }
+
+      this.uid = user.uid;
+
+      await this.settingsService.createDefaultIfMissing(user.uid, user.email);
+
+      this.sub = this.settingsService.getSettings(user.uid).subscribe({
+        next: (data) => {
+          this.settings = { ...this.settings, ...data };
+          this.originalSettings = JSON.parse(JSON.stringify(this.settings));
+          this.hasChanges = false;
+          this.loading = false;
+
+          this.applyTheme();
+        },
+        error: (err) => {
+          console.error('❌ Firestore settings read failed:', err);
+          this.loading = false;
+          this.showToast("❌ Can't load settings. Check Firestore rules!");
+        },
+      });
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
+  }
+
+  selectTab(tab: TabKey) {
+    this.activeTab = tab;
+  }
+
+  // ✅ detect changes
+  trackChanges() {
+    if (!this.originalSettings) return;
+    this.hasChanges = JSON.stringify(this.settings) !== JSON.stringify(this.originalSettings);
+  }
+
+  applyTheme() {
+    const body = document.body;
+    if (this.settings.darkMode) body.classList.add('dark-mode');
+    else body.classList.remove('dark-mode');
+  }
+
+  showToast(msg: string) {
+    this.toastMsg = msg;
+    this.toastVisible = true;
+    setTimeout(() => (this.toastVisible = false), 2500);
+  }
+
+  async save() {
+    if (!this.uid) return;
+
+    this.saving = true;
+
+    try {
+      await this.settingsService.saveSettings(this.uid, this.settings);
+      this.originalSettings = JSON.parse(JSON.stringify(this.settings));
+      this.hasChanges = false;
+
+      this.applyTheme();
+      this.showToast('✅ Settings saved!');
+    } catch (err) {
+      console.error(err);
+      this.showToast('❌ Failed to save settings');
+    } finally {
+      this.saving = false;
+    }
+  }
 
   async logout() {
-    await this.auth.logout();
+    await signOut(this.auth);
     this.router.navigate(['/login']);
+  }
+
+  async deleteAccount() {
+    const user = this.auth.currentUser;
+    if (!user) return;
+
+    const ok = confirm('⚠ Are you sure you want to delete your account permanently?');
+    if (!ok) return;
+
+    try {
+      await deleteUser(user);
+      this.showToast('✅ Account deleted');
+      this.router.navigate(['/register']);
+    } catch (err) {
+      console.error(err);
+      this.showToast('❌ Delete failed. Logout + login again then try.');
+    }
   }
 }

@@ -8,14 +8,8 @@ import { RegisterComponent } from './features/auth/register/register.component';
 
 import { authGuard } from './core/guards/auth.guard';
 
-import { ProfileComponent } from './features/profile/profile.component';
-import { SettingsComponent } from './features/settings/settings.component';
-import { UsersComponent } from './features/users/users.component';
-import { ChatsComponent } from './features/chats/chats.component';
-import { ContactComponent } from './features/contact/contact.component';
-
-
 export const routes: Routes = [
+  // ✅ AUTH LAYOUT
   {
     path: '',
     component: AuthLayoutComponent,
@@ -26,22 +20,65 @@ export const routes: Routes = [
     ],
   },
 
+  // ✅ APP LAYOUT (Protected)
   {
     path: 'app',
     component: AppLayoutComponent,
     canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'chats', pathMatch: 'full' },
-      { path: 'chats', component: ChatsComponent },
 
-      { path: 'chats', component: ChatsComponent },
-      { path: 'users', component: UsersComponent },
-      { path: 'profile', component: ProfileComponent },
-      { path: 'settings', component: SettingsComponent },
-      { path: 'contact', component: ContactComponent },
+      // ✅ pages
+      {
+        path: 'chats',
+        loadComponent: () =>
+          import('./features/chats/chats.component').then((m) => m.ChatsComponent),
+      },
+      {
+        path: 'chat/:id',
+        loadComponent: () =>
+          import('./features/chat/chat-room/chat-room.component').then(
+            (m) => m.ChatRoomComponent
+          ),
+      },
+      {
+        path: 'create-room',
+        loadComponent: () =>
+          import('./features/chats/create-room/create-room.component').then(
+            (m) => m.CreateRoomComponent
+          ),
+      },
+      {
+        path: 'users',
+        loadComponent: () =>
+          import('./features/users/users.component').then((m) => m.UsersComponent),
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/profile/profile.component').then((m) => m.ProfileComponent),
+      },
+      {
+        path: 'settings',
+        loadComponent: () =>
+          import('./features/settings/settings.component').then((m) => m.SettingsComponent),
+      },
+      {
+        path: 'contact',
+        loadComponent: () =>
+          import('./features/contact/contact.component').then((m) => m.ContactComponent),
+      },
+      {
+  path: 'app/user/:uid',
+  loadComponent: () =>
+    import('./features/users/user-profile/user-profile.component').then(
+      (m) => m.UserProfileComponent
+    ),
+}
 
     ],
   },
 
+  // ✅ fallback
   { path: '**', redirectTo: 'login' },
 ];
