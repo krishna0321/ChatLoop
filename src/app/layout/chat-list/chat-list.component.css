@@ -5,6 +5,7 @@
   background: rgba(2,6,23,0.55);
   backdrop-filter: blur(12px);
   border-right: 1px solid rgba(255,255,255,0.06);
+  min-width: 0;
 }
 
 /* HEADER */
@@ -35,7 +36,8 @@
   opacity: .9;
 }
 
-.newBtn{
+/* ✅ header actions button style */
+.headerActions a{
   width:42px;
   height:42px;
   border-radius: 14px;
@@ -46,6 +48,10 @@
   color:white;
   font-weight: 950;
   box-shadow: 0 12px 30px rgba(37,99,235,0.22);
+  transition: .15s ease;
+}
+.headerActions a:hover{
+  transform: translateY(-1px);
 }
 
 /* LOADING */
@@ -125,6 +131,8 @@
   flex:1;
   overflow:auto;
   padding: 10px 10px 12px;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
 }
 
 .chatList::-webkit-scrollbar { width: 10px; }
@@ -143,6 +151,7 @@
   color:white;
   position:relative;
   transition: .15s ease;
+  min-width: 0;
 }
 
 .chatItem:hover{
@@ -159,6 +168,7 @@
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.10);
   font-size: 18px;
+  flex-shrink: 0;
 }
 
 .info{
@@ -171,6 +181,7 @@
   justify-content:space-between;
   gap: 10px;
   align-items:center;
+  min-width:0;
 }
 
 .title{
@@ -179,6 +190,7 @@
   white-space: nowrap;
   overflow:hidden;
   text-overflow: ellipsis;
+  min-width:0;
 }
 
 .subtitle{
@@ -199,6 +211,7 @@
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.06);
   opacity: .9;
+  flex-shrink: 0;
 }
 
 .type.group{
@@ -223,4 +236,58 @@
   font-size: 12px;
   display:grid;
   place-items:center;
+  flex-shrink: 0;
+}
+
+/* ✅ RESPONSIVE (Mobile + Tablet) */
+@media (max-width: 900px) {
+  .chatListWrap{
+    border-right: none;
+    width: 100%;
+  }
+
+  /* ✅ make list padding bigger for touch */
+  .chatList{
+    padding: 10px 10px 90px; /* ✅ important: space for bottom nav */
+  }
+
+  .chatItem{
+    border-radius: 16px;
+    padding: 12px 12px;
+  }
+
+  .avatar{
+    width:44px;
+    height:44px;
+    border-radius: 15px;
+  }
+}
+
+/* ✅ Very small mobile */
+@media (max-width: 420px){
+  .listHeader{
+    padding: 10px 12px;
+  }
+
+  .headerTitle{
+    font-size: 15px;
+  }
+
+  .chatItem{
+    gap: 10px;
+    padding: 11px 11px;
+  }
+
+  .title{
+    font-size: 13.5px;
+  }
+
+  .subtitle{
+    font-size: 12px;
+  }
+
+  .type{
+    font-size: 9px;
+    padding: 3px 8px;
+  }
 }

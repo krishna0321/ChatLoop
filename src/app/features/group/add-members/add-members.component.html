@@ -1,0 +1,27 @@
+<div class="wrap">
+  <div class="card">
+    <div class="head">
+      <h2>➕ Add Members</h2>
+      <a routerLink="/app/chats" class="back">⬅ Chats</a>
+    </div>
+
+    <input [(ngModel)]="search" (input)="apply()" placeholder="Search users..." />
+
+    <div class="list">
+      <button class="u" *ngFor="let u of filtered" (click)="toggle(u.uid)" [class.active]="isSelected(u.uid)">
+        <div class="av">{{ (u.name || u.email || 'U')[0] }}</div>
+        <div class="info">
+          <div class="n">{{ u.name || 'User' }}</div>
+          <div class="s">{{ u.phone || u.email }}</div>
+        </div>
+        <div class="c">{{ isSelected(u.uid) ? '✅' : '' }}</div>
+      </button>
+    </div>
+
+    <button class="primary" (click)="add()" [disabled]="loading">
+      {{ loading ? 'Adding...' : '✅ Add Selected' }}
+    </button>
+
+    <p class="err" *ngIf="err">{{ err }}</p>
+  </div>
+</div>

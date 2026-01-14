@@ -1,14 +1,63 @@
-<!-- Header -->
-<div class="header">
-  <div>
-    <div class="title">Contacts</div>
-    <div class="subtitle">{{ filtered.length }} saved contacts</div>
+<div class="contacts-panel">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <div class="title">Contacts</div>
+      <div class="subtitle">{{ filtered.length }} saved contacts</div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn ghost" (click)="openScanner()">📷 Scan QR</button>
+      <button class="btn primary" (click)="openAdd()">➕ Add</button>
+    </div>
   </div>
 
-  <div class="header-actions">
-    <button class="btn ghost" (click)="openScanner()">📷 Scan QR</button>
-    <button class="btn primary" (click)="openAdd()">➕ Add</button>
+  <!-- ✅ Search -->
+  <div class="search-wrap">
+    <div class="icon">🔍</div>
+
+    <input
+      class="search"
+      placeholder="Search contacts..."
+      [(ngModel)]="search"
+      (input)="applyFilter()"
+    />
   </div>
+
+  <!-- ✅ Contact List -->
+  <div class="list" *ngIf="filtered.length > 0; else emptyTpl">
+    <div class="item" *ngFor="let c of filtered">
+      <div class="avatar">{{ (c.name || 'C')[0] }}</div>
+
+      <div class="info">
+        <div class="name">{{ c.name || 'Unknown' }}</div>
+
+        <div class="sub">
+          <span>{{ c.phone || 'No phone' }}</span>
+          <span class="tag gray" *ngIf="c.uid">UID</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="chat-btn" (click)="openChatByUid(c.uid); $event.stopPropagation()" *ngIf="c.uid">
+          💬
+        </button>
+        <button class="icon-btn danger" (click)="removeContact(c); $event.stopPropagation()">
+          🗑
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty -->
+  <ng-template #emptyTpl>
+    <div class="empty">
+      <div class="empty-emoji">📞</div>
+      <div class="empty-title">No contacts found</div>
+      <div class="empty-sub">Add friends or scan QR to save contacts.</div>
+    </div>
+  </ng-template>
 </div>
 
 <!-- ✅ QR Scanner Modal -->

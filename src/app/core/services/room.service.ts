@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Auth } from '@angular/fire/auth';
 import {
   Firestore,
   collection,
@@ -9,13 +10,11 @@ import {
   query,
   where,
   orderBy,
-  collectionData,
   serverTimestamp,
   deleteField,
-  increment,
   setDoc,
 } from '@angular/fire/firestore';
-import { Auth } from '@angular/fire/auth';
+import { onSnapshot } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
 export type RoomType = 'dm' | 'group' | 'channel';
@@ -48,6 +47,9 @@ export interface Room {
 export class RoomService {
   constructor(private firestore: Firestore, private auth: Auth) {}
 
+  // ==========================
+  // DM rooms (optional)
+  // ==========================
   getDmRoomId(uid1: string, uid2: string) {
     return [uid1, uid2].sort().join('_');
   }
@@ -84,11 +86,15 @@ export class RoomService {
     return roomId;
   }
 
+  // ==========================
+  // CREATE GROUP / CHANNEL ✅
+  // ==========================
   async createRoom(data: Partial<Room>) {
     const myUid = this.auth.currentUser?.uid;
     if (!myUid) throw new Error('Not logged in');
 
     const roomsRef = collection(this.firestore, 'rooms');
+
     const members = Array.from(new Set([myUid, ...(data.members || [])]));
 
     const payload: Room = {
@@ -121,6 +127,25 @@ export class RoomService {
     return res.id;
   }
 
+  // ==========================
+  // LISTEN MY ROOMS ✅
+  // ==========================
+  listenMyRooms(myUid: string, callback: (rooms: any[]) => void) {
+    const roomsRef = collection(this.firestore, 'rooms');
+
+    const q = query(
+      roomsRef,
+      where('members', 'array-contains', myUid),
+      orderBy('updatedAt', 'desc')
+    );
+
+    return onSnapshot(q, (snap) => {
+      const rooms = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
+      callback(rooms);
+    });
+  }
+
+  // observable (if needed)
   myRooms$(): Observable<Room[]> {
     const uid = this.auth.currentUser?.uid;
     if (!uid) return new Observable((sub) => sub.next([]));
@@ -132,9 +157,46 @@ export class RoomService {
       orderBy('updatedAt', 'desc')
     );
 
-    return collectionData(q1, { idField: 'id' }) as Observable<Room[]>;
+    // you can use collectionData if you want
+    return new Observable((sub) => {
+      const unsub = onSnapshot(q1, (snap) => {
+        const rooms = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as any;
+        sub.next(rooms);
+      });
+      return () => unsub();
+    }) as any;
   }
 
+  // ==========================
+  // ✅ THIS IS THE MAIN FIX
+  // when any message is sent -> update room meta
+  // ==========================
+  async updateRoomMeta(roomId: string, senderId: string, text: string) {
+    const roomDoc = doc(this.firestore, `rooms/${roomId}`);
+    const snap = await getDoc(roomDoc);
+    if (!snap.exists()) return;
+
+    const room = snap.data() as any;
+    const members: string[] = room?.members || [];
+
+    const unreadUpdate: any = {};
+    members.forEach((uid) => {
+      if (uid === senderId) unreadUpdate[`unread.${uid}`] = 0;
+      else unreadUpdate[`unread.${uid}`] = (room?.unread?.[uid] || 0) + 1;
+    });
+
+    await updateDoc(roomDoc, {
+      lastMessage: text,
+      lastSenderId: senderId,
+      lastMessageAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      ...unreadUpdate,
+    });
+  }
+
+  // ==========================
+  // mark read
+  // ==========================
   async markAsRead(roomId: string, myUid: string) {
     const roomDoc = doc(this.firestore, `rooms/${roomId}`);
     await updateDoc(roomDoc, {
@@ -144,19 +206,13 @@ export class RoomService {
 
   async muteRoom(roomId: string, myUid: string, mute: boolean) {
     const roomDoc = doc(this.firestore, `rooms/${roomId}`);
-    if (mute) {
-      await updateDoc(roomDoc, { [`muted.${myUid}`]: true });
-    } else {
-      await updateDoc(roomDoc, { [`muted.${myUid}`]: deleteField() });
-    }
+    if (mute) await updateDoc(roomDoc, { [`muted.${myUid}`]: true });
+    else await updateDoc(roomDoc, { [`muted.${myUid}`]: deleteField() });
   }
 
   async pinRoom(roomId: string, myUid: string, pin: boolean) {
     const roomDoc = doc(this.firestore, `rooms/${roomId}`);
-    if (pin) {
-      await updateDoc(roomDoc, { [`pinned.${myUid}`]: true });
-    } else {
-      await updateDoc(roomDoc, { [`pinned.${myUid}`]: deleteField() });
-    }
+    if (pin) await updateDoc(roomDoc, { [`pinned.${myUid}`]: true });
+    else await updateDoc(roomDoc, { [`pinned.${myUid}`]: deleteField() });
   }
 }

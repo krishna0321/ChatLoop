@@ -2,7 +2,6 @@
 
   <!-- LEFT SIDEBAR -->
   <aside class="sidebar" [class.mobileHide]="!mobileListOpen" (click)="$event.stopPropagation()">
-
     <div class="top">
       <div class="logoRow">
         <div class="logo">
@@ -25,51 +24,47 @@
 
     <div class="list">
       <div
-        *ngFor="let c of filteredChats"
+        *ngFor="let r of filteredRooms"
         class="item"
-        [class.active]="selectedChatId === c.id"
-        (click)="openChat(c)"
+        [class.active]="selectedRoomId === r.id"
+        (click)="openRoom(r)"
       >
-        <div class="avatar">{{ getChatName(c)[0] || 'U' }}</div>
+        <div class="avatar">{{ (getRoomTitle(r)[0] || 'U') }}</div>
 
         <div class="info">
           <div class="row">
-            <div class="name">{{ getChatName(c) }}</div>
-            <div class="time">{{ formatTime(c.updatedAt) }}</div>
+            <div class="name">{{ getRoomTitle(r) }}</div>
+            <div class="time">{{ formatTime(r.updatedAt) }}</div>
           </div>
 
           <div class="row2">
-            <div class="preview">{{ getPreviewText(c) }}</div>
+            <div class="preview">{{ getPreviewText(r) }}</div>
 
             <div class="right">
-              <span *ngIf="isPinned(c)" class="icon">📌</span>
-              <span *ngIf="isMuted(c)" class="icon">🔕</span>
+              <span *ngIf="isPinned(r)" class="icon">📌</span>
+              <span *ngIf="isMuted(r)" class="icon">🔕</span>
 
-              <div *ngIf="getUnread(c) > 0" class="badge">
-                {{ getUnread(c) }}
+              <div *ngIf="getUnread(r) > 0" class="badge">
+                {{ getUnread(r) }}
               </div>
             </div>
           </div>
         </div>
 
-        <button class="more" (click)="openMenu($event, c)">⋮</button>
+        <button class="more" (click)="openMenu($event, r)">⋮</button>
 
-        <div class="dropdown" *ngIf="menuChatId === c.id" (click)="$event.stopPropagation()">
-          <button (click)="toggleMute(c)">
-            {{ isMuted(c) ? '🔔 Unmute' : '🔕 Mute' }}
+        <div class="dropdown" *ngIf="menuRoomId === r.id" (click)="$event.stopPropagation()">
+          <button (click)="toggleMute(r)">
+            {{ isMuted(r) ? '🔔 Unmute' : '🔕 Mute' }}
           </button>
 
-          <button (click)="togglePin(c)">
-            {{ isPinned(c) ? '📌 Unpin' : '📌 Pin' }}
-          </button>
-
-          <button class="danger" (click)="toggleBlock(c)">
-            {{ isBlockedChat(c) ? '✅ Unblock' : '⛔ Block' }}
+          <button (click)="togglePin(r)">
+            {{ isPinned(r) ? '📌 Unpin' : '📌 Pin' }}
           </button>
         </div>
       </div>
 
-      <div *ngIf="filteredChats.length === 0" class="emptyLeft">
+      <div *ngIf="filteredRooms.length === 0" class="emptyLeft">
         No chats found
       </div>
     </div>
@@ -77,23 +72,34 @@
 
   <!-- RIGHT CONTENT -->
   <main class="content">
-    <ng-container *ngIf="selectedUser; else empty">
-      <!-- ✅ mobile top bar -->
+    <!-- DM Chat -->
+    <ng-container *ngIf="selectedUser">
       <div class="mobileTopBar">
         <button class="backBtn" (click)="backToList()">⬅</button>
-       <span class="mTitle">{{ selectedUser.name || 'Chat' }}</span>
+        <span class="mTitle">{{ selectedUser.name || selectedUser.email || 'Chat' }}</span>
       </div>
 
       <app-chat [user]="selectedUser"></app-chat>
     </ng-container>
 
-    <ng-template #empty>
+    <!-- Room Chat -->
+    <ng-container *ngIf="selectedRoomId && !selectedUser">
+      <div class="mobileTopBar">
+        <button class="backBtn" (click)="backToList()">⬅</button>
+        <span class="mTitle">Room</span>
+      </div>
+
+      <app-chat-room [roomId]="selectedRoomId"></app-chat-room>
+    </ng-container>
+
+    <!-- Empty -->
+    <ng-container *ngIf="!selectedUser && !selectedRoomId">
       <div class="empty">
         <div class="iconBig">💬</div>
         <div class="t1">Select a chat</div>
         <div class="t2">Choose from the left panel</div>
       </div>
-    </ng-template>
+    </ng-container>
   </main>
 
 </div>

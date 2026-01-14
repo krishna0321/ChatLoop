@@ -28,12 +28,14 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'chats', pathMatch: 'full' },
 
-      // ✅ pages
+      // ✅ CHATS
       {
         path: 'chats',
         loadComponent: () =>
           import('./features/chats/chats.component').then((m) => m.ChatsComponent),
       },
+
+      // ✅ ROOM CHAT PAGE (optional direct route)
       {
         path: 'chat/:id',
         loadComponent: () =>
@@ -41,6 +43,8 @@ export const routes: Routes = [
             (m) => m.ChatRoomComponent
           ),
       },
+
+      // ✅ CREATE ROOM OLD PAGE
       {
         path: 'create-room',
         loadComponent: () =>
@@ -48,34 +52,63 @@ export const routes: Routes = [
             (m) => m.CreateRoomComponent
           ),
       },
+
+      // ✅ GROUP SYSTEM ✅✅✅
+     {
+  path: 'group/create',
+  loadComponent: () =>
+    import('./features/group/create-group/create-group.component')
+      .then(m => m.CreateGroupComponent),
+},
+{
+  path: 'group/:id',
+  loadComponent: () =>
+    import('./features/group/group-chat/group-chat.component')
+      .then(m => m.GroupChatComponent),
+},
+
+      // ✅ USERS
       {
         path: 'users',
         loadComponent: () =>
           import('./features/users/users.component').then((m) => m.UsersComponent),
       },
+
+      // ✅ USER PROFILE ✅ FIXED PATH
+      {
+        path: 'user/:uid',
+        loadComponent: () =>
+          import('./features/users/user-profile/user-profile.component').then(
+            (m) => m.UserProfileComponent
+          ),
+      },
+
+      // ✅ PROFILE
       {
         path: 'profile',
         loadComponent: () =>
-          import('./features/profile/profile.component').then((m) => m.ProfileComponent),
+          import('./features/profile/profile.component').then(
+            (m) => m.ProfileComponent
+          ),
       },
+
+      // ✅ SETTINGS
       {
         path: 'settings',
         loadComponent: () =>
-          import('./features/settings/settings.component').then((m) => m.SettingsComponent),
+          import('./features/settings/settings.component').then(
+            (m) => m.SettingsComponent
+          ),
       },
+
+      // ✅ CONTACT
       {
         path: 'contact',
         loadComponent: () =>
-          import('./features/contact/contact.component').then((m) => m.ContactComponent),
+          import('./features/contact/contact.component').then(
+            (m) => m.ContactComponent
+          ),
       },
-      {
-  path: 'app/user/:uid',
-  loadComponent: () =>
-    import('./features/users/user-profile/user-profile.component').then(
-      (m) => m.UserProfileComponent
-    ),
-}
-
     ],
   },
 

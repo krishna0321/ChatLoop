@@ -1,0 +1,104 @@
+<div class="chatWrap" *ngIf="room">
+  <!-- HEADER -->
+  <div class="topBar">
+    <button class="backBtn" routerLink="/app/chats">⬅</button>
+
+    <div class="center" (click)="openInfo()">
+      <div class="titleRow">
+        <div class="t">{{ room?.name || 'Group' }}</div>
+        <span class="badgeType" [class.channel]="room?.type==='channel'">
+          {{ room?.type || 'group' }}
+        </span>
+      </div>
+      <div class="sub">
+        👥 Members: {{ room?.members?.length || 0 }}
+      </div>
+    </div>
+
+    <button class="infoBtn" (click)="openInfo()">☰</button>
+  </div>
+
+  <!-- MESSAGES -->
+  <div class="msgArea" *ngIf="!loading">
+    <div
+      class="msg"
+      *ngFor="let m of messages"
+      [class.me]="m.senderId === me"
+      [class.deleted]="m.isDeleted"
+    >
+      <div class="bubble">
+        <div class="text">
+          {{ m.isDeleted ? 'This message was deleted' : m.text }}
+        </div>
+
+        <div class="meta">
+          <span *ngIf="m.editedAt">edited</span>
+
+          <button
+            *ngIf="m.senderId === me && !m.isDeleted"
+            class="del"
+            (click)="deleteMsg(m)"
+          >
+            delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="end"></div>
+  </div>
+
+  <div class="loading" *ngIf="loading">Loading messages...</div>
+
+  <!-- INPUT -->
+  <div class="inputBar">
+    <div class="locked" *ngIf="room?.type==='channel' && !canSend()">
+      🔒 Only admins can send messages
+    </div>
+
+    <div class="row">
+      <input
+        [(ngModel)]="text"
+        placeholder="Write a message..."
+        [disabled]="!canSend()"
+        (keyup.enter)="send()"
+      />
+      <button (click)="send()" [disabled]="!canSend()">➤</button>
+    </div>
+  </div>
+
+  <!-- ✅ TELEGRAM GROUP INFO DRAWER -->
+  <div class="drawerBackdrop" *ngIf="showInfo" (click)="closeInfo()">
+    <div class="drawer" (click)="$event.stopPropagation()">
+      <div class="drawerHead">
+        <div class="drawerTitle">{{ room?.name }}</div>
+        <button class="x" (click)="closeInfo()">✖</button>
+      </div>
+
+      <div class="drawerBody">
+        <div class="card">
+          <div class="row2">
+            <span>Type</span>
+            <b>{{ room?.type }}</b>
+          </div>
+          <div class="row2">
+            <span>Owner</span>
+            <b>{{ room?.ownerId }}</b>
+          </div>
+          <div class="row2">
+            <span>Members</span>
+            <b>{{ room?.members?.length || 0 }}</b>
+          </div>
+        </div>
+
+        <button class="primary" (click)="goAddMembers()" *ngIf="isAdmin()">
+          ➕ Add Members
+        </button>
+
+        <div class="hint">
+          ✅ Next: We will build member list + remove + make admin UI
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

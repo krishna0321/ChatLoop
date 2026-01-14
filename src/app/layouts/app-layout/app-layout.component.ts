@@ -13,40 +13,56 @@ import { LeftbarComponent } from '../../layout/leftbar/leftbar.component';
     LeftbarComponent
   ],
   template: `
-    <div class="app">
-      <!-- LEFT ICON BAR -->
+    <div class="appShell">
+      <!-- LEFT / BOTTOM BAR -->
       <app-leftbar></app-leftbar>
 
-      <!-- ✅ ROUTED PAGES HERE -->
-      <div class="content">
+      <!-- MAIN CONTENT -->
+      <div class="main">
         <router-outlet></router-outlet>
       </div>
     </div>
   `,
   styles: [`
-  :host{
-    display:block;
-    height:100vh;
-    width:100%;
-  }
+    :host{
+      display:block;
+      height:100vh;
+      width:100%;
+    }
 
-  .app {
-    display: flex;
-    height: 100vh;
-    width: 100%;
-    background: #020617;
-    color: white;
-    overflow: hidden;
-  }
+    /* ✅ Root shell */
+    .appShell{
+      display:flex;
+      height:100vh;
+      width:100%;
+      background:#020617;
+      color:white;
+      overflow:hidden;
+    }
 
-  .content {
-    flex: 1;
-    min-width: 0;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-  }
-`]
+    /* ✅ Main routed content */
+    .main{
+      flex:1;
+      min-width:0;
+      height:100vh;
+      overflow:auto; /* 🔥 VERY IMPORTANT */
+      display:flex;
+      flex-direction:column;
+    }
 
+    /* ===========================
+       📱 MOBILE FIX
+    ============================ */
+    @media (max-width: 900px){
+      .appShell{
+        flex-direction:column;
+      }
+
+      .main{
+        height: calc(100vh - 66px); /* bottom bar height */
+        padding-bottom: 0;
+      }
+    }
+  `]
 })
 export class AppLayoutComponent {}

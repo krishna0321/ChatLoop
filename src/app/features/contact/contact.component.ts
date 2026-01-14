@@ -271,4 +271,17 @@ closeAdd() {
     if (this.usersSub) this.usersSub.unsubscribe?.();
     this.closeScanner();
   }
+  async removeContact(c: Contact) {
+  const ok = confirm(`Delete contact "${c.name}" ?`);
+  if (!ok) return;
+
+  try {
+    await this.contactService.deleteContact(this.myUid, c.id!);
+    this.showToast('✅ Contact deleted', 'ok');
+  } catch (e) {
+    console.error(e);
+    this.showToast('❌ Delete failed', 'err');
+  }
+}
+
 }

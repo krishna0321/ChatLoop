@@ -37,7 +37,6 @@ export class CreateRoomComponent {
     if (!name) return 'Please enter group/channel name';
     if (name.length < 3) return 'Name must be at least 3 characters';
     if (name.length > 30) return 'Name must be max 30 characters';
-
     if (desc.length > 120) return 'Description must be max 120 characters';
 
     return '';
@@ -56,22 +55,18 @@ export class CreateRoomComponent {
     try {
       this.loading = true;
 
-      // ✅ IMPORTANT:
-      // Your RoomService.createRoom already uses auth.currentUser.uid as ownerId/admin
       const roomId = await this.rooms.createRoom({
         type: this.type,
         name: this.name.trim(),
         description: this.description.trim(),
-
-        // members optional: service already adds myUid automatically
         members: [],
       });
 
       this.msg = 'Created ✅';
 
-      // ✅ Go to chats list & open created room
-      this.router.navigate(['/app/chats'], { queryParams: { room: roomId } });
-      // If your route is different, change this line only
+      await this.router.navigate(['/app/chats'], {
+        queryParams: { room: roomId },
+      });
     } catch (e: any) {
       console.error(e);
       this.err = e?.message || 'Create failed';

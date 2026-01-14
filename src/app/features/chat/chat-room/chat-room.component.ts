@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
 import { Firestore, doc, docData } from '@angular/fire/firestore';
 import { Subscription } from 'rxjs';
@@ -17,7 +17,7 @@ import { RoomService } from '../../../core/services/room.service';
   styleUrls: ['./chat-room.component.css'],
 })
 export class ChatRoomComponent implements OnInit, OnDestroy {
-  roomId = '';
+  @Input() roomId = ''; // ✅ works with chats sidebar
   room: any = null;
 
   loading = true;
@@ -42,25 +42,27 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     this.me = user.uid;
 
-    this.roomId = this.route.snapshot.paramMap.get('id') || '';
+    // ✅ if opened by route
+    if (!this.roomId) {
+      this.roomId = this.route.snapshot.paramMap.get('id') || '';
+    }
     if (!this.roomId) return;
 
-    // ✅ listen room document
+    // ✅ listen room
     const roomDoc = doc(this.fs, `rooms/${this.roomId}`);
     const subRoom = docData(roomDoc, { idField: 'id' }).subscribe((data: any) => {
       this.room = data;
     });
     this.subs.push(subRoom);
 
-    // ✅ mark read
+    // ✅ read
     this.rooms.markAsRead(this.roomId, this.me);
 
-    // ✅ listen messages
+    // ✅ messages
     const subMsg = this.msg.getRoomMessages(this.roomId).subscribe((list) => {
-      this.messages = list;
+      this.messages = list || [];
       this.loading = false;
 
-      // auto scroll bottom
       setTimeout(() => {
         const el = document.getElementById('msgEnd');
         el?.scrollIntoView({ behavior: 'smooth' });
@@ -84,6 +86,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   async send() {
     const value = this.text.trim();
     if (!value) return;
+    if (!this.canSend()) return;
 
     try {
       await this.msg.sendRoomMessage(this.roomId, this.me, value);

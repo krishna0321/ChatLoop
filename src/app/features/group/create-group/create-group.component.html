@@ -1,0 +1,66 @@
+<div class="wrap">
+  <div class="card">
+    <div class="head">
+      <div>
+        <h2>➕ New {{ type === 'group' ? 'Group' : 'Channel' }}</h2>
+        <p class="sub">Telegram style room creation</p>
+      </div>
+      <a routerLink="/app/chats" class="back">⬅ Back</a>
+    </div>
+
+    <div class="tabs">
+      <button (click)="setType('group')" [class.active]="type==='group'">👥 Group</button>
+      <button (click)="setType('channel')" [class.active]="type==='channel'">📢 Channel</button>
+    </div>
+
+    <div class="field">
+      <label>Name</label>
+      <input [(ngModel)]="name" placeholder="Example: Anime Lovers" />
+      <div class="help">{{ name.trim().length }}/30</div>
+    </div>
+
+    <div class="field">
+      <label>Description</label>
+      <textarea [(ngModel)]="description" placeholder="Optional..."></textarea>
+      <div class="help">{{ description.trim().length }}/120</div>
+    </div>
+
+    <!-- members -->
+    <div class="members">
+      <div class="membersTop">
+        <b>Members</b>
+        <span class="count">{{ selected.size }} selected</span>
+      </div>
+
+      <div class="searchWrap">
+        <input [(ngModel)]="search" (input)="applyFilter()" placeholder="Search users..." />
+      </div>
+
+      <div class="list">
+        <button
+          class="user"
+          *ngFor="let u of filtered"
+          (click)="toggleUser(u.uid)"
+          [class.active]="isSelected(u.uid)"
+        >
+          <div class="avatar">{{ (u.name || u.email || 'U')[0] }}</div>
+          <div class="info">
+            <div class="name">{{ u.name || 'User' }}</div>
+            <div class="sub2">{{ u.phone || u.email }}</div>
+          </div>
+          <div class="check">{{ isSelected(u.uid) ? '✅' : '' }}</div>
+        </button>
+
+        <div class="empty" *ngIf="filtered.length===0">
+          No users found.
+        </div>
+      </div>
+    </div>
+
+    <button class="primary" (click)="create()" [disabled]="loading">
+      {{ loading ? 'Creating...' : '✅ Create' }}
+    </button>
+
+    <p class="err" *ngIf="err">{{ err }}</p>
+  </div>
+</div>
