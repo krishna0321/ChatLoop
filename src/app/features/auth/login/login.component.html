@@ -1,27 +1,132 @@
-<div class="auth-container">
-  <h2>Welcome back</h2>
-  <p class="subtitle">Login to continue to Chatloop</p>
+<div class="page">
+  <!-- Background -->
+  <div class="bg"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
 
-  <label>Email</label>
-  <input
-    type="email"
-    [(ngModel)]="email"
-    placeholder="you@example.com"
-  />
+  <div class="shell">
+    <!-- LEFT BRAND PANEL -->
+    <section class="brand">
+      <div class="logoRow">
+        <div class="logo">💬</div>
+        <div class="brandText">
+          <div class="name">Chatloop</div>
+          <div class="tag">Secure • Fast • Modern</div>
+        </div>
+      </div>
 
-  <label>Password</label>
-  <input
-    type="password"
-    [(ngModel)]="password"
-    placeholder="Enter your password"
-  />
+      <h1>Welcome back 👋</h1>
+      <p class="desc">
+        Continue your chats with a premium experience. Built with Firebase, designed like a modern messenger.
+      </p>
 
-  <button (click)="login()">Login</button>
+      <div class="features">
+        <div class="f">⚡ Instant messaging experience</div>
+        <div class="f">🔐 Secure login with Firebase</div>
+        <div class="f">📱 Works on mobile & desktop</div>
+      </div>
 
-  <p class="error" *ngIf="error">{{ error }}</p>
+      <div class="stats">
+        <div class="stat">
+          <b>100%</b>
+          <span>Realtime</span>
+        </div>
+        <div class="stat">
+          <b>24/7</b>
+          <span>Always online</span>
+        </div>
+        <div class="stat">
+          <b>Pro</b>
+          <span>UI design</span>
+        </div>
+      </div>
+    </section>
 
-  <p class="link">
-    Don’t have an account?
-    <a routerLink="/register">Create one</a>
-  </p>
+    <!-- RIGHT FORM CARD -->
+    <section class="formWrap">
+      <div class="card">
+        <div class="top">
+          <div class="app">
+            <div class="appIcon">✨</div>
+            <div class="appText">
+              <div class="appName">Sign In</div>
+              <div class="appSub">Enter your credentials to continue</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Social -->
+        <div class="social">
+          <button class="socialBtn google" type="button" (click)="loginGoogle()">G Continue with Google</button>
+          <button class="socialBtn github" type="button" (click)="loginGithub()">🐙 Continue with GitHub</button>
+        </div>
+
+        <div class="divider"><span>or</span></div>
+
+        <!-- FORM -->
+        <div class="form">
+          <label>Email</label>
+          <div class="inputWrap">
+            <span class="ico">✉️</span>
+            <input
+              type="email"
+              [(ngModel)]="email"
+              placeholder="you@example.com"
+              autocomplete="email"
+            />
+          </div>
+
+          <label>Password</label>
+          <div class="inputWrap">
+            <span class="ico">🔒</span>
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              [(ngModel)]="password"
+              placeholder="Enter password"
+              autocomplete="current-password"
+            />
+            <button
+              type="button"
+              class="eyeBtn"
+              (click)="toggleShowPassword()"
+              title="Show password"
+            >
+              {{ showPassword ? '🙈' : '👁️' }}
+            </button>
+          </div>
+
+          <!-- remember + forgot -->
+          <div class="rowTools">
+            <label class="remember">
+              <input type="checkbox" [(ngModel)]="remember" />
+              Remember me
+            </label>
+
+            <button class="forgot" type="button" (click)="forgotPassword()">
+              Forgot password?
+            </button>
+          </div>
+
+          <button class="primary" (click)="login()" [disabled]="loading">
+            <span class="spinner" *ngIf="loading"></span>
+            {{ loading ? 'Signing in...' : 'Sign In' }}
+          </button>
+
+          <p class="error" *ngIf="error">{{ error }}</p>
+
+          <p class="link">
+            Don’t have an account?
+            <a routerLink="/register">Create account</a>
+          </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+          <span>🔐 Secure Login</span>
+          <span class="dot">•</span>
+          <span>Firebase Auth</span>
+        </div>
+      </div>
+    </section>
+  </div>
 </div>

@@ -1,56 +1,118 @@
-<div class="register-container">
-  <h2>Create Account</h2>
+<div class="page">
+  <!-- Animated background orbs -->
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
 
-  <div *ngIf="error" class="error">{{ error }}</div>
-  <div *ngIf="success" class="success">{{ success }}</div>
+  <!-- LEFT -->
+  <section class="brand">
+    <div class="badge">✨</div>
+    <h1>Start chatting smarter</h1>
+    <p>
+      Secure. Fast. Built for real conversations — not noise.
+    </p>
 
-  <!-- PHONE -->
-  <label class="label">Phone</label>
-  <input
-    [(ngModel)]="phone"
-    (blur)="touched.phone = true"
-    type="text"
-    placeholder="Phone (10 digits)"
-  />
-  <div class="fieldError" *ngIf="phoneError">{{ phoneError }}</div>
+    <div class="features">
+      <div>⚡ Instant messaging</div>
+      <div>🔐 End-to-end mindset</div>
+      <div>📱 Mobile & desktop ready</div>
+    </div>
+  </section>
 
-  <!-- EMAIL -->
-  <label class="label">Email</label>
-  <input
-    [(ngModel)]="email"
-    (blur)="touched.email = true"
-    type="email"
-    placeholder="Email"
-  />
-  <div class="fieldError" *ngIf="emailError">{{ emailError }}</div>
+  <!-- RIGHT -->
+  <section class="formWrap">
+    <div class="card fadeIn">
+      <h2>Create account</h2>
+      <p class="sub">Join thousands chatting smarter</p>
 
-  <!-- PASSWORD -->
-  <label class="label">Password</label>
-  <input
-    [(ngModel)]="password"
-    (blur)="touched.password = true"
-    type="password"
-    placeholder="Password (min 6)"
-  />
-  <div class="fieldError" *ngIf="passwordError">{{ passwordError }}</div>
+      <div *ngIf="error" class="error">{{ error }}</div>
 
-  <!-- CONFIRM -->
-  <label class="label">Confirm Password</label>
-  <input
-    [(ngModel)]="confirmPassword"
-    (blur)="touched.confirmPassword = true"
-    type="password"
-    placeholder="Confirm Password"
-  />
-  <div class="fieldError" *ngIf="confirmPasswordError">
-    {{ confirmPasswordError }}
-  </div>
+      <!-- Social login -->
+      <div class="social">
+        <button class="socialBtn google">G Continue with Google</button>
+        <button class="socialBtn github">🐙 Continue with GitHub</button>
+      </div>
 
-  <button class="btn" (click)="register()" [disabled]="loading || !formValid">
-    {{ loading ? 'Creating...' : 'Register' }}
-  </button>
+      <div class="divider"><span>or</span></div>
 
-  <p class="login-link">
-    Already have an account? <a routerLink="/login">Login</a>
-  </p>
+      <!-- Phone -->
+      <div class="field">
+        <select class="code">
+          <option>+91</option>
+          <option>+1</option>
+          <option>+44</option>
+        </select>
+
+        <input [(ngModel)]="phone" placeholder=" " type="text" />
+        <label>Phone number</label>
+      </div>
+
+      <!-- Email -->
+      <div class="field">
+        <input [(ngModel)]="email" placeholder=" " type="email" />
+        <label>Email address</label>
+      </div>
+
+      <!-- Password -->
+      <div class="field">
+        <input
+          [(ngModel)]="password"
+          placeholder=" "
+          [type]="showPass ? 'text' : 'password'"
+        />
+        <label>Password</label>
+        <button class="eye" (click)="showPass = !showPass">
+          {{ showPass ? '🙈' : '👁️' }}
+        </button>
+      </div>
+
+     <!-- Password rules -->
+     <div class="rules">
+        <span [class.ok]="hasMinLength">• 6+ characters</span>
+        <span [class.ok]="hasNumber">• Number</span>
+        <span [class.ok]="hasUppercase">• Uppercase</span>
+        <span [class.ok]="hasLowercase">• Lowercase</span>
+     </div>
+    <!-- Strength -->
+     <div class="strength">
+     <div class="bar">
+        <span [style.width.%]="strength * 25"></span>
+     </div>
+        <small small>{{ strengthLabel }}</small>
+     </div>
+
+
+      <!-- Confirm -->
+      <div class="field">
+        <input
+          [(ngModel)]="confirmPassword"
+          placeholder=" "
+          [type]="showConfirm ? 'text' : 'password'"
+        />
+        <label>Confirm password</label>
+        <button class="eye" (click)="showConfirm = !showConfirm">
+          {{ showConfirm ? '🙈' : '👁️' }}
+        </button>
+      </div>
+
+      <!-- Terms -->
+      <label class="terms">
+        <input type="checkbox" />
+        I agree to the <b>Terms</b> & <b>Privacy Policy</b>
+      </label>
+
+      <button
+        class="submit"
+        [disabled]="!formValid || loading"
+        (click)="register()"
+      >
+        <span *ngIf="!loading">Create account</span>
+        <span *ngIf="loading" class="loader"></span>
+      </button>
+
+      <p class="login">
+        Already have an account?
+        <a routerLink="/login">Sign in</a>
+      </p>
+    </div>
+  </section>
 </div>
