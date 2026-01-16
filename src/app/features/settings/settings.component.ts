@@ -23,14 +23,13 @@ export class SettingsComponent implements OnInit, OnDestroy {
   saving = false;
 
   uid: string | null = null;
-
   activeTab: TabKey = 'profile';
 
-  // ✅ toast
+  // toast
   toastMsg = '';
   toastVisible = false;
 
-  // ✅ track unsaved changes
+  // detect unsaved changes
   hasChanges = false;
   private originalSettings: UserSettings | null = null;
 
@@ -63,15 +62,23 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
       this.uid = user.uid;
 
-      await this.settingsService.createDefaultIfMissing(user.uid, user.email);
+      try {
+        // ✅ Create default doc if missing
+        await this.settingsService.createDefaultIfMissing(user.uid, user.email || '');
+      } catch (err) {
+        console.error('❌ Default settings create error:', err);
+      }
 
       this.sub = this.settingsService.getSettings(user.uid).subscribe({
         next: (data) => {
-          this.settings = { ...this.settings, ...data };
-          this.originalSettings = JSON.parse(JSON.stringify(this.settings));
-          this.hasChanges = false;
-          this.loading = false;
+          // ✅ Merge + keep UI defaults
+          this.settings = { ...this.settings, ...data, uid: user.uid };
 
+          // ✅ clone for comparison
+          this.originalSettings = structuredClone(this.settings);
+          this.hasChanges = false;
+
+          this.loading = false;
           this.applyTheme();
         },
         error: (err) => {
@@ -91,10 +98,12 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.activeTab = tab;
   }
 
-  // ✅ detect changes
+  // ✅ runs every time user changes something
   trackChanges() {
     if (!this.originalSettings) return;
-    this.hasChanges = JSON.stringify(this.settings) !== JSON.stringify(this.originalSettings);
+
+    this.hasChanges =
+      JSON.stringify(this.settings) !== JSON.stringify(this.originalSettings);
   }
 
   applyTheme() {
@@ -106,23 +115,26 @@ export class SettingsComponent implements OnInit, OnDestroy {
   showToast(msg: string) {
     this.toastMsg = msg;
     this.toastVisible = true;
-    setTimeout(() => (this.toastVisible = false), 2500);
+
+    setTimeout(() => {
+      this.toastVisible = false;
+    }, 2500);
   }
 
   async save() {
     if (!this.uid) return;
 
     this.saving = true;
-
     try {
       await this.settingsService.saveSettings(this.uid, this.settings);
-      this.originalSettings = JSON.parse(JSON.stringify(this.settings));
+
+      this.originalSettings = structuredClone(this.settings);
       this.hasChanges = false;
 
       this.applyTheme();
       this.showToast('✅ Settings saved!');
     } catch (err) {
-      console.error(err);
+      console.error('❌ save error:', err);
       this.showToast('❌ Failed to save settings');
     } finally {
       this.saving = false;
@@ -146,7 +158,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
       this.showToast('✅ Account deleted');
       this.router.navigate(['/register']);
     } catch (err) {
-      console.error(err);
+      console.error('❌ delete error:', err);
       this.showToast('❌ Delete failed. Logout + login again then try.');
     }
   }

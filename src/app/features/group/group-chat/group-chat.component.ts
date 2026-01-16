@@ -1,124 +1,84 @@
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { RoomService } from '../../../core/services/room.service'; // Adjust path!!
 import { Auth } from '@angular/fire/auth';
-import { Firestore, doc, docData, updateDoc, arrayUnion, arrayRemove } from '@angular/fire/firestore';
-import { Subscription } from 'rxjs';
-
-import { MessageService, RoomMessage } from '../../../core/services/message.service';
-import { RoomService } from '../../../core/services/room.service';
-import { UserService, AppUser } from '../../../core/services/user.service';
 
 @Component({
   selector: 'app-group-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './group-chat.component.html',
-  styleUrls: ['./group-chat.component.css'],
+  styleUrls: ['./group-chat.component.scss'],
 })
 export class GroupChatComponent implements OnInit, OnDestroy {
-  id = '';
+
+  roomId: string | null = null;
   room: any = null;
+  loading: boolean = true;
+  messages: any[] = [];
+  err: string = '';
+  text: string = '';
+  myUid: string = '';
 
-  me = '';
-  myUser: AppUser | null = null;
-
-  loading = true;
-  messages: RoomMessage[] = [];
-  text = '';
-
-  showInfo = false;
-
-  private subs: Subscription[] = [];
+  private unsubRoom!: () => void;
+  private unsubMsgs!: () => void;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private auth: Auth,
-    private fs: Firestore,
-    private msg: MessageService,
-    private rooms: RoomService,
-    private users: UserService
+    private roomService: RoomService,
+    private auth: Auth
   ) {}
 
-  ngOnInit(): void {
-    const u = this.auth.currentUser;
-    if (!u) return;
+  ngOnInit() {
+    this.myUid = this.auth.currentUser?.uid || '';
+    this.roomId = this.route.snapshot.paramMap.get('id');
 
-    this.me = u.uid;
-    this.id = this.route.snapshot.paramMap.get('id') || '';
-    if (!this.id) return;
+    if (!this.roomId) {
+      this.err = 'Invalid group ID';
+      return;
+    }
 
-    // my profile
-    this.subs.push(
-      this.users.getUser(this.me).subscribe((me) => (this.myUser = me))
-    );
+    // listen to room changes
+    this.unsubRoom = this.roomService.listenRoom(this.roomId, (room) => {
+      this.room = room;
+      this.loading = false;
+      if (!room) this.err = 'Group not found';
+    });
 
-    // room doc
-    const roomRef = doc(this.fs, `rooms/${this.id}`);
-    this.subs.push(
-      docData(roomRef, { idField: 'id' }).subscribe((d: any) => {
-        this.room = d;
-      })
-    );
-
-    // mark read
-    this.rooms.markAsRead(this.id, this.me);
-
-    // messages
-    this.subs.push(
-      this.msg.getRoomMessages(this.id).subscribe((list) => {
-        this.messages = list || [];
-        this.loading = false;
-        setTimeout(() => document.getElementById('end')?.scrollIntoView({ behavior: 'smooth' }), 40);
-      })
-    );
+    // listen to messages
+    this.unsubMsgs = this.roomService.listenRoomMessages(this.roomId, (msgs) => {
+      this.messages = msgs;
+    });
   }
 
-  ngOnDestroy(): void {
-    this.subs.forEach((s) => s.unsubscribe());
+  ngOnDestroy() {
+    if (this.unsubRoom) this.unsubRoom();
+    if (this.unsubMsgs) this.unsubMsgs();
   }
 
-  isOwner(): boolean {
-    return this.room?.ownerId === this.me;
-  }
+  send() {
+    if (!this.text.trim()) return;
 
-  isAdmin(): boolean {
-    const admins = this.room?.admins || [];
-    return admins.includes(this.me);
-  }
+    this.roomService.sendRoomMessage(this.roomId!, {
+      text: this.text,
+      senderId: this.myUid,
+    });
 
-  canSend(): boolean {
-    if (!this.room) return true;
-    if (this.room.type !== 'channel') return true;
-    return this.isAdmin();
-  }
-
-  async send() {
-    const v = this.text.trim();
-    if (!v) return;
-    if (!this.canSend()) return;
-
-    await this.msg.sendRoomMessage(this.id, this.me, v);
     this.text = '';
   }
 
-  async deleteMsg(m: RoomMessage) {
-    if (!m?.id) return;
-    if (m.senderId !== this.me) return;
-
-    await this.msg.deleteRoomMessage(this.id, m.id);
-  }
-
   openInfo() {
-    this.showInfo = true;
-  }
-  closeInfo() {
-    this.showInfo = false;
+    this.router.navigate([`/app/group/${this.roomId}/info`]);
   }
 
-  goAddMembers() {
-    this.router.navigate(['/app/group/add-members', this.id]);
+  getInitial(uid: string): string {
+    return uid?.slice(0, 1).toUpperCase();
+  }
+
+  getMemberName(uid: string): string {
+    return uid === this.myUid ? 'You' : `User ${uid.slice(0, 5)}`;
   }
 }

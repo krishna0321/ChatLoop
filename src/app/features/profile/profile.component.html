@@ -18,9 +18,35 @@
 
   <div class="layout">
 
-    <!-- LEFT CARD (Profile summary) -->
+    <!-- ✅ LEFT SIDEBAR -->
     <aside class="side">
-      <div class="avatar">{{ (u.name || 'U')[0] }}</div>
+
+      <!-- ✅ Avatar Upload -->
+      <div class="avatarWrap">
+
+        <div class="avatarImg">
+          <img *ngIf="u.photoURL" [src]="u.photoURL" class="img" alt="avatar" />
+          <div *ngIf="!u.photoURL" class="txt">
+            {{ (u.name || 'U')[0] }}
+          </div>
+        </div>
+
+        <label class="camBtn" title="Upload photo">
+          📷
+          <input
+            type="file"
+            hidden
+            accept="image/*"
+            (change)="onPickAvatar($event)"
+          />
+        </label>
+
+        <div class="avatarHint">
+          {{ uploading ? 'Uploading...' : 'Tap camera to update photo' }}
+        </div>
+
+        <div class="avatarErr" *ngIf="avatarErr">{{ avatarErr }}</div>
+      </div>
 
       <div class="name">{{ u.name || 'User' }}</div>
       <div class="sub">{{ u.email }}</div>
@@ -48,10 +74,10 @@
       </div>
     </aside>
 
-    <!-- RIGHT CONTENT -->
+    <!-- ✅ RIGHT SIDE -->
     <main class="main">
 
-      <!-- ✅ PROFILE DETAILS CARD -->
+      <!-- ✅ PROFILE DETAILS -->
       <section class="card">
         <h3 class="card-title">📌 Profile details</h3>
 

@@ -7,7 +7,7 @@
       <div class="info">
         <div class="title">{{ user.name || 'User' }}</div>
         <div class="sub">
-          {{ user.phone || 'No phone' }}
+          {{ user.phone || user.email || 'No info' }}
           <span *ngIf="isBlocked" class="pill danger">Blocked</span>
         </div>
       </div>
@@ -38,13 +38,36 @@
       (click)="openMsgMenu($event, m)"
     >
       <div class="text">
-        <ng-container *ngIf="!m.isDeleted; else deletedTpl">
+
+        <!-- ✅ IMAGE MESSAGE -->
+        <ng-container *ngIf="m.type === 'image' && m.fileUrl && !m.isDeleted">
+          <img class="imgMsg" [src]="m.fileUrl" />
+          <div class="caption" *ngIf="m.text">{{ m.text }}</div>
+        </ng-container>
+
+        <!-- ✅ FILE MESSAGE -->
+        <ng-container *ngIf="m.type === 'file' && m.fileUrl && !m.isDeleted">
+          <a class="fileMsg" [href]="m.fileUrl" target="_blank" rel="noopener">
+            <div class="fileIcon2">📎</div>
+            <div class="fileMeta">
+              <div class="fileName2">{{ m.fileName || 'File' }}</div>
+              <div class="fileSize2">
+                {{ (m.fileSize || 0) > 0 ? ((m.fileSize || 0) / 1024 / 1024).toFixed(1) + ' MB' : '' }}
+              </div>
+            </div>
+          </a>
+        </ng-container>
+
+        <!-- ✅ TEXT/LINK MESSAGE -->
+        <ng-container *ngIf="(!m.type || m.type === 'text' || m.type === 'link') && !m.isDeleted">
           {{ m.text }}
         </ng-container>
 
-        <ng-template #deletedTpl>
+        <!-- ✅ DELETED -->
+        <ng-container *ngIf="m.isDeleted">
           <span class="deletedText">This message was deleted</span>
-        </ng-template>
+        </ng-container>
+
       </div>
 
       <div class="meta" *ngIf="!m.isDeleted">
@@ -160,7 +183,7 @@
           <button (click)="setTab('links')" [class.active]="profileTab==='links'">Links</button>
         </div>
 
-        <!-- Tab content -->
+        <!-- Media -->
         <div class="tabContent" *ngIf="profileTab==='media'">
           <div *ngIf="sharedMedia.length === 0" class="emptyTab">
             No media shared yet.
@@ -171,6 +194,7 @@
           </div>
         </div>
 
+        <!-- Files -->
         <div class="tabContent" *ngIf="profileTab==='files'">
           <div *ngIf="sharedFiles.length === 0" class="emptyTab">
             No files shared yet.
@@ -185,6 +209,7 @@
           </a>
         </div>
 
+        <!-- Links -->
         <div class="tabContent" *ngIf="profileTab==='links'">
           <div *ngIf="sharedLinks.length === 0" class="emptyTab">
             No links shared yet.

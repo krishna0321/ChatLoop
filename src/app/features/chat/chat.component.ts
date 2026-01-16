@@ -84,6 +84,8 @@ export class ChatComponent
   private meSub?: any;
   private contactUnsub?: any;
 
+  private loading = false;
+
   constructor(
     private auth: Auth,
     private firestore: Firestore,
@@ -96,8 +98,9 @@ export class ChatComponent
   // INIT
   // =====================
   ngOnInit(): void {
-    this.authUnsub = onAuthStateChanged(this.auth, (u) => {
+    this.authUnsub = onAuthStateChanged(this.auth, async (u) => {
       if (!u) return;
+
       this.myUid = u.uid;
 
       // blocked status realtime
@@ -106,7 +109,7 @@ export class ChatComponent
         this.isBlocked = !!this.user?.uid && blocked.includes(this.user.uid);
       });
 
-      this.loadChat();
+      await this.loadChat();
     });
   }
 
@@ -132,29 +135,37 @@ export class ChatComponent
   private async loadChat() {
     if (!this.user?.uid || !this.myUid) return;
 
-    this.chatId = this.chatService.getChatId(this.myUid, this.user.uid);
+    // prevent double load
+    if (this.loading) return;
+    this.loading = true;
 
-    await this.chatService.ensureChat(this.chatId, [this.myUid, this.user.uid]);
+    try {
+      this.chatId = this.chatService.getChatId(this.myUid, this.user.uid);
 
-    // chat doc listen (mute/pin)
-    this.chatDocSub?.unsubscribe?.();
-    this.chatDocSub = docData(doc(this.firestore, `chats/${this.chatId}`)).subscribe(
-      (d: any) => {
-        this.isMuted = !!d?.muted?.[this.myUid];
-        this.isPinned = !!d?.pinned?.[this.myUid];
-      }
-    );
+      // ✅ MAIN FIX: always ensure parent chat exists
+      await this.chatService.ensureChat(this.chatId, [this.myUid, this.user.uid]);
 
-    // mark read
-    if ((this.chatService as any).markAsRead) {
-      await (this.chatService as any).markAsRead(this.chatId, this.myUid);
+      // ✅ chat meta listener (mute/pin)
+      this.chatDocSub?.unsubscribe?.();
+      this.chatDocSub = docData(doc(this.firestore, `chats/${this.chatId}`)).subscribe(
+        (d: any) => {
+          this.isMuted = !!d?.muted?.[this.myUid];
+          this.isPinned = !!d?.pinned?.[this.myUid];
+        }
+      );
+
+      // ✅ mark read
+      await this.chatService.markAsRead(this.chatId, this.myUid);
+
+      // ✅ realtime messages
+      this.msgUnsub?.();
+      this.msgUnsub = this.chatService.listenMessages(this.chatId, (msgs) => {
+        this.messages = msgs || [];
+        this.buildSharedTabs();
+      });
+    } finally {
+      this.loading = false;
     }
-
-    this.msgUnsub?.();
-    this.msgUnsub = this.chatService.listenMessages(this.chatId, (msgs) => {
-      this.messages = msgs || [];
-      this.buildSharedTabs();
-    });
   }
 
   // =====================
@@ -188,7 +199,7 @@ export class ChatComponent
 
     if (!m?.id) return;
 
-    // only my messages
+    // ✅ only my messages + not deleted
     if (m.senderId !== this.myUid || m.isDeleted) {
       this.menuMessageId = null;
       return;
@@ -202,18 +213,23 @@ export class ChatComponent
     this.selectedMessage = m;
   }
 
-  send() {
-    const v = this.text.trim();
+  // ✅ MAIN SEND FUNCTION (fixed)
+  async send() {
+    const v = (this.text || '').trim();
     if (!v || !this.chatId) return;
+    if (!this.myUid || !this.user?.uid) return;
     if (this.isBlocked) return;
 
     try {
-      (this.chatService as any).sendMessage(this.chatId, v, this.myUid, this.user.uid);
-    } catch {
-      this.chatService.sendMessage(this.chatId, v, this.myUid, this.user.uid);
-    }
+      // ✅ ensure chat exists always
+      await this.chatService.ensureChat(this.chatId, [this.myUid, this.user.uid]);
 
-    this.text = '';
+      await this.chatService.sendMessage(this.chatId, v, this.myUid, this.user.uid);
+
+      this.text = '';
+    } catch (err) {
+      console.error('🔥 send() failed:', err);
+    }
   }
 
   clickEdit() {
@@ -341,16 +357,11 @@ export class ChatComponent
       this.sendingFile = true;
       this.fileError = '';
 
-      if ((this.chatService as any).sendFileMessage) {
-        await (this.chatService as any).sendFileMessage(
-          this.chatId,
-          file,
-          this.myUid,
-          this.user.uid
-        );
-      } else {
-        alert('sendFileMessage() not added in service yet');
-      }
+      // ✅ ensure chat exists first
+      await this.chatService.ensureChat(this.chatId, [this.myUid, this.user.uid]);
+
+      // ✅ send file message
+      await this.chatService.sendFileMessage(this.chatId, file, this.myUid, this.user.uid);
     } catch (err: any) {
       console.error(err);
       this.fileError = err?.message || 'Upload failed';
@@ -369,10 +380,8 @@ export class ChatComponent
     this.sharedLinks = [];
 
     (this.messages || []).forEach((m: any) => {
-      // images
       if (m.type === 'image' && m.fileUrl) this.sharedMedia.push(m.fileUrl);
 
-      // files
       if (m.type === 'file' && m.fileUrl) {
         this.sharedFiles.push({
           name: m.fileName || 'File',
@@ -381,7 +390,6 @@ export class ChatComponent
         });
       }
 
-      // links
       const urls = (m.text || '').match(/https?:\/\/\S+/g) || [];
       urls.forEach((u: string) => this.sharedLinks.push({ title: u, url: u }));
     });

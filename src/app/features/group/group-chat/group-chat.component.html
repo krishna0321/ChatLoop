@@ -1,104 +1,54 @@
-<div class="chatWrap" *ngIf="room">
-  <!-- HEADER -->
-  <div class="topBar">
-    <button class="backBtn" routerLink="/app/chats">⬅</button>
+<div class="wrap" *ngIf="roomId">
 
-    <div class="center" (click)="openInfo()">
-      <div class="titleRow">
-        <div class="t">{{ room?.name || 'Group' }}</div>
-        <span class="badgeType" [class.channel]="room?.type==='channel'">
-          {{ room?.type || 'group' }}
-        </span>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="left" (click)="openInfo()">
+      <div class="avatar">
+        {{ (room?.name || 'Group').slice(0,1).toUpperCase() }}
       </div>
-      <div class="sub">
-        👥 Members: {{ room?.members?.length || 0 }}
+
+      <div class="meta">
+        <div class="name">{{ room?.name || 'Group' }}</div>
+        <div class="sub">👥 Members: {{ room?.members?.length || 0 }}</div>
       </div>
     </div>
 
-    <button class="infoBtn" (click)="openInfo()">☰</button>
-  </div>
+    <button class="iconBtn" (click)="openInfo()">ℹ</button>
+  </header>
+
+  <!-- LOADING -->
+  <div class="loading" *ngIf="loading">Loading group chat...</div>
 
   <!-- MESSAGES -->
-  <div class="msgArea" *ngIf="!loading">
+  <main class="msgs" #box *ngIf="!loading">
+
     <div
-      class="msg"
       *ngFor="let m of messages"
-      [class.me]="m.senderId === me"
-      [class.deleted]="m.isDeleted"
+      class="bubble"
+      [class.me]="m.senderId === myUid"
     >
-      <div class="bubble">
-        <div class="text">
-          {{ m.isDeleted ? 'This message was deleted' : m.text }}
-        </div>
-
-        <div class="meta">
-          <span *ngIf="m.editedAt">edited</span>
-
-          <button
-            *ngIf="m.senderId === me && !m.isDeleted"
-            class="del"
-            (click)="deleteMsg(m)"
-          >
-            delete
-          </button>
-        </div>
+      <!-- only for others -->
+      <div class="sender" *ngIf="m.senderId !== myUid">
+        <span class="miniAv">{{ getInitial(m.senderId) }}</span>
+        <span class="senderName">{{ getMemberName(m.senderId) }}</span>
       </div>
+
+      <div class="text">{{ m.text }}</div>
     </div>
 
-    <div id="end"></div>
-  </div>
+  </main>
 
-  <div class="loading" *ngIf="loading">Loading messages...</div>
+  <!-- ERROR -->
+  <div class="err" *ngIf="err">{{ err }}</div>
 
   <!-- INPUT -->
-  <div class="inputBar">
-    <div class="locked" *ngIf="room?.type==='channel' && !canSend()">
-      🔒 Only admins can send messages
-    </div>
+  <footer class="composer">
+    <input
+      [(ngModel)]="text"
+      placeholder="Write a message..."
+      (keydown.enter)="send()"
+    />
+    <button (click)="send()" [disabled]="!text.trim()">➤</button>
+  </footer>
 
-    <div class="row">
-      <input
-        [(ngModel)]="text"
-        placeholder="Write a message..."
-        [disabled]="!canSend()"
-        (keyup.enter)="send()"
-      />
-      <button (click)="send()" [disabled]="!canSend()">➤</button>
-    </div>
-  </div>
-
-  <!-- ✅ TELEGRAM GROUP INFO DRAWER -->
-  <div class="drawerBackdrop" *ngIf="showInfo" (click)="closeInfo()">
-    <div class="drawer" (click)="$event.stopPropagation()">
-      <div class="drawerHead">
-        <div class="drawerTitle">{{ room?.name }}</div>
-        <button class="x" (click)="closeInfo()">✖</button>
-      </div>
-
-      <div class="drawerBody">
-        <div class="card">
-          <div class="row2">
-            <span>Type</span>
-            <b>{{ room?.type }}</b>
-          </div>
-          <div class="row2">
-            <span>Owner</span>
-            <b>{{ room?.ownerId }}</b>
-          </div>
-          <div class="row2">
-            <span>Members</span>
-            <b>{{ room?.members?.length || 0 }}</b>
-          </div>
-        </div>
-
-        <button class="primary" (click)="goAddMembers()" *ngIf="isAdmin()">
-          ➕ Add Members
-        </button>
-
-        <div class="hint">
-          ✅ Next: We will build member list + remove + make admin UI
-        </div>
-      </div>
-    </div>
-  </div>
 </div>

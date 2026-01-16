@@ -27,6 +27,10 @@ export class ProfileComponent {
   qrDataUrl = '';
   profileLink = '';
 
+  // ✅ avatar upload
+  uploading = false;
+  avatarErr = '';
+
   constructor(private profile: ProfileService) {
     this.profile.getMyProfile().subscribe(async (u) => {
       this.user = u;
@@ -34,10 +38,10 @@ export class ProfileComponent {
       if (u) {
         this.reset(u);
 
-        // ✅ Share link
+        // ✅ share link
         this.profileLink = `chatloop://user/${u.uid}`;
 
-        // ✅ Generate QR
+        // ✅ generate QR
         this.qrDataUrl = await QRCode.toDataURL(this.profileLink, {
           width: 220,
           margin: 1,
@@ -62,7 +66,11 @@ export class ProfileComponent {
     this.err = '';
 
     try {
-      await this.profile.updateMyProfile(this.form);
+      await this.profile.updateMyProfile({
+        name: this.form.name,
+        phone: this.form.phone,
+      });
+
       this.msg = '✅ Profile updated';
       this.editMode = false;
 
@@ -70,6 +78,50 @@ export class ProfileComponent {
     } catch (e: any) {
       this.err = e?.message || '❌ Update failed';
       setTimeout(() => (this.err = ''), 2500);
+    }
+  }
+
+  // ✅ PICK + UPLOAD AVATAR
+  async onPickAvatar(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    this.avatarErr = '';
+
+    // ✅ only images
+    if (!file.type.startsWith('image/')) {
+      this.avatarErr = 'Please choose image file only';
+      input.value = '';
+      return;
+    }
+
+    // ✅ size limit 2MB
+    const max = 2 * 1024 * 1024;
+    if (file.size > max) {
+      this.avatarErr = 'Image too large (Max 2MB)';
+      input.value = '';
+      return;
+    }
+
+    try {
+      this.uploading = true;
+
+      const url = await this.profile.updateAvatar(file);
+
+      // ✅ update UI instantly
+      if (this.user) {
+        this.user = { ...this.user, photoURL: url };
+      }
+
+      this.msg = '✅ Photo updated';
+      setTimeout(() => (this.msg = ''), 2000);
+    } catch (err: any) {
+      console.error(err);
+      this.avatarErr = err?.message || 'Upload failed';
+    } finally {
+      this.uploading = false;
+      input.value = '';
     }
   }
 

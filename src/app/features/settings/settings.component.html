@@ -1,5 +1,8 @@
 <div class="settings-shell">
 
+  <!-- ✅ Toast -->
+  <div class="toast" *ngIf="toastVisible">{{ toastMsg }}</div>
+
   <!-- ✅ Mobile Tabs -->
   <div class="mobile-tabs">
     <button (click)="selectTab('profile')" [class.active]="activeTab==='profile'">👤</button>
@@ -96,7 +99,10 @@
           </div>
 
           <label class="switch">
-            <input type="checkbox" [(ngModel)]="settings.darkMode" (change)="applyTheme(); trackChanges()" />
+            <!-- ✅ use ngModelChange for reliable changes -->
+            <input type="checkbox"
+              [(ngModel)]="settings.darkMode"
+              (ngModelChange)="applyTheme(); trackChanges()" />
             <span class="slider"></span>
           </label>
         </div>
@@ -118,7 +124,9 @@
           </div>
 
           <label class="switch">
-            <input type="checkbox" [(ngModel)]="settings.notifyMessages" (change)="trackChanges()" />
+            <input type="checkbox"
+              [(ngModel)]="settings.notifyMessages"
+              (ngModelChange)="trackChanges()" />
             <span class="slider"></span>
           </label>
         </div>
@@ -130,7 +138,9 @@
           </div>
 
           <label class="switch">
-            <input type="checkbox" [(ngModel)]="settings.notifySound" (change)="trackChanges()" />
+            <input type="checkbox"
+              [(ngModel)]="settings.notifySound"
+              (ngModelChange)="trackChanges()" />
             <span class="slider"></span>
           </label>
         </div>
@@ -147,7 +157,9 @@
           </div>
 
           <label class="switch">
-            <input type="checkbox" [(ngModel)]="settings.showOnlineStatus" (change)="trackChanges()" />
+            <input type="checkbox"
+              [(ngModel)]="settings.showOnlineStatus"
+              (ngModelChange)="trackChanges()" />
             <span class="slider"></span>
           </label>
         </div>
@@ -159,7 +171,9 @@
           </div>
 
           <label class="switch">
-            <input type="checkbox" [(ngModel)]="settings.allowFriendRequests" (change)="trackChanges()" />
+            <input type="checkbox"
+              [(ngModel)]="settings.allowFriendRequests"
+              (ngModelChange)="trackChanges()" />
             <span class="slider"></span>
           </label>
         </div>

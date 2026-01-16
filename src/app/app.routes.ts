@@ -9,7 +9,7 @@ import { RegisterComponent } from './features/auth/register/register.component';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-  // ✅ AUTH LAYOUT
+  // ✅ AUTH
   {
     path: '',
     component: AuthLayoutComponent,
@@ -20,7 +20,7 @@ export const routes: Routes = [
     ],
   },
 
-  // ✅ APP LAYOUT (Protected)
+  // ✅ APP
   {
     path: 'app',
     component: AppLayoutComponent,
@@ -35,7 +35,7 @@ export const routes: Routes = [
           import('./features/chats/chats.component').then((m) => m.ChatsComponent),
       },
 
-      // ✅ ROOM CHAT PAGE (optional direct route)
+      // ✅ ROOM CHAT (direct)
       {
         path: 'chat/:id',
         loadComponent: () =>
@@ -44,7 +44,7 @@ export const routes: Routes = [
           ),
       },
 
-      // ✅ CREATE ROOM OLD PAGE
+      // ✅ CREATE ROOM
       {
         path: 'create-room',
         loadComponent: () =>
@@ -53,19 +53,38 @@ export const routes: Routes = [
           ),
       },
 
-      // ✅ GROUP SYSTEM ✅✅✅
-     {
-  path: 'group/create',
-  loadComponent: () =>
-    import('./features/group/create-group/create-group.component')
-      .then(m => m.CreateGroupComponent),
-},
-{
-  path: 'group/:id',
-  loadComponent: () =>
-    import('./features/group/group-chat/group-chat.component')
-      .then(m => m.GroupChatComponent),
-},
+      // ✅ GROUP SYSTEM
+      {
+        path: 'group/create',
+        loadComponent: () =>
+          import('./features/group/create-group/create-group.component').then(
+            (m) => m.CreateGroupComponent
+          ),
+      },
+
+      {
+        path: 'group/:id',
+        loadComponent: () =>
+          import('./features/group/group-chat/group-chat.component').then(
+            (m) => m.GroupChatComponent
+          ),
+      },
+
+      {
+        path: 'group/:id/info',
+        loadComponent: () =>
+          import('./features/group/group-info/group-info.component').then(
+            (m) => m.GroupInfoComponent
+          ),
+      },
+
+      {
+        path: 'group/:id/add-members',
+        loadComponent: () =>
+          import('./features/group/add-members/add-members.component').then(
+            (m) => m.AddMembersComponent
+          ),
+      },
 
       // ✅ USERS
       {
@@ -74,7 +93,7 @@ export const routes: Routes = [
           import('./features/users/users.component').then((m) => m.UsersComponent),
       },
 
-      // ✅ USER PROFILE ✅ FIXED PATH
+      // ✅ USER PROFILE
       {
         path: 'user/:uid',
         loadComponent: () =>

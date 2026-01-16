@@ -97,3 +97,33 @@
     </div>
   </div>
 </div>
+<!-- ✅ ADD CONTACT MODAL -->
+<div class="modal" *ngIf="showAdd" (click)="closeAdd()">
+  <div class="box" (click)="$event.stopPropagation()">
+    <div class="mTitle">➕ Add Contact</div>
+    <div class="mSub">Save phone number / link Chatloop user automatically</div>
+
+    <div style="margin-top:14px; display:flex; flex-direction:column; gap:10px;">
+      <input
+        class="search"
+        style="padding:12px 14px;border-radius:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10)"
+        placeholder="Name"
+        [(ngModel)]="form.name"
+      />
+
+      <input
+        class="search"
+        style="padding:12px 14px;border-radius:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10)"
+        placeholder="Phone number"
+        [(ngModel)]="form.phone"
+      />
+    </div>
+
+    <div class="actions2">
+      <button class="btn ghost" (click)="closeAdd()">Cancel</button>
+      <button class="btn primary" [disabled]="saving" (click)="saveManualContact()">
+        {{ saving ? 'Saving...' : '✅ Save' }}
+      </button>
+    </div>
+  </div>
+</div>

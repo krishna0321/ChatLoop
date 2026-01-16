@@ -24,20 +24,20 @@ export class ContactComponent implements OnInit, OnDestroy {
   filtered: Contact[] = [];
   search = '';
 
-showAdd = false;
-saving = false;
-form: Contact = { name: '', phone: '' };
+  // ✅ ADD MODAL
+  showAdd = false;
+  saving = false;
+  form: Contact = { name: '', phone: '' };
 
-openAdd() {
-  this.showAdd = true;
-  this.form = { name: '', phone: '' };
-}
+  openAdd() {
+    this.showAdd = true;
+    this.form = { name: '', phone: '' };
+  }
 
-closeAdd() {
-  this.showAdd = false;
-  this.saving = false;
-}
-
+  closeAdd() {
+    this.showAdd = false;
+    this.saving = false;
+  }
 
   users: AppUser[] = [];
 
@@ -105,9 +105,61 @@ closeAdd() {
     });
   }
 
-  // ✅ normalize
+  // ✅ normalize phone
   normalizePhone(phone: string) {
     return (phone || '').replace(/\s+/g, '').trim();
+  }
+
+  // ===================================================
+  // ✅ NEW: SAVE MANUAL CONTACT (FIX)
+  // ===================================================
+  async saveManualContact() {
+    if (!this.myUid) return;
+
+    const name = (this.form.name || '').trim();
+    const phone = this.normalizePhone(this.form.phone || '');
+
+    if (!name || name.length < 2) {
+      this.showToast('❌ Enter valid name', 'err');
+      return;
+    }
+
+    if (!phone || phone.length < 8) {
+      this.showToast('❌ Enter valid phone number', 'err');
+      return;
+    }
+
+    // prevent duplicates
+    const exists = this.contacts.some(
+      (c) => this.normalizePhone(c.phone || '') === phone
+    );
+    if (exists) {
+      this.showToast('⚠ This number already in contacts', 'err');
+      return;
+    }
+
+    // ✅ if user exists in app, link uid automatically
+    const matchedUser = this.users.find(
+      (u) => this.normalizePhone(u.phone || '') === phone
+    );
+
+    try {
+      this.saving = true;
+
+      await this.contactService.addContact(this.myUid, {
+        name,
+        phone,
+        uid: matchedUser?.uid || '', // optional
+      });
+
+      this.showToast('✅ Contact added', 'ok');
+      this.closeAdd();
+    } catch (e) {
+      console.error(e);
+      this.showToast('❌ Failed to add contact', 'err');
+    } finally {
+      this.saving = false;
+    }
   }
 
   // ===================================================
@@ -150,32 +202,26 @@ closeAdd() {
     } catch {}
   }
 
-  // ✅ extract uid from url
   extractUidFromQr(text: string): string {
     const t = (text || '').trim();
 
-    // 1) chatloop://user/<uid>
     if (t.startsWith('chatloop://user/')) {
       return t.replace('chatloop://user/', '').trim();
     }
 
-    // 2) https://chatloop.app/u/<uid>
-    // 3) http://localhost:4200/u/<uid>
     try {
       if (t.startsWith('http')) {
         const url = new URL(t);
-        const parts = url.pathname.split('/').filter(Boolean); // remove empty
-        // /u/<uid>
+        const parts = url.pathname.split('/').filter(Boolean);
+
         const uIndex = parts.indexOf('u');
         if (uIndex !== -1 && parts[uIndex + 1]) return parts[uIndex + 1];
 
-        // /user/<uid>
         const userIndex = parts.indexOf('user');
         if (userIndex !== -1 && parts[userIndex + 1]) return parts[userIndex + 1];
       }
     } catch {}
 
-    // 4) plain uid
     return t;
   }
 
@@ -192,17 +238,14 @@ closeAdd() {
       return;
     }
 
-    // stop scanner
     await this.closeScanner();
 
-    // check user exists
     const found = this.users.find((x) => x.uid === uid);
     if (!found) {
       this.showToast('❌ User not registered', 'err');
       return;
     }
 
-    // open result modal
     this.scannedUid = uid;
     this.scannedUser = found;
     this.showScanResult = true;
@@ -217,13 +260,11 @@ closeAdd() {
   // ===================================================
   // ✅ ADD FRIEND (save contact)
   // ===================================================
-
   async addFriendFromScan() {
     if (!this.myUid || !this.scannedUser) return;
 
     const uid = this.scannedUser.uid;
 
-    // already added?
     const exists = this.contacts.some((c) => c.uid === uid);
     if (exists) {
       this.showToast('⚠ Already in contacts', 'err');
@@ -264,24 +305,22 @@ closeAdd() {
     await this.openChatByUid(uid);
   }
 
-  // ===================================================
+  async removeContact(c: Contact) {
+    const ok = confirm(`Delete contact "${c.name}" ?`);
+    if (!ok) return;
+
+    try {
+      await this.contactService.deleteContact(this.myUid, c.id!);
+      this.showToast('✅ Contact deleted', 'ok');
+    } catch (e) {
+      console.error(e);
+      this.showToast('❌ Delete failed', 'err');
+    }
+  }
 
   ngOnDestroy() {
     if (this.unsubContacts) this.unsubContacts();
     if (this.usersSub) this.usersSub.unsubscribe?.();
     this.closeScanner();
   }
-  async removeContact(c: Contact) {
-  const ok = confirm(`Delete contact "${c.name}" ?`);
-  if (!ok) return;
-
-  try {
-    await this.contactService.deleteContact(this.myUid, c.id!);
-    this.showToast('✅ Contact deleted', 'ok');
-  } catch (e) {
-    console.error(e);
-    this.showToast('❌ Delete failed', 'err');
-  }
-}
-
 }

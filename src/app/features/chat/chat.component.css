@@ -548,24 +548,6 @@
 /* keep your existing CSS above */
 /* ✅ ADD THESE EXTRA STYLES */
 
-/* attach button */
-.attachBtn{
-  width:46px;
-  height:46px;
-  border-radius:14px;
-  display:grid;
-  place-items:center;
-  cursor:pointer;
-  user-select:none;
-
-  border:1px solid rgba(255,255,255,0.10);
-  background: rgba(255,255,255,0.06);
-  font-weight:1000;
-}
-.attachBtn.disabled{
-  opacity:.5;
-  pointer-events:none;
-}
 
 /* upload error */
 .uploadErr{
@@ -627,13 +609,6 @@
   opacity:.7;
 }
 
-/* empty state inside tabs */
-.emptyTab{
-  padding: 18px 8px;
-  text-align:center;
-  opacity:.65;
-  font-weight:950;
-}
 
 /* file rows inside drawer */
 .fileRow{
@@ -666,14 +641,6 @@
 .attachBtn.disabled{
   opacity:.45;
   pointer-events:none;
-}
-
-.uploadErr{
-  padding: 8px 12px;
-  font-weight: 900;
-  color: rgba(255, 160, 160, 0.95);
-  background: rgba(255,0,0,0.10);
-  border-top: 1px solid rgba(255,255,255,0.06);
 }
 
 .emptyTab{

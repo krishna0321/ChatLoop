@@ -11,6 +11,7 @@ import {
   serverTimestamp,
   arrayUnion,
   arrayRemove,
+  getDoc,
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
@@ -20,18 +21,21 @@ export interface AppUser {
   phone?: string;
   email?: string;
 
-  bio?: string;   // ✅ ADD THIS
-
+  bio?: string;
   blocked?: string[];
 
   createdAt?: any;
   updatedAt?: any;
 }
 
-
 @Injectable({ providedIn: 'root' })
 export class UserService {
   constructor(private firestore: Firestore) {}
+
+  // ✅ normalize phone (remove spaces + +91 etc)
+  normalizePhone(phone: string): string {
+    return (phone || '').replace(/\D/g, '').trim();
+  }
 
   // ✅ READ ALL USERS
   getUsers(): Observable<AppUser[]> {
@@ -54,6 +58,7 @@ export class UserService {
       ref,
       {
         ...user,
+        phone: user.phone ? this.normalizePhone(user.phone) : '',
         blocked: user.blocked ?? [],
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
@@ -66,9 +71,13 @@ export class UserService {
   async updateUser(uid: string, data: Partial<AppUser>) {
     if (!uid) return;
 
+    // if updating phone -> normalize it
+    const patch: any = { ...data };
+    if (patch.phone) patch.phone = this.normalizePhone(patch.phone);
+
     const ref = doc(this.firestore, `users/${uid}`);
     return updateDoc(ref, {
-      ...data,
+      ...patch,
       updatedAt: serverTimestamp(),
     });
   }
@@ -81,12 +90,11 @@ export class UserService {
     return deleteDoc(ref);
   }
 
-  // ✅ BLOCK USER (BLOCK ONLY THAT ACCOUNT UID)
+  // ✅ BLOCK USER
   async blockUser(myUid: string, targetUid: string) {
-    // ✅ validation (important fix)
     if (!myUid || !targetUid) return;
-    if (myUid === targetUid) return; // cannot block yourself
-    if (targetUid.trim().length < 5) return; // safety
+    if (myUid === targetUid) return;
+    if (targetUid.trim().length < 5) return;
 
     const ref = doc(this.firestore, `users/${myUid}`);
     return updateDoc(ref, {
@@ -104,6 +112,44 @@ export class UserService {
     return updateDoc(ref, {
       blocked: arrayRemove(targetUid),
       updatedAt: serverTimestamp(),
+    });
+  }
+
+  // ======================================================
+  // ✅✅ PHONE UNIQUE SYSTEM (NEW)
+  // phone_index/{phone} -> { uid, createdAt }
+  // ======================================================
+
+  // ✅ check phone already taken
+  async isPhoneTaken(phone: string): Promise<boolean> {
+    const clean = this.normalizePhone(phone);
+    if (!clean) return false;
+
+    const indexRef = doc(this.firestore, `phone_index/${clean}`);
+    const snap = await getDoc(indexRef);
+
+    return snap.exists();
+  }
+
+  // ✅ reserve phone number before creating user profile
+  async reservePhone(uid: string, phone: string) {
+    const clean = this.normalizePhone(phone);
+    if (!uid) throw new Error('Missing uid');
+    if (!clean) throw new Error('Phone number required');
+
+    const indexRef = doc(this.firestore, `phone_index/${clean}`);
+    const snap = await getDoc(indexRef);
+
+    // ✅ already exists
+    if (snap.exists()) {
+      throw new Error('Phone number already registered');
+    }
+
+    // ✅ create index document
+    await setDoc(indexRef, {
+      uid,
+      phone: clean,
+      createdAt: serverTimestamp(),
     });
   }
 }

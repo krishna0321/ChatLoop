@@ -1,1 +1,40 @@
-<p>group-info works!</p>
+<div class="page" *ngIf="room">
+
+  <div class="top">
+    <a class="back" routerLink="/app/chats">⬅ Chats</a>
+    <div class="t">
+      <div class="name">{{ room.name }}</div>
+      <div class="sub">{{ room.type }} • {{ (room.members?.length || 0) }} members</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <span>Description</span>
+      <b>{{ room.description || 'No description' }}</b>
+    </div>
+
+    <div class="actions">
+      <button class="btn ghost" (click)="openAddMembers()">➕ Add Members</button>
+      <button class="btn danger" (click)="leave()">🚪 Leave</button>
+      <button class="btn danger2" *ngIf="isOwner()" (click)="deleteRoom()">🗑 Delete</button>
+    </div>
+  </div>
+
+  <div class="section">Members</div>
+
+  <div class="list">
+    <div class="mem" *ngFor="let uid of room.members">
+      <div class="av">{{ getInitial(uid) }}</div>
+      <div class="meta">
+        <div class="n">
+          {{ getUserName(uid) }}
+          <span class="tag owner" *ngIf="room.ownerId === uid">Owner</span>
+          <span class="tag admin" *ngIf="isAdmin(uid) && room.ownerId !== uid">Admin</span>
+        </div>
+        <div class="s">{{ uid }}</div>
+      </div>
+    </div>
+  </div>
+
+</div>

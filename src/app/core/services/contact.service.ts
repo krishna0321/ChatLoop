@@ -3,19 +3,18 @@ import {
   Firestore,
   collection,
   addDoc,
-  onSnapshot,
-  query,
-  orderBy,
-  serverTimestamp,
+  deleteDoc,
   doc,
-  deleteDoc
+  onSnapshot,
+  serverTimestamp,
 } from '@angular/fire/firestore';
 
 export interface Contact {
   id?: string;
   name: string;
   phone: string;
-  uid?: string; // if contact is registered user
+  uid?: string;
+  createdAt?: any;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -24,23 +23,29 @@ export class ContactService {
 
   listenContacts(myUid: string, cb: (list: Contact[]) => void) {
     const ref = collection(this.firestore, `users/${myUid}/contacts`);
-    const q = query(ref, orderBy('createdAt', 'desc'));
 
-    return onSnapshot(q, snap => {
-      cb(snap.docs.map(d => ({ id: d.id, ...d.data() })) as Contact[]);
+    return onSnapshot(ref, (snap) => {
+      const list: Contact[] = snap.docs.map((d) => ({
+        id: d.id,
+        ...(d.data() as any),
+      }));
+      cb(list);
     });
   }
 
-  addContact(myUid: string, data: Contact) {
-    return addDoc(collection(this.firestore, `users/${myUid}/contacts`), {
-      ...data,
-      createdAt: serverTimestamp()
+  addContact(myUid: string, contact: Contact) {
+    const ref = collection(this.firestore, `users/${myUid}/contacts`);
+
+    return addDoc(ref, {
+      name: contact.name || '',
+      phone: contact.phone || '',
+      uid: contact.uid || '',
+      createdAt: serverTimestamp(),
     });
   }
 
   deleteContact(myUid: string, contactId: string) {
-    return deleteDoc(
-      doc(this.firestore, `users/${myUid}/contacts/${contactId}`)
-    );
+    const ref = doc(this.firestore, `users/${myUid}/contacts/${contactId}`);
+    return deleteDoc(ref);
   }
 }

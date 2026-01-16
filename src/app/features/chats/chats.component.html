@@ -1,7 +1,13 @@
 <div class="layout" (click)="closeAll()">
 
   <!-- LEFT SIDEBAR -->
-  <aside class="sidebar" [class.mobileHide]="!mobileListOpen" (click)="$event.stopPropagation()">
+  <aside
+    class="sidebar"
+    [class.mobileHide]="!mobileListOpen"
+    (click)="$event.stopPropagation()"
+  >
+
+    <!-- TOP -->
     <div class="top">
       <div class="logoRow">
         <div class="logo">
@@ -18,18 +24,25 @@
           [(ngModel)]="searchText"
           (input)="applyFilter()"
           placeholder="Search chats..."
+          (click)="$event.stopPropagation()"
         />
       </div>
     </div>
 
+    <!-- LIST -->
     <div class="list">
+
+      <!-- ✅ CHATS TITLE -->
+      <div class="section-title">Chats</div>
+
+      <!-- ✅ CHATS LIST -->
       <div
         *ngFor="let r of filteredRooms"
         class="item"
         [class.active]="selectedRoomId === r.id"
         (click)="openRoom(r)"
       >
-        <div class="avatar">{{ (getRoomTitle(r)[0] || 'U') }}</div>
+        <div class="avatar">{{ (getRoomTitle(r)[0] || 'U').toUpperCase() }}</div>
 
         <div class="info">
           <div class="row">
@@ -51,27 +64,68 @@
           </div>
         </div>
 
-        <button class="more" (click)="openMenu($event, r)">⋮</button>
+        <button class="more" (click)="$event.stopPropagation(); openMenu($event, r)">
+          ⋮
+        </button>
 
-        <div class="dropdown" *ngIf="menuRoomId === r.id" (click)="$event.stopPropagation()">
-          <button (click)="toggleMute(r)">
+        <div
+          class="dropdown"
+          *ngIf="menuRoomId === r.id"
+          (click)="$event.stopPropagation()"
+        >
+          <button (click)="$event.stopPropagation(); toggleMute(r)">
             {{ isMuted(r) ? '🔔 Unmute' : '🔕 Mute' }}
           </button>
 
-          <button (click)="togglePin(r)">
+          <button (click)="$event.stopPropagation(); togglePin(r)">
             {{ isPinned(r) ? '📌 Unpin' : '📌 Pin' }}
           </button>
         </div>
       </div>
 
+      <!-- ✅ EMPTY CHATS -->
       <div *ngIf="filteredRooms.length === 0" class="emptyLeft">
         No chats found
       </div>
+
+      <!-- ✅ PEOPLE SECTION (ONLY SHOW WHEN SEARCHING) -->
+      <ng-container *ngIf="shouldShowPeople()">
+
+        <div class="divider"></div>
+
+        <div class="section-title">People</div>
+
+        <div class="people-list">
+          <div class="chat-item" *ngFor="let u of filteredUsers">
+            <div class="avatar">
+              {{ (u.name || u.email || '?').slice(0,1).toUpperCase() }}
+            </div>
+
+            <div class="meta" (click)="startDmWithUser(u)">
+              <div class="title">{{ u.name || u.email || 'Unknown' }}</div>
+              <div class="sub">{{ u.email || u.phone || '' }}</div>
+            </div>
+
+            <button
+              class="pillBtn"
+              (click)="$event.stopPropagation(); startDmWithUser(u)"
+            >
+              Start
+            </button>
+          </div>
+
+          <div *ngIf="filteredUsers.length === 0" class="emptyLeft">
+            No users found
+          </div>
+        </div>
+      </ng-container>
+
     </div>
   </aside>
 
   <!-- RIGHT CONTENT -->
   <main class="content">
+
     <!-- DM Chat -->
     <ng-container *ngIf="selectedUser">
       <div class="mobileTopBar">
@@ -100,6 +154,7 @@
         <div class="t2">Choose from the left panel</div>
       </div>
     </ng-container>
+
   </main>
 
 </div>

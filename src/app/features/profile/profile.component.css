@@ -428,3 +428,71 @@
     bottom: 86px; /* ✅ above bottom nav */
   }
 }
+/* ✅ Avatar Upload (New) */
+.avatarWrap{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  margin-bottom: 10px;
+}
+
+.avatarImg{
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  overflow:hidden;
+
+  display:grid;
+  place-items:center;
+
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.85), rgba(37, 99, 235, 0.5));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+}
+
+.avatarImg .img{
+  width:100%;
+  height:100%;
+  object-fit: cover;
+}
+
+.avatarImg .txt{
+  font-size: 34px;
+  font-weight: 1000;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.camBtn{
+  width:46px;
+  height:46px;
+  border-radius: 16px;
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  user-select:none;
+
+  border:1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.06);
+  font-weight: 1000;
+  transition: .2s;
+}
+
+.camBtn:hover{
+  transform: translateY(-1px);
+}
+
+.avatarHint{
+  font-size: 12px;
+  opacity: 0.7;
+  font-weight: 800;
+  text-align:center;
+}
+
+.avatarErr{
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(255,160,160,0.95);
+  text-align:center;
+}

@@ -27,10 +27,13 @@ export class ChatsComponent implements OnInit, OnDestroy {
   // ✅ USERS MAP
   usersMap = new Map<string, AppUser>();
 
+  // ✅ all users (but we show only when searching)
+  allUsers: AppUser[] = [];
+  filteredUsers: AppUser[] = [];
+
   // ✅ chats list
   dmChats: any[] = [];
   rooms: any[] = [];
-
   filteredRooms: any[] = [];
 
   searchText = '';
@@ -54,6 +57,8 @@ export class ChatsComponent implements OnInit, OnDestroy {
   private usersSub: any;
   private qpSub: any;
 
+  private _filterTimer: any = null;
+
   constructor(
     private auth: Auth,
     private chatService: ChatService,
@@ -61,6 +66,19 @@ export class ChatsComponent implements OnInit, OnDestroy {
     private roomService: RoomService,
     private route: ActivatedRoute
   ) {}
+
+  // ✅ Telegram style: People list only when searching
+  shouldShowPeople(): boolean {
+    return (this.searchText || '').trim().length > 0;
+  }
+
+  // ✅ stable filtering (prevents flicker)
+  private scheduleFilter() {
+    clearTimeout(this._filterTimer);
+    this._filterTimer = setTimeout(() => {
+      this.applyFilter();
+    }, 50);
+  }
 
   ngOnInit(): void {
     this.checkMobile();
@@ -73,19 +91,31 @@ export class ChatsComponent implements OnInit, OnDestroy {
       // ✅ my user doc for blocked list
       this.meSub = this.userService.getUser(this.myUid).subscribe((me: any) => {
         this.blockedUids = me?.blocked || [];
+        this.scheduleFilter();
       });
 
-      // ✅ users list
+      // ✅ users list (ALL USERS)
       this.usersSub = this.userService.getUsers().subscribe((users: AppUser[]) => {
+        const safeUsers = users || [];
+
         this.usersMap.clear();
-        (users || []).forEach((us) => this.usersMap.set(us.uid, us));
-        this.applyFilter();
+        safeUsers.forEach((us) => this.usersMap.set(us.uid, us));
+
+        // ✅ store all users except me + blocked
+        this.allUsers = safeUsers.filter((u) => {
+          if (!u?.uid) return false;
+          if (u.uid === this.myUid) return false;
+          if ((this.blockedUids || []).includes(u.uid)) return false;
+          return true;
+        });
+
+        this.scheduleFilter();
       });
 
       // ✅ DM Chats
       this.unsubDm = this.chatService.listenMyChats(this.myUid, (data: any[]) => {
         this.dmChats = (data || []).map((c) => ({ ...c, type: 'dm' as ListItemType }));
-        this.applyFilter();
+        this.scheduleFilter();
       });
 
       // ✅ Rooms (Groups / Channels)
@@ -94,21 +124,23 @@ export class ChatsComponent implements OnInit, OnDestroy {
           ...r,
           type: (r.type || 'group') as ListItemType,
         }));
-        this.applyFilter();
+        this.scheduleFilter();
       });
 
-      // ✅ open from url
-      this.qpSub = this.route.queryParamMap.subscribe((p) => {
+      // ✅ open from url (?uid=xxx or ?room=xxx)
+      this.qpSub = this.route.queryParamMap.subscribe(async (p) => {
         const uid = p.get('uid');
-        if (uid) this.openDmByUid(uid);
-
         const roomId = p.get('room');
+
+        if (uid) await this.openDmByUid(uid);
         if (roomId) this.openRoomById(roomId);
       });
     });
   }
 
   ngOnDestroy(): void {
+    clearTimeout(this._filterTimer);
+
     if (this.unsubAuth) this.unsubAuth();
     if (this.unsubDm) this.unsubDm();
     if (this.unsubRooms) this.unsubRooms();
@@ -134,7 +166,7 @@ export class ChatsComponent implements OnInit, OnDestroy {
   // ✅ UI functions for HTML
   // ======================
   closeAll() {
-    this.menuRoomId = null;
+    if (this.menuRoomId) this.menuRoomId = null;
   }
 
   openMenu(event: MouseEvent, item: any) {
@@ -148,6 +180,7 @@ export class ChatsComponent implements OnInit, OnDestroy {
   applyFilter() {
     const t = (this.searchText || '').trim().toLowerCase();
 
+    // ✅ chats + rooms list
     let list = [...this.rooms, ...this.dmChats];
 
     // pinned first, then updated
@@ -161,16 +194,27 @@ export class ChatsComponent implements OnInit, OnDestroy {
       return bt - at;
     });
 
-    if (!t) {
-      this.filteredRooms = list;
-      return;
-    }
+    // ✅ filter chats/rooms
+    this.filteredRooms = t
+      ? list.filter((x) => {
+          const name = this.getRoomTitle(x).toLowerCase();
+          const last = (x.lastMessage || '').toLowerCase();
+          return name.includes(t) || last.includes(t);
+        })
+      : list;
 
-    this.filteredRooms = list.filter((x) => {
-      const name = this.getRoomTitle(x).toLowerCase();
-      const last = (x.lastMessage || '').toLowerCase();
-      return name.includes(t) || last.includes(t);
-    });
+    // ✅ People only visible when searching
+    const basePeopleUsers = this.shouldShowPeople() ? [...this.allUsers] : [];
+
+    // filter people
+    this.filteredUsers = t
+      ? basePeopleUsers.filter((u) => {
+          const name = (u.name || '').toLowerCase();
+          const email = (u.email || '').toLowerCase();
+          const phone = (u.phone || '').toLowerCase();
+          return name.includes(t) || email.includes(t) || phone.includes(t);
+        })
+      : basePeopleUsers;
   }
 
   // ======================
@@ -190,7 +234,6 @@ export class ChatsComponent implements OnInit, OnDestroy {
     return u?.name || u?.email || 'Unknown';
   }
 
-  // ✅ IMPORTANT: your HTML calls getPreviewText()
   getPreviewText(item: any): string {
     const msg = item?.lastMessage || '';
     if (!msg) return 'No messages yet...';
@@ -244,7 +287,6 @@ export class ChatsComponent implements OnInit, OnDestroy {
   openRoom(item: any) {
     this.closeAll();
 
-    // reset
     this.selectedUser = null;
     this.selectedRoomId = null;
 
@@ -253,14 +295,43 @@ export class ChatsComponent implements OnInit, OnDestroy {
     } else {
       const otherUid = this.getOtherUid(item);
       this.selectedUser = otherUid ? this.usersMap.get(otherUid) || null : null;
+
+      // ✅ ensure chat exists
+      if (otherUid) {
+        const chatId = this.chatService.getChatId(this.myUid, otherUid);
+        this.chatService.ensureChat(chatId, [this.myUid, otherUid]);
+      }
     }
 
     if (this.isMobile) this.mobileListOpen = false;
   }
 
-  private openDmByUid(uid: string) {
+  // ✅ start DM from People list
+  async startDmWithUser(user: AppUser) {
+    if (!user?.uid || !this.myUid) return;
+
+    const chatId = this.chatService.getChatId(this.myUid, user.uid);
+
+    await this.chatService.ensureChat(chatId, [this.myUid, user.uid]);
+
+    this.selectedRoomId = null;
+    this.selectedUser = user;
+
+    // ✅ clear search to hide people again
+    this.searchText = '';
+    this.applyFilter();
+
+    if (this.isMobile) this.mobileListOpen = false;
+  }
+
+  // ✅ open DM from URL
+  private async openDmByUid(uid: string) {
     if (!uid || !this.myUid) return;
+
     const chatId = this.chatService.getChatId(this.myUid, uid);
+
+    await this.chatService.ensureChat(chatId, [this.myUid, uid]);
+
     this.openRoom({ id: chatId, users: [this.myUid, uid], type: 'dm' });
   }
 

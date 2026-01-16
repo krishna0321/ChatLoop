@@ -31,7 +31,7 @@ export interface ChatMessage {
   id?: string;
 
   // ✅ base fields
-  type?: ChatMessageType;          // text/image/file/link
+  type?: ChatMessageType;
   text: string;
   senderId: string;
   receiverId?: string;
@@ -46,7 +46,7 @@ export interface ChatMessage {
   fileUrl?: string;
   fileName?: string;
   mimeType?: string;
-  fileSize?: number; // bytes
+  fileSize?: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -86,8 +86,8 @@ export class ChatService {
 
     // ✅ patch old chats WITHOUT touching updatedAt
     const data: any = snap.data();
-
     const patch: any = {};
+
     if (!data?.muted) patch.muted = {};
     if (!data?.pinned) patch.pinned = {};
     if (!data?.unread) {
@@ -108,14 +108,21 @@ export class ChatService {
     const refCol = collection(this.firestore, `chats/${chatId}/messages`);
     const q = query(refCol, orderBy('createdAt', 'asc'));
 
-    return onSnapshot(q, (snap) => {
-      const data = snap.docs.map((d) => ({
-        id: d.id,
-        ...(d.data() as any),
-      })) as ChatMessage[];
+    return onSnapshot(
+      q,
+      (snap) => {
+        const data = snap.docs.map((d) => ({
+          id: d.id,
+          ...(d.data() as any),
+        })) as ChatMessage[];
 
-      callback(data);
-    });
+        callback(data);
+      },
+      (err) => {
+        console.error('🔥 listenMessages() error:', err);
+        callback([]);
+      }
+    );
   }
 
   // ✅ mark read (when opening chat)
@@ -149,7 +156,12 @@ export class ChatService {
   }
 
   // ✅ SEND text message (updates unread + preview)
-  async sendMessage(chatId: string, text: string, senderId: string, receiverId: string) {
+  async sendMessage(
+    chatId: string,
+    text: string,
+    senderId: string,
+    receiverId: string
+  ) {
     const value = (text || '').trim();
     if (!value) return;
 
@@ -161,7 +173,6 @@ export class ChatService {
       senderId,
       receiverId,
       createdAt: serverTimestamp(),
-
       editedAt: null,
       isDeleted: false,
       deletedAt: null,
@@ -174,8 +185,6 @@ export class ChatService {
       lastSenderId: senderId,
       updatedAt: serverTimestamp(),
       lastMessageAt: serverTimestamp(),
-
-      // ✅ increment unread for receiver
       [`unread.${receiverId}`]: increment(1),
     });
   }
@@ -195,18 +204,13 @@ export class ChatService {
     // ✅ upload path
     const safeName = (file.name || 'file').replace(/[^\w.\-]+/g, '_');
     const path = `chat_uploads/${chatId}/${Date.now()}_${safeName}`;
-
     const fileRef = ref(this.storage, path);
 
-    // ✅ upload to Firebase Storage
     await uploadBytes(fileRef, file);
-
-    // ✅ get public url
     const url = await getDownloadURL(fileRef);
 
     const msgRef = collection(this.firestore, `chats/${chatId}/messages`);
 
-    // ✅ firestore msg
     await addDoc(msgRef, {
       type: msgType,
       text: isImage ? '📷 Photo' : `📎 ${file.name}`,
@@ -225,14 +229,12 @@ export class ChatService {
       fileSize: file.size || 0,
     });
 
-    // ✅ update chat preview
     const chatDoc = doc(this.firestore, `chats/${chatId}`);
     await updateDoc(chatDoc, {
       lastMessage: isImage ? '📷 Photo' : `📎 ${file.name}`,
       lastSenderId: senderId,
       updatedAt: serverTimestamp(),
       lastMessageAt: serverTimestamp(),
-
       [`unread.${receiverId}`]: increment(1),
     });
   }
@@ -248,7 +250,7 @@ export class ChatService {
     return { id: d.id, ...(d.data() as any) } as ChatMessage;
   }
 
-  // ✅ EDIT message (text only)
+  // ✅ EDIT message
   async editMessage(chatId: string, messageId: string, newText: string) {
     const value = (newText || '').trim();
     if (!value) return;
@@ -274,7 +276,7 @@ export class ChatService {
     }
   }
 
-  // ✅ DELETE message (soft delete telegram style)
+  // ✅ DELETE message (soft delete)
   async deleteMessage(chatId: string, messageId: string) {
     const msgDoc = doc(this.firestore, `chats/${chatId}/messages/${messageId}`);
 
@@ -305,19 +307,26 @@ export class ChatService {
     }
   }
 
-  // ✅ Recent chats list
+  // ======================================================
+  // ✅ RECENT CHATS LIST (FULL FIX)
+  // Sorted query needs Firestore composite index.
+  // If missing, fallback query still shows chats after refresh.
+  // ======================================================
   listenMyChats(myUid: string, callback: (chats: any[]) => void) {
     const chatsRef = collection(this.firestore, 'chats');
 
-    const q = query(
+    const qSorted = query(
       chatsRef,
       where('users', 'array-contains', myUid),
       orderBy('updatedAt', 'desc')
     );
 
-    return onSnapshot(q, (snap) => {
-      let chats = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
+    const qFallback = query(
+      chatsRef,
+      where('users', 'array-contains', myUid)
+    );
 
+    const applyPinnedSorting = (chats: any[]) => {
       // ✅ pinned chats should come first
       chats = chats.sort((a: any, b: any) => {
         const ap = a?.pinned?.[myUid] ? 1 : 0;
@@ -325,13 +334,70 @@ export class ChatService {
         return bp - ap;
       });
 
-      callback(chats);
-    });
+      // ✅ then sort inside pinned/unpinned by updatedAt locally
+      chats = chats.sort((a: any, b: any) => {
+        const ap = a?.pinned?.[myUid] ? 1 : 0;
+        const bp = b?.pinned?.[myUid] ? 1 : 0;
+
+        if (ap !== bp) return bp - ap;
+
+        const at = this.getTimeValue(a?.updatedAt);
+        const bt = this.getTimeValue(b?.updatedAt);
+        return bt - at;
+      });
+
+      return chats;
+    };
+
+    const unsubSorted = onSnapshot(
+      qSorted,
+      (snap) => {
+        let chats = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
+        chats = applyPinnedSorting(chats);
+        callback(chats);
+      },
+      (err: any) => {
+        console.error('🔥 listenMyChats() sorted query failed:', err);
+        console.warn('⚠️ Falling back to chats query without orderBy(updatedAt)...');
+
+        const unsubFallback = onSnapshot(
+          qFallback,
+          (snap2) => {
+            let chats = snap2.docs.map((d) => ({
+              id: d.id,
+              ...(d.data() as any),
+            }));
+
+            chats = applyPinnedSorting(chats);
+            callback(chats);
+          },
+          (err2: any) => {
+            console.error('🔥 listenMyChats() fallback query also failed:', err2);
+            callback([]);
+          }
+        );
+
+        return () => unsubFallback();
+      }
+    );
+
+    return unsubSorted;
   }
 
-  // ✅ detect links inside messages (for profile "Links tab")
+  // ✅ detect links inside messages
   private detectMessageType(text: string): ChatMessageType {
     const hasUrl = /https?:\/\/[^\s]+/i.test(text);
     return hasUrl ? 'link' : 'text';
+  }
+
+  // ✅ helper timestamp
+  private getTimeValue(ts: any): number {
+    try {
+      if (!ts) return 0;
+      const d = ts?.toDate ? ts.toDate() : new Date(ts);
+      return d.getTime();
+    } catch {
+      return 0;
+    }
   }
 }

@@ -2,19 +2,23 @@ import { Injectable } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
 import {
   Firestore,
-  collection,
   addDoc,
+  arrayRemove,
+  arrayUnion,
+  collection,
+  deleteDoc,
+  deleteField,
   doc,
   getDoc,
-  updateDoc,
-  query,
-  where,
+  onSnapshot,
   orderBy,
+  query,
   serverTimestamp,
-  deleteField,
   setDoc,
+  updateDoc,
+  where,
 } from '@angular/fire/firestore';
-import { onSnapshot } from '@angular/fire/firestore';
+
 import { Observable } from 'rxjs';
 
 export type RoomType = 'dm' | 'group' | 'channel';
@@ -43,17 +47,25 @@ export interface Room {
   pinned?: Record<string, boolean>;
 }
 
+export interface RoomMessage {
+  id?: string;
+  text: string;
+  senderId: string;
+  createdAt?: any;
+}
+
 @Injectable({ providedIn: 'root' })
 export class RoomService {
   constructor(private firestore: Firestore, private auth: Auth) {}
 
   // ==========================
-  // DM rooms (optional)
+  // ✅ DM room id
   // ==========================
   getDmRoomId(uid1: string, uid2: string) {
     return [uid1, uid2].sort().join('_');
   }
 
+  // ✅ Ensure DM room exists
   async ensureDmRoom(uid1: string, uid2: string) {
     const roomId = this.getDmRoomId(uid1, uid2);
     const roomDoc = doc(this.firestore, `rooms/${roomId}`);
@@ -87,14 +99,13 @@ export class RoomService {
   }
 
   // ==========================
-  // CREATE GROUP / CHANNEL ✅
+  // ✅ CREATE GROUP / CHANNEL
   // ==========================
   async createRoom(data: Partial<Room>) {
     const myUid = this.auth.currentUser?.uid;
     if (!myUid) throw new Error('Not logged in');
 
     const roomsRef = collection(this.firestore, 'rooms');
-
     const members = Array.from(new Set([myUid, ...(data.members || [])]));
 
     const payload: Room = {
@@ -127,50 +138,187 @@ export class RoomService {
     return res.id;
   }
 
-  // ==========================
-  // LISTEN MY ROOMS ✅
-  // ==========================
-  listenMyRooms(myUid: string, callback: (rooms: any[]) => void) {
+  // ======================================================
+  // ✅ LISTEN ONE ROOM DOC
+  // ======================================================
+  listenRoom(roomId: string, cb: (room: Room | null) => void) {
+    const ref = doc(this.firestore, `rooms/${roomId}`);
+
+    return onSnapshot(
+      ref,
+      (snap) => {
+        if (!snap.exists()) return cb(null);
+        cb({ id: snap.id, ...(snap.data() as any) });
+      },
+      (err) => {
+        console.error('🔥 listenRoom error:', err);
+        cb(null);
+      }
+    );
+  }
+
+  // ======================================================
+  // ✅ LISTEN ROOM MESSAGES
+  // ======================================================
+  listenRoomMessages(roomId: string, cb: (msgs: RoomMessage[]) => void) {
+    const refCol = collection(this.firestore, `rooms/${roomId}/messages`);
+    const qSorted = query(refCol, orderBy('createdAt', 'asc'));
+
+    return onSnapshot(
+      qSorted,
+      (snap) => {
+        const msgs = snap.docs.map((d) => ({
+          id: d.id,
+          ...(d.data() as any),
+        })) as RoomMessage[];
+        cb(msgs);
+      },
+      (err) => {
+        console.error('🔥 listenRoomMessages error:', err);
+        cb([]);
+      }
+    );
+  }
+
+  // ======================================================
+  // ✅ SEND ROOM MESSAGE (Group / Channel chat send)
+  // ======================================================
+  async sendRoomMessage(roomId: string, data: { text: string; senderId: string }) {
+    const txt = (data?.text || '').trim();
+    if (!txt) return;
+
+    const msgRef = collection(this.firestore, `rooms/${roomId}/messages`);
+
+    await addDoc(msgRef, {
+      text: txt,
+      senderId: data.senderId,
+      createdAt: serverTimestamp(),
+    });
+
+    // ✅ Telegram preview meta update + unread
+    await this.updateRoomMeta(roomId, data.senderId, txt);
+  }
+
+  // ======================================================
+  // ✅ ADD MEMBERS
+  // ======================================================
+  async addMembers(roomId: string, memberUids: string[]) {
+    const roomDoc = doc(this.firestore, `rooms/${roomId}`);
+    const snap = await getDoc(roomDoc);
+    if (!snap.exists()) throw new Error('Room not found');
+
+    const room = snap.data() as any;
+    const currentMembers: string[] = room?.members || [];
+
+    const addList = (memberUids || [])
+      .filter(Boolean)
+      .filter((uid) => !currentMembers.includes(uid));
+
+    if (addList.length === 0) return;
+
+    const unreadPatch: any = {};
+    addList.forEach((uid) => {
+      unreadPatch[`unread.${uid}`] = 0;
+    });
+
+    await updateDoc(roomDoc, {
+      members: arrayUnion(...addList),
+      updatedAt: serverTimestamp(),
+      ...unreadPatch,
+    });
+  }
+
+  // ======================================================
+  // ✅ LEAVE ROOM
+  // ======================================================
+  async leaveRoom(roomId: string, uid: string) {
+    if (!roomId || !uid) return;
+
+    const roomDoc = doc(this.firestore, `rooms/${roomId}`);
+
+    await updateDoc(roomDoc, {
+      members: arrayRemove(uid),
+      admins: arrayRemove(uid),
+
+      [`unread.${uid}`]: deleteField(),
+      [`muted.${uid}`]: deleteField(),
+      [`pinned.${uid}`]: deleteField(),
+
+      updatedAt: serverTimestamp(),
+    });
+  }
+
+  // ======================================================
+  // ✅ DELETE ROOM
+  // ======================================================
+  async deleteRoom(roomId: string) {
+    const roomDoc = doc(this.firestore, `rooms/${roomId}`);
+    await deleteDoc(roomDoc);
+  }
+
+  // ======================================================
+  // ✅ LISTEN MY ROOMS (telegram list sidebar)
+  // ======================================================
+  listenMyRooms(myUid: string, callback: (rooms: Room[]) => void) {
     const roomsRef = collection(this.firestore, 'rooms');
 
-    const q = query(
+    const qSorted = query(
       roomsRef,
       where('members', 'array-contains', myUid),
       orderBy('updatedAt', 'desc')
     );
 
-    return onSnapshot(q, (snap) => {
-      const rooms = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
-      callback(rooms);
-    });
+    const qFallback = query(roomsRef, where('members', 'array-contains', myUid));
+
+    const unsubSorted = onSnapshot(
+      qSorted,
+      (snap) => {
+        const rooms = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as Room[];
+        callback(rooms);
+      },
+      (err: any) => {
+        console.error('🔥 listenMyRooms() sorted query failed:', err);
+        console.warn('⚠️ Falling back (no orderBy)...');
+
+        const unsubFallback = onSnapshot(
+          qFallback,
+          (snap2) => {
+            let rooms = snap2.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as Room[];
+
+            rooms = rooms.sort((a: any, b: any) => {
+              const at = this.getTimeValue(a.updatedAt);
+              const bt = this.getTimeValue(b.updatedAt);
+              return bt - at;
+            });
+
+            callback(rooms);
+          },
+          (err2: any) => {
+            console.error('🔥 listenMyRooms() fallback failed:', err2);
+            callback([]);
+          }
+        );
+
+        return () => unsubFallback();
+      }
+    );
+
+    return unsubSorted;
   }
 
-  // observable (if needed)
   myRooms$(): Observable<Room[]> {
     const uid = this.auth.currentUser?.uid;
     if (!uid) return new Observable((sub) => sub.next([]));
 
-    const roomsRef = collection(this.firestore, 'rooms');
-    const q1 = query(
-      roomsRef,
-      where('members', 'array-contains', uid),
-      orderBy('updatedAt', 'desc')
-    );
-
-    // you can use collectionData if you want
     return new Observable((sub) => {
-      const unsub = onSnapshot(q1, (snap) => {
-        const rooms = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as any;
-        sub.next(rooms);
-      });
-      return () => unsub();
+      const unsub = this.listenMyRooms(uid, (rooms: Room[]) => sub.next(rooms));
+      return () => unsub?.();
     }) as any;
   }
 
-  // ==========================
-  // ✅ THIS IS THE MAIN FIX
-  // when any message is sent -> update room meta
-  // ==========================
+  // ======================================================
+  // ✅ Update room meta: last message + unread
+  // ======================================================
   async updateRoomMeta(roomId: string, senderId: string, text: string) {
     const roomDoc = doc(this.firestore, `rooms/${roomId}`);
     const snap = await getDoc(roomDoc);
@@ -194,9 +342,9 @@ export class RoomService {
     });
   }
 
-  // ==========================
-  // mark read
-  // ==========================
+  // ======================================================
+  // ✅ mark read
+  // ======================================================
   async markAsRead(roomId: string, myUid: string) {
     const roomDoc = doc(this.firestore, `rooms/${roomId}`);
     await updateDoc(roomDoc, {
@@ -214,5 +362,18 @@ export class RoomService {
     const roomDoc = doc(this.firestore, `rooms/${roomId}`);
     if (pin) await updateDoc(roomDoc, { [`pinned.${myUid}`]: true });
     else await updateDoc(roomDoc, { [`pinned.${myUid}`]: deleteField() });
+  }
+
+  // ==========================
+  // ✅ helper
+  // ==========================
+  private getTimeValue(ts: any): number {
+    try {
+      if (!ts) return 0;
+      const d = ts?.toDate ? ts.toDate() : new Date(ts);
+      return d.getTime();
+    } catch {
+      return 0;
+    }
   }
 }

@@ -1,127 +1,65 @@
 import { Injectable } from '@angular/core';
-
 import {
   Auth,
-  User,
-  UserCredential,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  sendPasswordResetEmail,
+  UserCredential,
 } from '@angular/fire/auth';
-
-import {
-  Firestore,
-  doc,
-  setDoc,
-  serverTimestamp,
-  updateDoc,
-} from '@angular/fire/firestore';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  constructor(private auth: Auth, private firestore: Firestore) {}
-
-  // ✅ current firebase user
-  get currentUser(): User | null {
-    return this.auth.currentUser;
-  }
-
-  // ✅ REGISTER (NO OTP)
-  async register(
-    email: string,
-    password: string,
-    phoneDigits10: string
-  ): Promise<UserCredential> {
-    const cleanEmail = (email || '').trim();
-    const cleanPass = (password || '').trim();
-
-    if (!cleanEmail || !cleanPass) {
-      throw new Error('Email and password are required');
-    }
-
-    if (!phoneDigits10 || phoneDigits10.length !== 10) {
-      throw new Error('Phone number must be 10 digits');
-    }
-
-    // 1) create firebase auth user
-    const cred = await createUserWithEmailAndPassword(
-      this.auth,
-      cleanEmail,
-      cleanPass
-    );
-
-    // 2) create user profile in Firestore
-    await setDoc(
-      doc(this.firestore, `users/${cred.user.uid}`),
-      {
-        uid: cred.user.uid,
-        email: cleanEmail,
-        phone: `+91${phoneDigits10}`,
-
-        name: '',
-        bio: '',
-        photoURL: '',
-
-        blocked: [],
-
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      },
-      { merge: true }
-    );
-
-    return cred;
-  }
+  constructor(private auth: Auth) {}
 
   // ✅ LOGIN
   async login(email: string, password: string): Promise<UserCredential> {
-    const cleanEmail = (email || '').trim();
+    return signInWithEmailAndPassword(this.auth, email, password);
+  }
+
+  // ✅ REGISTER (FINAL FIX ✅ phoneDigits10 OPTIONAL)
+  async register(
+    email: string,
+    password: string,
+    phoneDigits10: string = '' // ✅ important fix
+  ): Promise<UserCredential> {
+    const cleanEmail = (email || '').trim().toLowerCase();
     const cleanPass = (password || '').trim();
+    const cleanPhone = (phoneDigits10 || '').replace(/\D/g, '').slice(-10);
 
     if (!cleanEmail || !cleanPass) {
-      throw new Error('Email and password are required');
+      throw new Error('Email and password required');
     }
 
-    // update last login time after successful login
-    const cred = await signInWithEmailAndPassword(this.auth, cleanEmail, cleanPass);
-
-    try {
-      await updateDoc(doc(this.firestore, `users/${cred.user.uid}`), {
-        updatedAt: serverTimestamp(),
-      });
-    } catch {
-      // if document missing / permission issue ignore
+    if (cleanPass.length < 6) {
+      throw new Error('Password must be at least 6 characters');
     }
 
+    // ✅ phone is optional
+    if (cleanPhone && cleanPhone.length !== 10) {
+      throw new Error('Phone number must be 10 digits');
+    }
+
+    // ✅ Create firebase auth account
+    const cred = await createUserWithEmailAndPassword(this.auth, cleanEmail, cleanPass);
+
+    // ✅ return credential (phone handled in register.component.ts)
     return cred;
   }
 
   // ✅ LOGOUT
   async logout() {
-    return await signOut(this.auth);
+    return signOut(this.auth);
   }
 
-  // ✅ RESET PASSWORD (optional but useful)
-  async resetPassword(email: string) {
-    const cleanEmail = (email || '').trim();
-    if (!cleanEmail) throw new Error('Please enter your email');
-
-    return await sendPasswordResetEmail(this.auth, cleanEmail);
-  }
-
-  // ✅ Better Firebase error messages
+  // ✅ OPTIONAL: Error message helper
   getErrorMessage(err: any): string {
     const code = err?.code || '';
 
-    if (code.includes('auth/invalid-email')) return 'Invalid email address';
-    if (code.includes('auth/user-not-found')) return 'No account found with this email';
+    if (code.includes('auth/email-already-in-use')) return 'Email already registered';
+    if (code.includes('auth/invalid-email')) return 'Invalid email';
     if (code.includes('auth/wrong-password')) return 'Wrong password';
-    if (code.includes('auth/invalid-credential')) return 'Invalid login credentials';
-    if (code.includes('auth/email-already-in-use')) return 'This email is already registered';
-    if (code.includes('auth/weak-password')) return 'Password is too weak (min 6 characters)';
-    if (code.includes('auth/too-many-requests')) return 'Too many attempts. Try again later.';
-    if (code.includes('auth/network-request-failed')) return 'Network error. Check internet connection.';
+    if (code.includes('auth/user-not-found')) return 'Account not found';
+    if (code.includes('auth/weak-password')) return 'Weak password (min 6 chars)';
 
     return err?.message || 'Something went wrong';
   }

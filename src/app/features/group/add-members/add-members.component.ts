@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
-import { Firestore, doc, updateDoc, arrayUnion } from '@angular/fire/firestore';
 import { Subscription } from 'rxjs';
 
 import { UserService, AppUser } from '../../../core/services/user.service';
+import { RoomService } from '../../../core/services/room.service';
 
 @Component({
   selector: 'app-add-members',
@@ -16,60 +16,82 @@ import { UserService, AppUser } from '../../../core/services/user.service';
   styleUrls: ['./add-members.component.css'],
 })
 export class AddMembersComponent implements OnInit, OnDestroy {
-  id = '';
-  me = '';
+  myUid = '';
+  roomId = '';
+
+  room: any = null;
 
   users: AppUser[] = [];
   filtered: AppUser[] = [];
-  selected = new Set<string>();
 
   search = '';
-  loading = false;
+  selected = new Set<string>();
+
+  loading = true;
+  saving = false;
   err = '';
 
-  private sub?: Subscription;
+  private subUsers?: Subscription;
+  private subRoom?: any;
 
   constructor(
-    private route: ActivatedRoute,
     private auth: Auth,
-    private fs: Firestore,
-    private userService: UserService
+    private route: ActivatedRoute,
+    private router: Router,
+    private userService: UserService,
+    private roomService: RoomService
   ) {}
 
   ngOnInit(): void {
     const u = this.auth.currentUser;
     if (!u) return;
-    this.me = u.uid;
+    this.myUid = u.uid;
 
-    this.id = this.route.snapshot.paramMap.get('id') || '';
-    if (!this.id) return;
+    this.roomId = this.route.snapshot.paramMap.get('id') || '';
+    if (!this.roomId) return;
 
-    this.sub = this.userService.getUsers().subscribe((list) => {
-      this.users = (list || []).filter((x) => x.uid !== this.me);
+    this.subRoom = this.roomService.listenRoom(this.roomId, (r: any) => {
+      this.room = r;
+      this.loading = false;
+      this.apply();
+    });
+
+    this.subUsers = this.userService.getUsers().subscribe((list) => {
+      this.users = (list || []).filter((x) => x.uid !== this.myUid);
       this.apply();
     });
   }
 
   ngOnDestroy(): void {
-    this.sub?.unsubscribe();
+    this.subUsers?.unsubscribe();
+    this.subRoom?.();
   }
 
   apply() {
     const t = this.search.trim().toLowerCase();
-    if (!t) {
-      this.filtered = [...this.users];
-      return;
+    const members = new Set<string>(this.room?.members || []);
+
+    let list = (this.users || []).filter((u) => !members.has(u.uid));
+
+    if (t) {
+      list = list.filter((u) => {
+        return (
+          (u.name || '').toLowerCase().includes(t) ||
+          (u.email || '').toLowerCase().includes(t) ||
+          (u.phone || '').toLowerCase().includes(t)
+        );
+      });
     }
-    this.filtered = this.users.filter((u) => {
-      return (
-        (u.name || '').toLowerCase().includes(t) ||
-        (u.email || '').toLowerCase().includes(t) ||
-        (u.phone || '').toLowerCase().includes(t)
-      );
-    });
+
+    this.filtered = list;
+  }
+
+  getInitial(u: AppUser) {
+    return (u.name || u.email || 'U').slice(0, 1).toUpperCase();
   }
 
   toggle(uid: string) {
+    if (!uid) return;
     if (this.selected.has(uid)) this.selected.delete(uid);
     else this.selected.add(uid);
   }
@@ -81,28 +103,19 @@ export class AddMembersComponent implements OnInit, OnDestroy {
   async add() {
     this.err = '';
     if (this.selected.size === 0) {
-      this.err = 'Select at least one user';
+      this.err = 'Select at least 1 user';
       return;
     }
 
     try {
-      this.loading = true;
-      const roomRef = doc(this.fs, `rooms/${this.id}`);
-
-      for (const uid of this.selected) {
-        await updateDoc(roomRef, {
-          members: arrayUnion(uid),
-          [`unread.${uid}`]: 0,
-        });
-      }
-
-      alert('✅ Members added');
-      history.back();
+      this.saving = true;
+      await this.roomService.addMembers(this.roomId, Array.from(this.selected));
+      this.router.navigate(['/app/group', this.roomId, 'info']);
     } catch (e: any) {
       console.error(e);
-      this.err = e?.message || 'Add failed';
+      this.err = e?.message || 'Add members failed';
     } finally {
-      this.loading = false;
+      this.saving = false;
     }
   }
 }

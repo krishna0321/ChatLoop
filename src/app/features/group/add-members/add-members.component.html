@@ -1,27 +1,47 @@
-<div class="wrap">
-  <div class="card">
-    <div class="head">
-      <h2>➕ Add Members</h2>
-      <a routerLink="/app/chats" class="back">⬅ Chats</a>
-    </div>
+<div class="page">
 
-    <input [(ngModel)]="search" (input)="apply()" placeholder="Search users..." />
+  <div class="top">
+    <a class="back" [routerLink]="['/app/group', roomId, 'info']">⬅ Info</a>
+    <div>
+      <div class="title">Add Members</div>
+      <div class="sub">Search and add users into group</div>
+    </div>
+  </div>
+
+  <div class="card">
+
+    <div class="searchRow">
+      <span class="ico">🔍</span>
+      <input [(ngModel)]="search" (input)="apply()" placeholder="Search user..." />
+    </div>
 
     <div class="list">
-      <button class="u" *ngFor="let u of filtered" (click)="toggle(u.uid)" [class.active]="isSelected(u.uid)">
-        <div class="av">{{ (u.name || u.email || 'U')[0] }}</div>
-        <div class="info">
-          <div class="n">{{ u.name || 'User' }}</div>
-          <div class="s">{{ u.phone || u.email }}</div>
+      <div
+        class="user"
+        *ngFor="let u of filtered"
+        [class.sel]="isSelected(u.uid)"
+        (click)="toggle(u.uid)"
+      >
+        <div class="av">{{ getInitial(u) }}</div>
+        <div class="meta">
+          <div class="name">{{ u.name || u.email || 'User' }}</div>
+          <div class="sub">{{ u.email || u.phone || '' }}</div>
         </div>
-        <div class="c">{{ isSelected(u.uid) ? '✅' : '' }}</div>
-      </button>
+
+        <div class="check">{{ isSelected(u.uid) ? '✅' : '➕' }}</div>
+      </div>
+
+      <div class="empty" *ngIf="filtered.length === 0 && !loading">
+        No users available
+      </div>
     </div>
 
-    <button class="primary" (click)="add()" [disabled]="loading">
-      {{ loading ? 'Adding...' : '✅ Add Selected' }}
+    <p class="err" *ngIf="err">{{ err }}</p>
+
+    <button class="primary" (click)="add()" [disabled]="saving">
+      {{ saving ? 'Adding...' : '✅ Add Members' }}
     </button>
 
-    <p class="err" *ngIf="err">{{ err }}</p>
   </div>
+
 </div>

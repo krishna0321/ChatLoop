@@ -13,30 +13,42 @@ import { RouterOutlet } from '@angular/router';
     </div>
   `,
   styles: [`
-    .auth {
-      min-height: 100vh; /* ✅ allow scroll */
-      display: grid;
-      place-items: center;
+    :host{
+      display:block;
+      min-height:100vh;
+    }
+
+    /* ✅ Full screen auth canvas */
+    .auth{
+      min-height: 100vh;
+      width: 100%;
       background: #020617;
       color: white;
-      padding: 18px; /* ✅ mobile spacing */
+
+      display: grid;
+      place-items: center;
+      padding: 18px;
       overflow-y: auto;
     }
 
-    /* ✅ inner wrapper so forms never stretch too wide */
-    .auth-inner {
+    /* ✅ Important: allow login to be wide */
+    .auth-inner{
       width: 100%;
-      max-width: 460px; /* ✅ perfect for login/register */
+      max-width: 1200px; /* ✅ allow 2 column layout */
     }
 
-    /* ✅ Better mobile scaling */
-    @media (max-width: 480px) {
-      .auth {
-        padding: 14px;
-        place-items: start center; /* ✅ top align on very small screens */
+    @media (max-width: 860px){
+      .auth-inner{
+        max-width: 520px; /* ✅ on mobile keep it small */
       }
+    }
 
-      .auth-inner {
+    @media (max-width: 480px){
+      .auth{
+        padding: 14px;
+        place-items: start center;
+      }
+      .auth-inner{
         max-width: 100%;
       }
     }
