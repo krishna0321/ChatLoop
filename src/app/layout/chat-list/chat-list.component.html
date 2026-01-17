@@ -1,58 +1,61 @@
-<div class="chatListWrap">
+<div class="chatListShell">
 
-  <!-- ✅ HEADER -->
-  <div class="listHeader">
+  <!-- 🌌 BACKGROUND -->
+  <div class="bg"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <!-- HEADER -->
+  <header class="listHeader">
     <div class="headerTitle">
       Chats
       <span class="count">{{ chats.length }}</span>
     </div>
 
-    <div class="headerActions">
-      <a [routerLink]="['/app/create-room']">➕</a>
-    </div>
-  </div>
+    <a class="addBtn" [routerLink]="['/app/create-room']">➕</a>
+  </header>
 
-  <!-- ✅ LOADING -->
+  <!-- LOADING -->
   <div class="loadingBox" *ngIf="loading">
     <div class="spinner"></div>
     <div class="loadingText">Loading chats...</div>
   </div>
 
-  <!-- ✅ EMPTY STATE -->
-  <div *ngIf="!loading && chats.length === 0" class="emptyState">
+  <!-- EMPTY -->
+  <div *ngIf="!loading && chats.length === 0" class="empty">
     <div class="emoji">💬</div>
     <h3>No chats yet</h3>
-    <p>
-      You are new here 😄 <br />
-      Start chatting with someone!
-    </p>
+    <p>Start your first conversation</p>
 
-    <button class="startBtn" routerLink="/users">
-      ➕ Start New Chat
+    <button class="primary" routerLink="/app/users">
+      ➕ Start Chat
     </button>
 
     <div class="tip">
-      Tip: Go to <b>Users</b> page and click on any user to start chat.
+      Tip: Open <b>Users</b> and tap anyone to chat
     </div>
   </div>
 
-  <!-- ✅ CHAT LIST -->
+  <!-- CHAT LIST -->
   <div *ngIf="!loading && chats.length > 0" class="chatList">
     <a
       class="chatItem"
       *ngFor="let c of chats; trackBy: trackByChatId"
       [routerLink]="['/chat', c.id]"
     >
+
+      <!-- AVATAR -->
       <div class="avatar">
         {{ iconByType(c.type) }}
       </div>
 
+      <!-- INFO -->
       <div class="info">
-        <div class="titleRow">
+        <div class="row1">
           <div class="title">{{ c.title }}</div>
 
           <span
-            class="type"
+            class="badge"
             [class.dm]="c.type==='dm'"
             [class.group]="c.type==='group'"
             [class.channel]="c.type==='channel'"
@@ -66,7 +69,7 @@
         </div>
       </div>
 
-      <!-- ✅ unread badge -->
+      <!-- UNREAD -->
       <div class="unread" *ngIf="c.unread > 0">
         {{ c.unread }}
       </div>

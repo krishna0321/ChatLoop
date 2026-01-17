@@ -130,7 +130,7 @@ export const routes: Routes = [
       },
     ],
   },
-
+    
   // ✅ fallback
   { path: '**', redirectTo: 'login' },
 ];

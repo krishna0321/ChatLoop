@@ -1,5 +1,10 @@
 <div class="layout" (click)="closeAll()">
 
+  <!-- 🌌 BACKGROUND -->
+  <div class="bg"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
   <!-- LEFT SIDEBAR -->
   <aside
     class="sidebar"
@@ -12,9 +17,10 @@
       <div class="logoRow">
         <div class="logo">
           <span class="logoDot"></span>
-          Chatloop
+          <span class="logoText">Chatloop</span>
         </div>
-        <div class="tag">Telegram UI</div>
+
+        <div class="tag">Premium</div>
       </div>
 
       <div class="searchWrap">
@@ -23,7 +29,7 @@
           class="search"
           [(ngModel)]="searchText"
           (input)="applyFilter()"
-          placeholder="Search chats..."
+          placeholder="Search chats or people..."
           (click)="$event.stopPropagation()"
         />
       </div>
@@ -42,7 +48,9 @@
         [class.active]="selectedRoomId === r.id"
         (click)="openRoom(r)"
       >
-        <div class="avatar">{{ (getRoomTitle(r)[0] || 'U').toUpperCase() }}</div>
+        <div class="avatar">
+          {{ (getRoomTitle(r)[0] || 'U').toUpperCase() }}
+        </div>
 
         <div class="info">
           <div class="row">
@@ -88,7 +96,7 @@
         No chats found
       </div>
 
-      <!-- ✅ PEOPLE SECTION (ONLY SHOW WHEN SEARCHING) -->
+      <!-- ✅ PEOPLE SECTION -->
       <ng-container *ngIf="shouldShowPeople()">
 
         <div class="divider"></div>
@@ -97,7 +105,8 @@
 
         <div class="people-list">
           <div class="chat-item" *ngFor="let u of filteredUsers">
-            <div class="avatar">
+
+            <div class="avatar small">
               {{ (u.name || u.email || '?').slice(0,1).toUpperCase() }}
             </div>
 
@@ -112,6 +121,7 @@
             >
               Start
             </button>
+
           </div>
 
           <div *ngIf="filteredUsers.length === 0" class="emptyLeft">

@@ -1,293 +1,351 @@
-.chatListWrap{
-  height: 100%;
+/* =========================================
+   CHATLOOP – CHAT LIST (PREMIUM)
+   ✅ FIXED: NO :root (breaks global UI)
+========================================= */
+
+/* ✅ IMPORTANT: variables MUST be inside :host (component scope) */
+:host{
+  /* 🎨 CHANGE ONLY HERE */
+  --theme:#7c3aed;
+  --theme-2:#3b82f6;
+
+  --bg:#050816;
+  --panel: rgba(15,23,42,0.78);
+  --panel-soft: rgba(2,6,23,0.55);
+
+  --border: rgba(255,255,255,0.10);
+  --text: rgba(255,255,255,0.95);
+  --muted: rgba(255,255,255,0.65);
+
+  --glow: color-mix(in srgb, var(--theme) 40%, transparent);
+
+  flex:1;
+  display:flex;
+  height:100%;
+  min-width:0;
+  min-height:0; /* ✅ FIX flex scroll issues */
+}
+
+/* ✅ ROOT WRAP */
+.chatListShell{
+  flex:1;
+  min-height:0;
+  height:100%;
+  width:100%;
+
   display:flex;
   flex-direction:column;
-  background: rgba(2,6,23,0.55);
-  backdrop-filter: blur(12px);
-  border-right: 1px solid rgba(255,255,255,0.06);
-  min-width: 0;
+  position:relative;
+
+  background: var(--panel-soft);
+  backdrop-filter: blur(16px);
+  border-right:1px solid var(--border);
+  overflow:hidden;
+}
+
+/* BACKGROUND */
+.bg{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+
+  background:
+    radial-gradient(circle at 20% 0%, color-mix(in srgb, var(--theme) 22%, transparent), transparent 45%),
+    radial-gradient(circle at 80% 60%, color-mix(in srgb, var(--theme-2) 20%, transparent), transparent 55%);
+  filter: blur(80px);
+  opacity:.95;
+}
+
+.orb{
+  position:absolute;
+  width:420px;
+  height:420px;
+  border-radius:999px;
+  filter: blur(140px);
+  opacity:.22;
+  pointer-events:none;
+  z-index:0;
+  animation: float 8s ease-in-out infinite;
+}
+.orb1{
+  background: var(--theme);
+  top:-200px;
+  left:-200px;
+}
+.orb2{
+  background: var(--theme-2);
+  bottom:-220px;
+  right:-220px;
+  animation-delay:2s;
+}
+@keyframes float{
+  0%,100%{ transform:translate(0,0); }
+  50%{ transform:translate(24px,-20px); }
 }
 
 /* HEADER */
 .listHeader{
-  height: 64px;
+  flex-shrink:0;
+  height:66px;
+
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  justify-content:space-between;
+
   padding: 12px 14px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+
+  background: var(--panel);
+  border-bottom:1px solid var(--border);
+  backdrop-filter: blur(18px);
+
+  z-index:2;
 }
 
 .headerTitle{
-  font-size: 16px;
-  font-weight: 950;
-  color: white;
+  font-size:16px;
+  font-weight:1000;
+  color:white;
   display:flex;
   gap:10px;
   align-items:center;
 }
 
 .count{
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 999px;
+  font-size:12px;
+  padding:4px 10px;
+  border-radius:999px;
   background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.10);
-  opacity: .9;
+  border:1px solid var(--border);
 }
 
-/* ✅ header actions button style */
-.headerActions a{
+.addBtn{
   width:42px;
   height:42px;
-  border-radius: 14px;
+  border-radius:14px;
   display:grid;
   place-items:center;
   text-decoration:none;
-  background:#2563eb;
   color:white;
-  font-weight: 950;
-  box-shadow: 0 12px 30px rgba(37,99,235,0.22);
-  transition: .15s ease;
+  font-weight:1000;
+  background: linear-gradient(135deg,var(--theme),var(--theme-2));
+  box-shadow: 0 12px 36px var(--glow);
+  transition:.15s ease;
 }
-.headerActions a:hover{
+.addBtn:hover{
   transform: translateY(-1px);
 }
 
 /* LOADING */
 .loadingBox{
   flex:1;
+  min-height:0;
+
   display:flex;
   flex-direction:column;
   justify-content:center;
   align-items:center;
   gap:14px;
+
+  z-index:1;
 }
 
 .spinner{
-  width:38px;height:38px;
+  width:36px;
+  height:36px;
   border-radius:50%;
-  border: 4px solid rgba(255,255,255,.12);
-  border-top-color:#2563eb;
+  border:4px solid rgba(255,255,255,.12);
+  border-top-color: var(--theme);
   animation: spin 1s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin{ to{ transform:rotate(360deg); } }
 
 .loadingText{
-  opacity:.8;
   font-size:13px;
+  opacity:.75;
 }
 
 /* EMPTY */
-.emptyState{
+.empty{
   flex:1;
+  min-height:0;
+
   display:flex;
   flex-direction:column;
   justify-content:center;
   align-items:center;
   text-align:center;
+
   padding: 22px;
-  color:white;
+  z-index:1;
 }
 
-.emoji{
-  font-size: 40px;
-  margin-bottom: 8px;
+.empty .emoji{
+  font-size:42px;
+  margin-bottom:10px;
 }
 
-.emptyState h3{
-  margin: 0;
-  font-size: 18px;
-  font-weight: 950;
+.empty h3{
+  margin:0;
+  font-size:18px;
+  font-weight:1000;
 }
 
-.emptyState p{
-  margin: 10px 0 0;
+.empty p{
+  margin-top:8px;
+  font-size:13px;
   opacity:.75;
-  font-size: 13px;
-  line-height: 1.4;
 }
 
-.startBtn{
-  margin-top: 14px;
-  height: 44px;
-  padding: 0 14px;
-  border-radius: 14px;
+.primary{
+  margin-top:14px;
+  height:44px;
+  padding:0 16px;
+  border-radius:14px;
   border:none;
   cursor:pointer;
-  background:#2563eb;
+  font-weight:1000;
   color:white;
-  font-weight: 900;
+  background: linear-gradient(135deg,var(--theme),var(--theme-2));
+  box-shadow: 0 12px 40px var(--glow);
 }
 
 .tip{
-  margin-top: 14px;
-  font-size: 12px;
-  opacity: .7;
+  margin-top:14px;
+  font-size:12px;
+  opacity:.65;
 }
 
 /* CHAT LIST */
 .chatList{
   flex:1;
+  min-height:0; /* ✅ FIX scroll */
   overflow:auto;
+
   padding: 10px 10px 12px;
-  min-height: 0;
-  -webkit-overflow-scrolling: touch;
+  z-index:1;
 }
 
-.chatList::-webkit-scrollbar { width: 10px; }
+.chatList::-webkit-scrollbar{ width:8px; }
 .chatList::-webkit-scrollbar-thumb{
   background: rgba(255,255,255,0.10);
-  border-radius: 999px;
+  border-radius:999px;
 }
 
+/* CHAT ITEM */
 .chatItem{
   display:flex;
   align-items:center;
-  gap: 12px;
-  padding: 12px 12px;
-  border-radius: 18px;
+  gap:12px;
+  padding:12px;
+  border-radius:18px;
   text-decoration:none;
   color:white;
   position:relative;
-  transition: .15s ease;
-  min-width: 0;
+  transition:.15s ease;
 }
-
 .chatItem:hover{
   background: rgba(255,255,255,0.06);
 }
 
-/* avatar */
+/* AVATAR */
 .avatar{
   width:46px;
   height:46px;
-  border-radius: 16px;
+  border-radius:16px;
   display:grid;
   place-items:center;
+  font-size:18px;
   background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.10);
-  font-size: 18px;
-  flex-shrink: 0;
+  border:1px solid var(--border);
+  flex-shrink:0;
 }
 
+/* INFO */
 .info{
   flex:1;
   min-width:0;
 }
 
-.titleRow{
+.row1{
   display:flex;
   justify-content:space-between;
-  gap: 10px;
   align-items:center;
-  min-width:0;
+  gap:10px;
 }
 
 .title{
-  font-weight: 900;
-  font-size: 14px;
-  white-space: nowrap;
+  font-size:14px;
+  font-weight:900;
+  white-space:nowrap;
   overflow:hidden;
-  text-overflow: ellipsis;
-  min-width:0;
+  text-overflow:ellipsis;
 }
 
 .subtitle{
-  margin-top: 4px;
-  font-size: 12px;
-  opacity: .70;
-  white-space: nowrap;
+  margin-top:4px;
+  font-size:12px;
+  opacity:.7;
+  white-space:nowrap;
   overflow:hidden;
-  text-overflow: ellipsis;
+  text-overflow:ellipsis;
 }
 
-/* type badge */
-.type{
-  font-size: 10px;
-  padding: 4px 9px;
-  border-radius: 999px;
-  text-transform: uppercase;
-  border: 1px solid rgba(255,255,255,0.12);
+/* BADGE */
+.badge{
+  font-size:10px;
+  padding:4px 9px;
+  border-radius:999px;
+  text-transform:uppercase;
+  border:1px solid var(--border);
   background: rgba(255,255,255,0.06);
-  opacity: .9;
-  flex-shrink: 0;
 }
 
-.type.group{
-  background: rgba(34,197,94,.14);
-  border-color: rgba(34,197,94,.22);
+.badge.group{
+  background: rgba(34,197,94,.16);
+  border-color: rgba(34,197,94,.30);
 }
 
-.type.channel{
-  background: rgba(59,130,246,.14);
-  border-color: rgba(59,130,246,.22);
+.badge.channel{
+  background: rgba(59,130,246,.16);
+  border-color: rgba(59,130,246,.30);
 }
 
-/* unread */
+/* UNREAD */
 .unread{
-  min-width: 22px;
-  height: 22px;
-  padding: 0 7px;
-  border-radius: 999px;
-  background:#2563eb;
-  color:white;
-  font-weight: 900;
-  font-size: 12px;
+  min-width:22px;
+  height:22px;
+  padding:0 7px;
+  border-radius:999px;
+
   display:grid;
   place-items:center;
-  flex-shrink: 0;
+
+  font-size:12px;
+  font-weight:1000;
+  color:white;
+
+  background: linear-gradient(135deg,var(--theme),var(--theme-2));
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--theme) 30%, transparent);
+  animation: pulse 1.8s infinite;
+}
+@keyframes pulse{
+  0%{ box-shadow:0 0 0 0 color-mix(in srgb, var(--theme) 40%, transparent); }
+  100%{ box-shadow:0 0 0 10px transparent; }
 }
 
-/* ✅ RESPONSIVE (Mobile + Tablet) */
-@media (max-width: 900px) {
-  .chatListWrap{
-    border-right: none;
-    width: 100%;
+/* MOBILE */
+@media(max-width:900px){
+  .chatListShell{
+    border-right:none;
   }
-
-  /* ✅ make list padding bigger for touch */
   .chatList{
-    padding: 10px 10px 90px; /* ✅ important: space for bottom nav */
-  }
-
-  .chatItem{
-    border-radius: 16px;
-    padding: 12px 12px;
-  }
-
-  .avatar{
-    width:44px;
-    height:44px;
-    border-radius: 15px;
+    padding:10px 10px 90px; /* ✅ space for bottom bar */
   }
 }
 
-/* ✅ Very small mobile */
-@media (max-width: 420px){
-  .listHeader{
-    padding: 10px 12px;
-  }
-
-  .headerTitle{
-    font-size: 15px;
-  }
-
-  .chatItem{
-    gap: 10px;
-    padding: 11px 11px;
-  }
-
-  .title{
-    font-size: 13.5px;
-  }
-
-  .subtitle{
-    font-size: 12px;
-  }
-
-  .type{
-    font-size: 9px;
-    padding: 3px 8px;
-  }
+@media(max-width:420px){
+  .listHeader{ padding:10px 12px; }
+  .chatItem{ gap:10px; padding:11px; }
+  .avatar{ width:44px;height:44px;border-radius:15px; }
 }

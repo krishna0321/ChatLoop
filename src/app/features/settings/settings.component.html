@@ -1,5 +1,10 @@
 <div class="settings-shell">
 
+  <!-- 🌌 BACKGROUND -->
+  <div class="bg"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
   <!-- ✅ Toast -->
   <div class="toast" *ngIf="toastVisible">{{ toastMsg }}</div>
 
@@ -12,8 +17,8 @@
     <button (click)="selectTab('account')" [class.active]="activeTab==='account'">🔐</button>
   </div>
 
-  <!-- LEFT MENU (Desktop only) -->
-  <aside class="settings-nav">
+  <!-- ✅ LEFT MENU (Desktop only) -->
+  <aside class="settings-nav fadeUp">
     <div class="nav-title">
       <div class="nav-icon">⚙️</div>
       <div>
@@ -43,8 +48,8 @@
     </button>
   </aside>
 
-  <!-- MAIN -->
-  <main class="settings-main">
+  <!-- ✅ MAIN -->
+  <main class="settings-main fadeUp">
     <div class="settings-header">
       <div>
         <h1>⚙️ Settings</h1>
@@ -60,7 +65,7 @@
 
     <div *ngIf="!loading" class="page">
 
-      <!-- PROFILE -->
+      <!-- ✅ PROFILE -->
       <section class="card" *ngIf="activeTab==='profile'">
         <h3>👤 Profile</h3>
 
@@ -88,7 +93,7 @@
         </div>
       </section>
 
-      <!-- APPEARANCE -->
+      <!-- ✅ APPEARANCE -->
       <section class="card" *ngIf="activeTab==='appearance'">
         <h3>🎨 Appearance</h3>
 
@@ -99,21 +104,24 @@
           </div>
 
           <label class="switch">
-            <!-- ✅ use ngModelChange for reliable changes -->
             <input type="checkbox"
-              [(ngModel)]="settings.darkMode"
-              (ngModelChange)="applyTheme(); trackChanges()" />
+                   [(ngModel)]="settings.darkMode"
+                   (ngModelChange)="applyTheme(); trackChanges()" />
             <span class="slider"></span>
           </label>
         </div>
 
         <div class="preview-row">
-          <div class="preview dark"></div>
-          <div class="preview light"></div>
+          <div class="preview dark">
+            <div class="pTitle">Dark</div>
+          </div>
+          <div class="preview light">
+            <div class="pTitle">Light</div>
+          </div>
         </div>
       </section>
 
-      <!-- NOTIFICATIONS -->
+      <!-- ✅ NOTIFICATIONS -->
       <section class="card" *ngIf="activeTab==='notifications'">
         <h3>🔔 Notifications</h3>
 
@@ -125,8 +133,8 @@
 
           <label class="switch">
             <input type="checkbox"
-              [(ngModel)]="settings.notifyMessages"
-              (ngModelChange)="trackChanges()" />
+                   [(ngModel)]="settings.notifyMessages"
+                   (ngModelChange)="trackChanges()" />
             <span class="slider"></span>
           </label>
         </div>
@@ -139,14 +147,14 @@
 
           <label class="switch">
             <input type="checkbox"
-              [(ngModel)]="settings.notifySound"
-              (ngModelChange)="trackChanges()" />
+                   [(ngModel)]="settings.notifySound"
+                   (ngModelChange)="trackChanges()" />
             <span class="slider"></span>
           </label>
         </div>
       </section>
 
-      <!-- PRIVACY -->
+      <!-- ✅ PRIVACY -->
       <section class="card" *ngIf="activeTab==='privacy'">
         <h3>🛡️ Privacy</h3>
 
@@ -158,8 +166,8 @@
 
           <label class="switch">
             <input type="checkbox"
-              [(ngModel)]="settings.showOnlineStatus"
-              (ngModelChange)="trackChanges()" />
+                   [(ngModel)]="settings.showOnlineStatus"
+                   (ngModelChange)="trackChanges()" />
             <span class="slider"></span>
           </label>
         </div>
@@ -172,14 +180,14 @@
 
           <label class="switch">
             <input type="checkbox"
-              [(ngModel)]="settings.allowFriendRequests"
-              (ngModelChange)="trackChanges()" />
+                   [(ngModel)]="settings.allowFriendRequests"
+                   (ngModelChange)="trackChanges()" />
             <span class="slider"></span>
           </label>
         </div>
       </section>
 
-      <!-- ACCOUNT -->
+      <!-- ✅ ACCOUNT -->
       <section class="card danger" *ngIf="activeTab==='account'">
         <h3>🔐 Account</h3>
 

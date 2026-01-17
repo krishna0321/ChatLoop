@@ -1,18 +1,28 @@
 <div class="page">
 
+  <!-- ✅ Background -->
+  <div class="bg"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
   <div class="top">
     <a class="back" [routerLink]="['/app/group', roomId, 'info']">⬅ Info</a>
+
     <div>
       <div class="title">Add Members</div>
       <div class="sub">Search and add users into group</div>
     </div>
   </div>
 
-  <div class="card">
+  <div class="card fadeIn">
 
     <div class="searchRow">
       <span class="ico">🔍</span>
-      <input [(ngModel)]="search" (input)="apply()" placeholder="Search user..." />
+      <input
+        [(ngModel)]="search"
+        (input)="apply()"
+        placeholder="Search user..."
+      />
     </div>
 
     <div class="list">
@@ -23,6 +33,7 @@
         (click)="toggle(u.uid)"
       >
         <div class="av">{{ getInitial(u) }}</div>
+
         <div class="meta">
           <div class="name">{{ u.name || u.email || 'User' }}</div>
           <div class="sub">{{ u.email || u.phone || '' }}</div>

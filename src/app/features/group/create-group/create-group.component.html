@@ -1,11 +1,21 @@
 <div class="page">
-  <div class="shell">
+
+  <!-- 🌌 Background -->
+  <div class="bg"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div class="shell fadeIn">
 
     <!-- TOP BAR -->
     <div class="topbar">
       <div>
-        <div class="title">Create {{ type === 'group' ? 'Group' : 'Channel' }}</div>
-        <div class="sub">Telegram style creation • pick members • go chat</div>
+        <div class="title">
+          Create {{ type === 'group' ? 'Group' : 'Channel' }}
+        </div>
+        <div class="sub">
+          Telegram style creation • pick members • start chatting
+        </div>
       </div>
 
       <a routerLink="/app/chats" class="backBtn">⬅ Chats</a>
@@ -16,11 +26,17 @@
 
       <!-- TYPE SWITCH -->
       <div class="typeRow">
-        <button class="typeBtn" [class.active]="type==='group'" (click)="selectType('group')">
+        <button
+          class="typeBtn"
+          [class.active]="type==='group'"
+          (click)="selectType('group')">
           👥 Group
         </button>
 
-        <button class="typeBtn" [class.active]="type==='channel'" (click)="selectType('channel')">
+        <button
+          class="typeBtn"
+          [class.active]="type==='channel'"
+          (click)="selectType('channel')">
           📢 Channel
         </button>
       </div>
@@ -31,12 +47,17 @@
         <input [(ngModel)]="name" placeholder="Example: Anime Lovers" />
 
         <label>Description</label>
-        <textarea [(ngModel)]="description" placeholder="About this group/channel..."></textarea>
+        <textarea
+          [(ngModel)]="description"
+          placeholder="About this group / channel...">
+        </textarea>
       </div>
 
       <!-- SELECTED MEMBERS -->
       <div class="selectedBox">
-        <div class="secTitle">Selected Members ({{ selected.size }})</div>
+        <div class="secTitle">
+          Selected Members ({{ selected.size }})
+        </div>
 
         <div class="chips" *ngIf="selected.size > 0; else noMembers">
           <div class="chip" *ngFor="let uid of selected">
@@ -53,7 +74,11 @@
       <!-- SEARCH USERS -->
       <div class="searchRow">
         <span class="ico">🔍</span>
-        <input [(ngModel)]="search" (input)="apply()" placeholder="Search users..." />
+        <input
+          [(ngModel)]="search"
+          (input)="apply()"
+          placeholder="Search users..."
+        />
       </div>
 
       <!-- USERS LIST -->
@@ -84,7 +109,7 @@
       <p class="err" *ngIf="err">{{ err }}</p>
       <p class="ok" *ngIf="msg">{{ msg }}</p>
 
-      <!-- CREATE BTN -->
+      <!-- CREATE BUTTON -->
       <button class="primary" (click)="create()" [disabled]="loading">
         {{ loading ? 'Creating...' : '✅ Create & Open Chat' }}
       </button>

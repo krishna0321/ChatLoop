@@ -1,11 +1,13 @@
 <div class="chatRoomWrap">
 
+  <!-- TOP BAR -->
   <div class="topBar">
     <a routerLink="/chats" class="backBtn">⬅</a>
 
     <div class="roomInfo">
       <div class="roomTitle">
         {{ room?.name || 'Chat' }}
+
         <span class="type"
               [class.dm]="room?.type==='dm'"
               [class.group]="room?.type==='group'"
@@ -15,13 +17,20 @@
       </div>
 
       <div class="roomSub">
-        <span *ngIf="room?.type === 'channel'">📢 Channel · Members: {{ room?.members?.length || 0 }}</span>
-        <span *ngIf="room?.type === 'group'">👥 Group · Members: {{ room?.members?.length || 0 }}</span>
-        <span *ngIf="room?.type === 'dm'">💬 Direct Chat</span>
+        <span *ngIf="room?.type === 'channel'">
+          📢 Channel · {{ room?.members?.length || 0 }} members
+        </span>
+        <span *ngIf="room?.type === 'group'">
+          👥 Group · {{ room?.members?.length || 0 }} members
+        </span>
+        <span *ngIf="room?.type === 'dm'">
+          💬 Direct Chat
+        </span>
       </div>
     </div>
   </div>
 
+  <!-- MESSAGES -->
   <div class="msgArea" *ngIf="!loading">
     <div
       class="msg"
@@ -30,13 +39,17 @@
       [class.deleted]="m.isDeleted"
     >
       <div class="bubble">
-        <div class="text">{{ m.text }}</div>
+        <div class="text">
+          {{ m.isDeleted ? 'This message was deleted' : m.text }}
+        </div>
 
-        <div class="meta">
+        <div class="meta" *ngIf="!m.isDeleted">
           <span *ngIf="m.editedAt">edited</span>
-          <button *ngIf="m.senderId === me && !m.isDeleted"
-                  class="delBtn"
-                  (click)="deleteMessage(m)">
+
+          <button
+            *ngIf="m.senderId === me"
+            class="delBtn"
+            (click)="deleteMessage(m)">
             delete
           </button>
         </div>
@@ -46,11 +59,13 @@
     <div id="msgEnd"></div>
   </div>
 
+  <!-- LOADING -->
   <div class="loadingBox" *ngIf="loading">
     <div class="spinner"></div>
-    <div class="loadingText">Loading messages...</div>
+    <div class="loadingText">Loading messages…</div>
   </div>
 
+  <!-- INPUT -->
   <div class="inputBar">
     <div class="channelLocked" *ngIf="room?.type === 'channel' && !canSend()">
       🔒 Only admins can send messages in this channel
@@ -64,7 +79,12 @@
         (keyup.enter)="send()"
       />
 
-      <button class="sendBtn" (click)="send()" [disabled]="!canSend()">➤</button>
+      <button
+        class="sendBtn"
+        (click)="send()"
+        [disabled]="!canSend() || !text.trim()">
+        ➤
+      </button>
     </div>
   </div>
 

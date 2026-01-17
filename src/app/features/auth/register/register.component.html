@@ -1,5 +1,6 @@
 <div class="page">
-  <!-- Animated background orbs -->
+  <!-- Background -->
+  <div class="bg"></div>
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
 
@@ -28,14 +29,14 @@
 
       <!-- Social login -->
       <div class="social">
-        <button class="socialBtn google">G Continue with Google</button>
-        <button class="socialBtn github">🐙 Continue with GitHub</button>
+        <button class="socialBtn google" type="button">G Continue with Google</button>
+        <button class="socialBtn github" type="button">🐙 Continue with GitHub</button>
       </div>
 
       <div class="divider"><span>or</span></div>
 
       <!-- Phone -->
-      <div class="field">
+      <div class="field phone">
         <select class="code">
           <option>+91</option>
           <option>+1</option>
@@ -60,26 +61,26 @@
           [type]="showPass ? 'text' : 'password'"
         />
         <label>Password</label>
-        <button class="eye" (click)="showPass = !showPass">
+        <button type="button" class="eye" (click)="showPass = !showPass">
           {{ showPass ? '🙈' : '👁️' }}
         </button>
       </div>
 
-     <!-- Password rules -->
-     <div class="rules">
+      <!-- Password rules -->
+      <div class="rules">
         <span [class.ok]="hasMinLength">• 6+ characters</span>
         <span [class.ok]="hasNumber">• Number</span>
         <span [class.ok]="hasUppercase">• Uppercase</span>
         <span [class.ok]="hasLowercase">• Lowercase</span>
-     </div>
-    <!-- Strength -->
-     <div class="strength">
-     <div class="bar">
-        <span [style.width.%]="strength * 25"></span>
-     </div>
-        <small small>{{ strengthLabel }}</small>
-     </div>
+      </div>
 
+      <!-- Strength -->
+      <div class="strength">
+        <div class="bar">
+          <span [style.width.%]="strength * 25"></span>
+        </div>
+        <small>{{ strengthLabel }}</small>
+      </div>
 
       <!-- Confirm -->
       <div class="field">
@@ -89,7 +90,7 @@
           [type]="showConfirm ? 'text' : 'password'"
         />
         <label>Confirm password</label>
-        <button class="eye" (click)="showConfirm = !showConfirm">
+        <button type="button" class="eye" (click)="showConfirm = !showConfirm">
           {{ showConfirm ? '🙈' : '👁️' }}
         </button>
       </div>
@@ -100,6 +101,7 @@
         I agree to the <b>Terms</b> & <b>Privacy Policy</b>
       </label>
 
+      <!-- Submit -->
       <button
         class="submit"
         [disabled]="!formValid || loading"

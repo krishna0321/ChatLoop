@@ -1,4 +1,10 @@
-<div class="shell" *ngIf="!loading && user as u; else loadingTpl">
+<div class="page" *ngIf="!loading && user as u; else loadingTpl">
+
+  <!-- 🌌 BACKGROUND -->
+  <div class="bg"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
   <!-- HEADER -->
   <header class="topbar">
     <button class="back" routerLink="/app/chats">⬅</button>
@@ -8,16 +14,17 @@
       <div class="t2">{{ u.phone || u.email }}</div>
     </div>
 
-    <div class="actions">
-      <button class="mini" (click)="copy(profileLink)">🔗</button>
-    </div>
+    <button class="mini" (click)="copy(profileLink)">🔗</button>
   </header>
 
-  <!-- MAIN -->
+  <!-- CONTENT -->
   <div class="content">
-    <!-- LEFT -->
-    <aside class="left">
-      <div class="avatar">{{ (u.name || 'U')[0] }}</div>
+
+    <!-- LEFT PROFILE -->
+    <aside class="left fadeUp">
+      <div class="avatar">
+        {{ (u.name || 'U')[0] }}
+      </div>
 
       <div class="name">{{ u.name || 'User' }}</div>
       <div class="sub">{{ u.bio || 'No bio available' }}</div>
@@ -29,22 +36,30 @@
 
       <div class="buttons" *ngIf="!isMe">
         <button class="btn primary" (click)="message()">💬 Message</button>
-        <button class="btn ghost" (click)="addToContacts()" [disabled]="isContact">
+
+        <button class="btn ghost"
+                (click)="addToContacts()"
+                [disabled]="isContact">
           {{ isContact ? '✅ Added' : '➕ Add Contact' }}
         </button>
+
         <button class="btn danger" (click)="toggleBlock()">
           {{ isBlocked ? '✅ Unblock' : '⛔ Block' }}
         </button>
       </div>
 
       <div class="buttons" *ngIf="isMe">
-        <button class="btn primary" routerLink="/app/profile">👤 Edit My Profile</button>
+        <button class="btn primary" routerLink="/app/profile">
+          👤 Edit My Profile
+        </button>
       </div>
     </aside>
 
-    <!-- RIGHT -->
+    <!-- RIGHT INFO -->
     <main class="right">
-      <section class="card">
+
+      <!-- INFO CARD -->
+      <section class="card fadeUp">
         <h3>📌 Info</h3>
 
         <div class="row">
@@ -62,18 +77,22 @@
           <b class="mono">{{ profileLink }}</b>
         </div>
 
-        <button class="copyBtn" (click)="copy(profileLink)">📋 Copy link</button>
+        <button class="copyBtn" (click)="copy(profileLink)">
+          📋 Copy Link
+        </button>
       </section>
 
-      <section class="card qrCard">
+      <!-- QR CARD -->
+      <section class="card qrCard fadeUp">
         <div class="qrText">
           <h3>📷 QR Code</h3>
-          <p>Scan to open profile in Chatloop</p>
+          <p>Scan to open this profile in Chatloop</p>
           <div class="mono small">{{ profileLink }}</div>
         </div>
 
-        <img class="qr" [src]="qrDataUrl" alt="QR code" />
+        <img class="qr" [src]="qrDataUrl" alt="QR Code" />
       </section>
+
     </main>
   </div>
 </div>

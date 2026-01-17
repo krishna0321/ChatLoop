@@ -1,38 +1,52 @@
-<div class="page" *ngIf="room">
+<div class="gi-page" *ngIf="room">
 
-  <div class="top">
-    <a class="back" routerLink="/app/chats">⬅ Chats</a>
-    <div class="t">
-      <div class="name">{{ room.name }}</div>
-      <div class="sub">{{ room.type }} • {{ (room.members?.length || 0) }} members</div>
+  <!-- ✅ Background -->
+  <div class="gi-bg"></div>
+  <div class="gi-orb gi-orb1"></div>
+  <div class="gi-orb gi-orb2"></div>
+
+  <!-- ✅ Top -->
+  <div class="gi-top gi-fadeUp">
+    <a class="gi-back" routerLink="/app/chats">⬅ Chats</a>
+
+    <div class="gi-titleWrap">
+      <div class="gi-title">{{ room.name }}</div>
+      <div class="gi-sub">
+        {{ room.type }} • {{ (room.members?.length || 0) }} members
+      </div>
     </div>
   </div>
 
-  <div class="card">
-    <div class="row">
+  <!-- ✅ Info Card -->
+  <div class="gi-card gi-fadeUp">
+    <div class="gi-row">
       <span>Description</span>
       <b>{{ room.description || 'No description' }}</b>
     </div>
 
-    <div class="actions">
-      <button class="btn ghost" (click)="openAddMembers()">➕ Add Members</button>
-      <button class="btn danger" (click)="leave()">🚪 Leave</button>
-      <button class="btn danger2" *ngIf="isOwner()" (click)="deleteRoom()">🗑 Delete</button>
+    <div class="gi-actions">
+      <button class="gi-btn ghost" (click)="openAddMembers()">➕ Add Members</button>
+      <button class="gi-btn warn" (click)="leave()">🚪 Leave</button>
+      <button class="gi-btn danger" *ngIf="isOwner()" (click)="deleteRoom()">🗑 Delete</button>
     </div>
   </div>
 
-  <div class="section">Members</div>
+  <!-- ✅ Members -->
+  <div class="gi-section gi-fadeUp">Members</div>
 
-  <div class="list">
-    <div class="mem" *ngFor="let uid of room.members">
-      <div class="av">{{ getInitial(uid) }}</div>
-      <div class="meta">
-        <div class="n">
-          {{ getUserName(uid) }}
-          <span class="tag owner" *ngIf="room.ownerId === uid">Owner</span>
-          <span class="tag admin" *ngIf="isAdmin(uid) && room.ownerId !== uid">Admin</span>
+  <div class="gi-list gi-fadeUp">
+    <div class="gi-mem" *ngFor="let uid of room.members">
+      <div class="gi-av">{{ getInitial(uid) }}</div>
+
+      <div class="gi-meta">
+        <div class="gi-nameRow">
+          <span class="gi-name">{{ getUserName(uid) }}</span>
+
+          <span class="gi-tag owner" *ngIf="room.ownerId === uid">Owner</span>
+          <span class="gi-tag admin" *ngIf="isAdmin(uid) && room.ownerId !== uid">Admin</span>
         </div>
-        <div class="s">{{ uid }}</div>
+
+        <div class="gi-uid">{{ uid }}</div>
       </div>
     </div>
   </div>

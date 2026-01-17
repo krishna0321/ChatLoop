@@ -1,14 +1,19 @@
-<div class="profile-shell" *ngIf="user as u">
+<div class="page" *ngIf="user as u">
 
-  <!-- ✅ TOP HEADER -->
-  <header class="profile-header">
-    <div class="header-left">
-      <h1>👤 Profile</h1>
-      <p>Your Telegram-style profile with QR sharing</p>
+  <!-- 🌌 Background -->
+  <div class="bg"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <!-- ✅ Header -->
+  <header class="topbar fadeIn">
+    <div class="tLeft">
+      <div class="hTitle">👤 Profile</div>
+      <div class="hSub">Your Chatloop identity • QR sharing • Telegram style</div>
     </div>
 
     <button class="btn primary" (click)="toggleEdit()">
-      {{ editMode ? 'Close' : 'Edit Profile' }}
+      {{ editMode ? '✖ Close' : '✏ Edit Profile' }}
     </button>
   </header>
 
@@ -16,19 +21,14 @@
   <div class="toast ok" *ngIf="msg">{{ msg }}</div>
   <div class="toast err" *ngIf="err">{{ err }}</div>
 
-  <div class="layout">
-
-    <!-- ✅ LEFT SIDEBAR -->
-    <aside class="side">
-
-      <!-- ✅ Avatar Upload -->
-      <div class="avatarWrap">
-
+  <!-- ✅ HERO -->
+  <section class="hero fadeUp">
+    <div class="heroLeft">
+      <!-- Avatar -->
+      <div class="avatarArea">
         <div class="avatarImg">
           <img *ngIf="u.photoURL" [src]="u.photoURL" class="img" alt="avatar" />
-          <div *ngIf="!u.photoURL" class="txt">
-            {{ (u.name || 'U')[0] }}
-          </div>
+          <div *ngIf="!u.photoURL" class="txt">{{ (u.name || 'U')[0] }}</div>
         </div>
 
         <label class="camBtn" title="Upload photo">
@@ -42,100 +42,120 @@
         </label>
 
         <div class="avatarHint">
-          {{ uploading ? 'Uploading...' : 'Tap camera to update photo' }}
+          {{ uploading ? 'Uploading photo...' : 'Upload profile photo' }}
         </div>
 
         <div class="avatarErr" *ngIf="avatarErr">{{ avatarErr }}</div>
       </div>
 
-      <div class="name">{{ u.name || 'User' }}</div>
-      <div class="sub">{{ u.email }}</div>
+      <!-- Name / badges -->
+      <div class="heroMeta">
+        <div class="pName">{{ u.name || 'User' }}</div>
+        <div class="pEmail">{{ u.email }}</div>
 
-      <div class="chip-row">
-        <div class="chip">
-          <span class="dot"></span>
-          Active
+        <div class="badges">
+          <span class="pill online">
+            <span class="dot"></span> Active
+          </span>
+
+          <span class="pill mono" title="User ID">
+            {{ (u.uid || '').slice(0, 10) }}...
+          </span>
         </div>
-        <div class="chip mono" title="User ID">{{ (u.uid || '').slice(0, 10) }}...</div>
-      </div>
 
-      <div class="divider"></div>
-
-      <button class="btn ghost" (click)="copyText(u.uid)">📋 Copy UID</button>
-      <button class="btn ghost" (click)="copyText(profileLink)">🔗 Copy Share Link</button>
-
-      <div class="divider"></div>
-
-      <div class="info">
-        <div class="row">
-          <span>Phone</span>
-          <b>{{ u.phone || '-' }}</b>
+        <div class="heroBtns">
+          <button class="btn ghost" (click)="copyText(u.uid)">📋 Copy UID</button>
+          <button class="btn ghost" (click)="copyText(profileLink)">🔗 Copy Share Link</button>
         </div>
       </div>
-    </aside>
+    </div>
 
-    <!-- ✅ RIGHT SIDE -->
-    <main class="main">
-
-      <!-- ✅ PROFILE DETAILS -->
-      <section class="card">
-        <h3 class="card-title">📌 Profile details</h3>
-
-        <div class="row">
-          <span>Email</span>
-          <b>{{ u.email }}</b>
+    <!-- QR -->
+    <div class="heroRight">
+      <div class="qrBox">
+        <div class="qrTop">
+          <div class="qrTitle">📷 My QR</div>
+          <div class="qrSub">Scan to open my profile</div>
         </div>
 
-        <div class="row">
-          <span>Phone</span>
-          <b>{{ u.phone || '-' }}</b>
+        <img class="qr" [src]="qrDataUrl" alt="QR Code" />
+
+        <div class="qrLink">
+          <span class="mono">{{ profileLink }}</span>
+          <button class="mini" (click)="copyText(profileLink)">Copy</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ✅ GRID -->
+  <section class="grid fadeUp">
+
+    <!-- Details -->
+    <div class="card">
+      <div class="cardTitle">📌 Account Info</div>
+
+      <div class="row">
+        <span>Email</span>
+        <b>{{ u.email }}</b>
+      </div>
+
+      <div class="row">
+        <span>Phone</span>
+        <b>{{ u.phone || '-' }}</b>
+      </div>
+
+      <div class="row">
+        <span>User ID</span>
+        <b class="mono">{{ u.uid }}</b>
+      </div>
+    </div>
+
+    <!-- Edit -->
+    <div class="card" *ngIf="editMode">
+      <div class="cardTitle">✏️ Edit Profile</div>
+
+      <div class="form">
+        <div class="field">
+          <label>Name</label>
+          <input [(ngModel)]="form.name" placeholder="Enter name" />
         </div>
 
-        <div class="row">
-          <span>User ID</span>
-          <b class="mono">{{ u.uid }}</b>
-        </div>
-      </section>
-
-      <!-- ✅ QR CARD -->
-      <section class="card qr-card">
-        <div class="qr-left">
-          <h3 class="card-title">📷 My QR Code</h3>
-          <p class="muted">Scan this to open my Chatloop profile.</p>
-
-          <div class="qr-link">
-            <span class="mono">{{ profileLink }}</span>
-            <button class="mini" (click)="copyText(profileLink)">Copy</button>
-          </div>
+        <div class="field">
+          <label>Phone</label>
+          <input [(ngModel)]="form.phone" placeholder="Enter phone" />
         </div>
 
-        <div class="qr-right">
-          <img class="qr" [src]="qrDataUrl" alt="QR Code" />
+        <div class="actions">
+          <button class="btn primary" (click)="save()">✅ Save</button>
+          <button class="btn ghost" (click)="reset(u)">↩ Reset</button>
         </div>
-      </section>
+      </div>
+    </div>
 
-      <!-- ✅ EDIT CARD -->
-      <section class="card" *ngIf="editMode">
-        <h3 class="card-title">✏️ Edit Profile</h3>
+    <!-- Quick Actions -->
+    <div class="card">
+      <div class="cardTitle">⚡ Quick Actions</div>
 
-        <div class="form">
-          <div class="field">
-            <label>Name</label>
-            <input [(ngModel)]="form.name" placeholder="Enter name" />
-          </div>
+      <button class="actionRow" (click)="copyText(u.uid)">
+        <span class="ic">📋</span>
+        <span class="tx">Copy UID</span>
+        <span class="go">›</span>
+      </button>
 
-          <div class="field">
-            <label>Phone</label>
-            <input [(ngModel)]="form.phone" placeholder="Enter phone" />
-          </div>
+      <button class="actionRow" (click)="copyText(profileLink)">
+        <span class="ic">🔗</span>
+        <span class="tx">Copy Share Link</span>
+        <span class="go">›</span>
+      </button>
 
-          <div class="actions">
-            <button class="btn primary" (click)="save()">✅ Save</button>
-            <button class="btn ghost" (click)="reset(u)">↩ Reset</button>
-          </div>
-        </div>
-      </section>
+      <button class="actionRow" (click)="toggleEdit()">
+        <span class="ic">✏️</span>
+        <span class="tx">{{ editMode ? 'Close Edit Mode' : 'Edit Profile' }}</span>
+        <span class="go">›</span>
+      </button>
+    </div>
 
-    </main>
-  </div>
+  </section>
+
 </div>

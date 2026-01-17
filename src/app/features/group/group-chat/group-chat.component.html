@@ -1,5 +1,10 @@
 <div class="wrap" *ngIf="roomId">
 
+  <!-- 🌌 BACKGROUND -->
+  <div class="bg"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
   <!-- HEADER -->
   <header class="header">
     <div class="left" (click)="openInfo()">
@@ -9,7 +14,9 @@
 
       <div class="meta">
         <div class="name">{{ room?.name || 'Group' }}</div>
-        <div class="sub">👥 Members: {{ room?.members?.length || 0 }}</div>
+        <div class="sub">
+          👥 {{ room?.members?.length || 0 }} members
+        </div>
       </div>
     </div>
 
@@ -17,7 +24,10 @@
   </header>
 
   <!-- LOADING -->
-  <div class="loading" *ngIf="loading">Loading group chat...</div>
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    Loading group chat...
+  </div>
 
   <!-- MESSAGES -->
   <main class="msgs" #box *ngIf="!loading">
@@ -27,10 +37,12 @@
       class="bubble"
       [class.me]="m.senderId === myUid"
     >
-      <!-- only for others -->
+      <!-- Sender (only others) -->
       <div class="sender" *ngIf="m.senderId !== myUid">
         <span class="miniAv">{{ getInitial(m.senderId) }}</span>
-        <span class="senderName">{{ getMemberName(m.senderId) }}</span>
+        <span class="senderName">
+          {{ getMemberName(m.senderId) }}
+        </span>
       </div>
 
       <div class="text">{{ m.text }}</div>
@@ -41,13 +53,14 @@
   <!-- ERROR -->
   <div class="err" *ngIf="err">{{ err }}</div>
 
-  <!-- INPUT -->
+  <!-- COMPOSER -->
   <footer class="composer">
     <input
       [(ngModel)]="text"
       placeholder="Write a message..."
       (keydown.enter)="send()"
     />
+
     <button (click)="send()" [disabled]="!text.trim()">➤</button>
   </footer>
 

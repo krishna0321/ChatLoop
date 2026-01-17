@@ -40,10 +40,20 @@
       </div>
 
       <div class="actions">
-        <button class="chat-btn" (click)="openChatByUid(c.uid); $event.stopPropagation()" *ngIf="c.uid">
+        <button
+          class="chat-btn"
+          (click)="openChatByUid(c.uid); $event.stopPropagation()"
+          *ngIf="c.uid"
+          title="Chat"
+        >
           💬
         </button>
-        <button class="icon-btn danger" (click)="removeContact(c); $event.stopPropagation()">
+
+        <button
+          class="icon-btn danger"
+          (click)="removeContact(c); $event.stopPropagation()"
+          title="Remove"
+        >
           🗑
         </button>
       </div>
@@ -84,6 +94,7 @@
 
     <div class="result-user" *ngIf="scannedUser as u">
       <div class="avatar">{{ (u.name || 'U')[0] }}</div>
+
       <div class="meta">
         <div class="name">{{ u.name || 'User' }}</div>
         <div class="uid">UID: <span>{{ u.uid }}</span></div>
@@ -97,23 +108,22 @@
     </div>
   </div>
 </div>
+
 <!-- ✅ ADD CONTACT MODAL -->
 <div class="modal" *ngIf="showAdd" (click)="closeAdd()">
   <div class="box" (click)="$event.stopPropagation()">
     <div class="mTitle">➕ Add Contact</div>
     <div class="mSub">Save phone number / link Chatloop user automatically</div>
 
-    <div style="margin-top:14px; display:flex; flex-direction:column; gap:10px;">
+    <div class="addForm">
       <input
-        class="search"
-        style="padding:12px 14px;border-radius:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10)"
+        class="input"
         placeholder="Name"
         [(ngModel)]="form.name"
       />
 
       <input
-        class="search"
-        style="padding:12px 14px;border-radius:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10)"
+        class="input"
         placeholder="Phone number"
         [(ngModel)]="form.phone"
       />
