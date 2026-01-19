@@ -1,1 +1,51 @@
-<p>dashboard works!</p>
+<div class="dash">
+  <!-- 🌌 BACKGROUND -->
+  <div class="bg"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <!-- HEADER -->
+  <div class="head">
+    <div class="badge">✨ Premium</div>
+
+    <h2>📊 Dashboard</h2>
+    <p>Overview of your Chatloop app</p>
+  </div>
+
+  <!-- CARDS -->
+  <div class="cards">
+    <a class="card" routerLink="/app/chats">
+      <div class="icon grad1">💬</div>
+      <div class="meta">
+        <div class="title">Chats</div>
+        <div class="sub">Rooms & messages</div>
+      </div>
+      <div class="go">›</div>
+    </a>
+
+    <a class="card" routerLink="/app/users">
+      <div class="icon grad2">👥</div>
+      <div class="meta">
+        <div class="title">Users</div>
+        <div class="sub">Connections & profiles</div>
+      </div>
+      <div class="go">›</div>
+    </a>
+
+    <a class="card" routerLink="/app/settings">
+      <div class="icon grad3">⚙️</div>
+      <div class="meta">
+        <div class="title">Settings</div>
+        <div class="sub">Theme & privacy</div>
+      </div>
+      <div class="go">›</div>
+    </a>
+  </div>
+
+  <!-- FOOT NOTE -->
+  <div class="foot">
+    <div class="hint">
+      Tip: Search chats & people from the sidebar for quick access 🚀
+    </div>
+  </div>
+</div>

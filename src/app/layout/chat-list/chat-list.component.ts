@@ -32,6 +32,7 @@ export class ChatListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const user = this.auth.currentUser;
+
     if (!user) {
       this.loading = false;
       this.chats = [];
@@ -42,8 +43,7 @@ export class ChatListComponent implements OnInit, OnDestroy {
 
     this.sub = this.rooms.myRooms$().subscribe({
       next: (roomsList: Room[]) => {
-        // ✅ pinned first + latest updated
-        const sorted = [...roomsList].sort((a: any, b: any) => {
+        const sorted = [...(roomsList || [])].sort((a: any, b: any) => {
           const ap = a?.pinned?.[myUid] ? 1 : 0;
           const bp = b?.pinned?.[myUid] ? 1 : 0;
           if (bp !== ap) return bp - ap;
@@ -55,7 +55,10 @@ export class ChatListComponent implements OnInit, OnDestroy {
 
         this.chats = sorted.map((r) => ({
           id: r.id!,
-          title: r.type === 'dm' ? 'Direct Message' : (r.name || 'Room'),
+          title:
+            r.type === 'dm'
+              ? r.members?.find((m) => m !== myUid) || 'Direct Message'
+              : r.name || 'Room',
           type: r.type,
           lastMessage: r.lastMessage || '',
           updatedAt: r.updatedAt,
@@ -76,7 +79,7 @@ export class ChatListComponent implements OnInit, OnDestroy {
     this.sub?.unsubscribe();
   }
 
-  trackByChatId(index: number, item: ChatItem) {
+  trackByChatId(_: number, item: ChatItem) {
     return item.id;
   }
 

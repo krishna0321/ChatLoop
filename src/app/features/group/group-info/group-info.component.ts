@@ -19,6 +19,7 @@ export class GroupInfoComponent implements OnInit, OnDestroy {
   roomId = '';
 
   room: any = null;
+
   usersMap = new Map<string, AppUser>();
 
   loading = true;
@@ -37,20 +38,35 @@ export class GroupInfoComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const u = this.auth.currentUser;
-    if (!u) return;
+    if (!u) {
+      this.loading = false;
+      this.err = 'Not logged in';
+      return;
+    }
+
     this.myUid = u.uid;
 
     this.roomId = this.route.snapshot.paramMap.get('id') || '';
-    if (!this.roomId) return;
+    if (!this.roomId) {
+      this.loading = false;
+      this.err = 'Room ID missing';
+      return;
+    }
 
-    this.subUsers = this.userService.getUsers().subscribe((list) => {
-      this.usersMap.clear();
-      (list || []).forEach((x) => this.usersMap.set(x.uid, x));
+    // ✅ listen all users so we can show names in members list
+    this.subUsers = this.userService.getUsers().subscribe({
+      next: (list) => {
+        this.usersMap.clear();
+        (list || []).forEach((x) => this.usersMap.set(x.uid, x));
+      },
+      error: (e) => console.error('Users map error:', e),
     });
 
+    // ✅ listen room realtime
     this.subRoom = this.roomService.listenRoom(this.roomId, (r: any) => {
       this.room = r;
       this.loading = false;
+      this.err = '';
     });
   }
 
@@ -76,21 +92,33 @@ export class GroupInfoComponent implements OnInit, OnDestroy {
     return (this.room?.admins || []).includes(uid);
   }
 
+  // ✅ FIXED ROUTE
   openAddMembers() {
-    this.router.navigate(['/app/group', this.roomId, 'add']);
+    this.router.navigate(['/app/group', this.roomId, 'add-members']);
   }
 
   async leave() {
     if (!confirm('Leave this group?')) return;
-    await this.roomService.leaveRoom(this.roomId, this.myUid);
-    this.router.navigate(['/app/chats']);
+
+    try {
+      await this.roomService.leaveRoom(this.roomId, this.myUid);
+      await this.router.navigate(['/app/chats']);
+    } catch (e) {
+      console.error('Leave error:', e);
+      alert('Failed to leave group');
+    }
   }
 
   async deleteRoom() {
     if (!this.isOwner()) return;
     if (!confirm('Delete this group permanently?')) return;
 
-    await this.roomService.deleteRoom(this.roomId);
-    this.router.navigate(['/app/chats']);
+    try {
+      await this.roomService.deleteRoom(this.roomId);
+      await this.router.navigate(['/app/chats']);
+    } catch (e) {
+      console.error('Delete room error:', e);
+      alert('Failed to delete group');
+    }
   }
 }

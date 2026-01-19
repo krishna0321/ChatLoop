@@ -9,18 +9,21 @@ import { signOut } from 'firebase/auth';
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <nav class="nav">
+    <nav class="nav" aria-label="Chatloop Navigation">
 
-      <!-- GLOW BG -->
+      <!-- glow background -->
       <div class="navGlow"></div>
 
       <!-- BRAND -->
       <div class="brand" title="Chatloop">
-        <div class="logo">🫧</div>
+        <div class="logo">
+          <span class="bub">🫧</span>
+        </div>
       </div>
 
       <!-- LINKS -->
       <div class="links">
+
         <a
           class="item"
           routerLink="/app/chats"
@@ -81,7 +84,9 @@ import { signOut } from 'firebase/auth';
           data-tip="Create"
         >
           <span class="ico">➕</span>
+          <span class="pulse"></span>
         </a>
+
       </div>
 
       <!-- FOOTER -->
@@ -100,31 +105,37 @@ import { signOut } from 'firebase/auth';
     </nav>
   `,
   styles: [`
+    /* =========================================================
+       ✅ Chatloop Leftbar (Premium Telegram Style)
+       Works in Desktop Sidebar + Mobile Bottom Bar
+    ========================================================= */
+
     :host{
       display:block;
       height:100%;
+      min-height:0;
+
+      /* fallback if global not present */
+      --theme: var(--theme, #7c3aed);
+      --theme-2: var(--theme-2, #3b82f6);
+
+      --bg: var(--bg, #050816);
+      --text: var(--text, rgba(255,255,255,0.92));
+      --border: var(--border, rgba(255,255,255,0.10));
+
+      --t: .18s ease;
     }
 
-    :root{
-      --theme:#7c3aed;
-      --theme-2:#3b82f6;
+    *{ box-sizing:border-box; }
 
-      --bg: rgba(2,6,23,0.88);
-      --bg2: rgba(15,23,42,0.72);
-
-      --border: rgba(255,255,255,0.08);
-      --text: rgba(226,232,240,0.92);
-      --muted: rgba(226,232,240,0.55);
-
-      --glow: color-mix(in srgb, var(--theme) 40%, transparent);
-    }
-
-    /* ============================
-       DESKTOP LEFT NAV
-    ============================ */
+    /* =========================
+       NAV WRAPPER
+    ========================= */
     .nav{
-      width:76px;
-      height:100vh;
+      width:78px;
+      height:100%;
+      min-height:0;
+
       position:sticky;
       top:0;
       z-index:1000;
@@ -135,23 +146,40 @@ import { signOut } from 'firebase/auth';
 
       padding: 10px 10px 14px;
 
-      background: var(--bg);
+      background: rgba(2,6,23,0.72);
       border-right: 1px solid var(--border);
-      backdrop-filter: blur(16px);
+
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+
       overflow:hidden;
+      isolation:isolate;
     }
 
+    /* GLOW */
     .navGlow{
       position:absolute;
-      inset:0;
+      inset:-30%;
       pointer-events:none;
+      z-index:0;
+
       background:
-        radial-gradient(circle at 50% 12%, var(--glow), transparent 55%),
-        radial-gradient(circle at 50% 85%, color-mix(in srgb, var(--theme-2) 30%, transparent), transparent 60%);
-      filter: blur(50px);
-      opacity: .9;
+        radial-gradient(circle at 50% 12%, rgba(124,58,237,0.36), transparent 55%),
+        radial-gradient(circle at 50% 85%, rgba(59,130,246,0.26), transparent 60%),
+        radial-gradient(circle at 50% 50%, rgba(34,211,238,0.12), transparent 60%);
+      filter: blur(60px);
+      opacity: .95;
+      animation: glowMove 10s ease-in-out infinite;
     }
 
+    @keyframes glowMove{
+      0%,100%{ transform: translate(0,0); }
+      50%{ transform: translate(18px,-14px); }
+    }
+
+    /* =========================
+       BRAND
+    ========================= */
     .brand{
       position:relative;
       z-index:2;
@@ -159,44 +187,71 @@ import { signOut } from 'firebase/auth';
     }
 
     .logo{
-      width:52px;
-      height:52px;
-      border-radius:20px;
+      width:54px;
+      height:54px;
+      border-radius:22px;
+
       display:grid;
       place-items:center;
-      font-size:22px;
-      font-weight:1000;
 
       background: linear-gradient(135deg, var(--theme), var(--theme-2));
       border: 1px solid rgba(255,255,255,0.14);
+
       box-shadow:
-        0 18px 55px var(--glow),
+        0 18px 55px rgba(124,58,237,0.22),
         inset 0 1px 0 rgba(255,255,255,0.10);
 
-      transform: translateZ(0);
-      animation: pop .55s ease;
+      position:relative;
+      overflow:hidden;
+
+      animation: pop .45s ease;
     }
 
+    .logo::after{
+      content:"";
+      position:absolute;
+      inset:-50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.30), transparent 55%);
+      opacity:.16;
+      transform: translateX(-30%);
+      animation: shine 2.8s ease-in-out infinite;
+    }
+
+    @keyframes shine{
+      0%,100%{ transform: translateX(-30%); }
+      50%{ transform: translateX(20%); }
+    }
+
+    .bub{ font-size:22px; }
+
     @keyframes pop{
-      from{ transform:scale(.92); opacity:.7; }
+      from{ transform:scale(.92); opacity:.6; }
       to{ transform:scale(1); opacity:1; }
     }
 
+    /* =========================
+       LINKS
+    ========================= */
     .links{
       position:relative;
       z-index:2;
+
       display:flex;
       flex-direction:column;
-      gap: 8px;
+      gap: 9px;
+
       width:100%;
       align-items:center;
+
       padding: 6px 0;
+
       flex:1;
+      min-height:0;
     }
 
     .item{
-      width:52px;
-      height:52px;
+      width:54px;
+      height:54px;
       border-radius:20px;
 
       display:grid;
@@ -210,31 +265,35 @@ import { signOut } from 'firebase/auth';
       border:1px solid transparent;
       background: rgba(255,255,255,0.04);
 
-      transition: .18s ease;
+      transition: var(--t);
       cursor:pointer;
       overflow:hidden;
+
+      transform: translateZ(0);
+      user-select:none;
     }
 
-    /* glow shine */
+    /* hover shine */
     .item::after{
       content:"";
       position:absolute;
-      inset:0;
+      inset:-40%;
       background: linear-gradient(
         120deg,
-        transparent 25%,
+        transparent 20%,
         rgba(255,255,255,0.16),
         transparent 70%
       );
       opacity:0;
       transform: translateX(-40%);
-      transition:.25s ease;
+      transition: .22s ease;
     }
 
     .item:hover{
       transform: translateY(-2px);
       background: rgba(255,255,255,0.07);
       border-color: rgba(255,255,255,0.10);
+      box-shadow: 0 18px 55px rgba(0,0,0,0.28);
     }
 
     .item:hover::after{
@@ -242,18 +301,35 @@ import { signOut } from 'firebase/auth';
       transform: translateX(40%);
     }
 
-    /* Active state: Telegram-like indicator */
-    .item.active{
-      background: linear-gradient(
-        135deg,
-        color-mix(in srgb, var(--theme) 30%, transparent),
-        color-mix(in srgb, var(--theme-2) 18%, transparent)
-      );
-      border-color: color-mix(in srgb, var(--theme) 45%, rgba(255,255,255,0.12));
-      box-shadow: 0 18px 55px color-mix(in srgb, var(--theme) 25%, transparent);
-      color:#fff;
+    .item:active{
+      transform: translateY(0px) scale(.97);
     }
 
+    /* ✅ keyboard accessibility */
+    .item:focus-visible,
+    .logout:focus-visible{
+      outline: 3px solid rgba(124,58,237,0.35);
+      outline-offset: 2px;
+    }
+
+    /* =========================
+       ACTIVE STATE
+    ========================= */
+    .item.active{
+      color:#fff;
+      background: linear-gradient(
+        135deg,
+        rgba(124,58,237,0.22),
+        rgba(59,130,246,0.14)
+      );
+      border-color: rgba(124,58,237,0.40);
+
+      box-shadow:
+        0 18px 55px rgba(124,58,237,0.18),
+        inset 0 1px 0 rgba(255,255,255,0.10);
+    }
+
+    /* active indicator */
     .item.active::before{
       content:"";
       position:absolute;
@@ -263,24 +339,47 @@ import { signOut } from 'firebase/auth';
       width: 4px;
       border-radius: 999px;
       background: linear-gradient(180deg, var(--theme), var(--theme-2));
-      box-shadow: 0 0 18px var(--glow);
+      box-shadow: 0 0 18px rgba(124,58,237,0.40);
     }
 
-    /* Create special */
+    /* =========================
+       CREATE FAB
+    ========================= */
     .item.create{
+      margin-top: 10px;
+      color:white;
+      font-weight:900;
+
       background: linear-gradient(135deg, var(--theme), var(--theme-2));
       border: 1px solid rgba(255,255,255,0.14);
-      box-shadow: 0 18px 60px var(--glow);
-      color:white;
-      font-weight:1000;
-      margin-top: 10px;
+      box-shadow:
+        0 20px 65px rgba(124,58,237,0.30),
+        0 10px 26px rgba(0,0,0,0.45);
+    }
+
+    .item.create .pulse{
+      position:absolute;
+      inset:0;
+      border-radius:inherit;
+      background: radial-gradient(circle, rgba(255,255,255,0.35), transparent 55%);
+      opacity:.12;
+      animation: pulse 1.8s ease-in-out infinite;
+      pointer-events:none;
+    }
+
+    @keyframes pulse{
+      0%,100%{ transform: scale(1); opacity:.10; }
+      50%{ transform: scale(1.15); opacity:.18; }
     }
 
     .item.create:hover{
-      transform: translateY(-3px) scale(1.02);
+      transform: translateY(-3px) scale(1.03);
       filter: brightness(1.06);
     }
 
+    /* =========================
+       FOOTER
+    ========================= */
     .footer{
       position:relative;
       z-index:2;
@@ -291,8 +390,8 @@ import { signOut } from 'firebase/auth';
     }
 
     .logout{
-      width:52px;
-      height:52px;
+      width:54px;
+      height:54px;
       border-radius:20px;
       display:grid;
       place-items:center;
@@ -301,14 +400,21 @@ import { signOut } from 'firebase/auth';
       border: 1px solid rgba(255,255,255,0.10);
       color:white;
       font-size:22px;
+
       cursor:pointer;
-      transition:.18s ease;
+      transition: var(--t);
+      position:relative;
+      overflow:hidden;
     }
 
     .logout:hover{
       transform: translateY(-2px);
       background: rgba(255,255,255,0.09);
+      border-color: rgba(255,120,120,0.22);
+      box-shadow: 0 18px 55px rgba(0,0,0,0.28);
     }
+
+    .logout:active{ transform: scale(.97); }
 
     .logout:disabled{
       opacity:.6;
@@ -316,15 +422,15 @@ import { signOut } from 'firebase/auth';
       transform:none;
     }
 
-    /* ============================
-       TOOLTIP (desktop only)
-    ============================ */
+    /* =========================
+       Tooltip (Desktop)
+    ========================= */
     @media (min-width: 901px){
       .item[data-tip]::before,
       .logout[data-tip]::before{
         content: attr(data-tip);
         position:absolute;
-        left: 72px;
+        left: 76px;
         top: 50%;
         transform: translateY(-50%);
 
@@ -332,18 +438,18 @@ import { signOut } from 'firebase/auth';
         border-radius: 14px;
 
         font-size:12px;
-        font-weight: 950;
-        letter-spacing:.2px;
+        font-weight: 1000;
 
         background: rgba(2,6,23,0.94);
         border:1px solid rgba(255,255,255,0.12);
         color:white;
+
         opacity:0;
         pointer-events:none;
         white-space:nowrap;
-        box-shadow: 0 16px 60px rgba(0,0,0,0.55);
 
-        transition: .18s ease;
+        box-shadow: 0 16px 60px rgba(0,0,0,0.55);
+        transition: .16s ease;
       }
 
       .item:hover::before,
@@ -352,13 +458,13 @@ import { signOut } from 'firebase/auth';
       }
     }
 
-    /* ============================
-       MOBILE: convert to bottom bar
-    ============================ */
+    /* =========================
+       ✅ MOBILE BOTTOM NAV
+    ========================= */
     @media (max-width: 900px){
       .nav{
         width:100%;
-        height:72px;
+        height:74px;
 
         flex-direction:row;
         justify-content:space-between;
@@ -370,13 +476,14 @@ import { signOut } from 'firebase/auth';
         top:auto;
 
         padding: 10px 12px;
+
         border-right:none;
         border-top: 1px solid var(--border);
+
+        z-index:2000;
       }
 
-      .brand{
-        display:none;
-      }
+      .brand{ display:none; }
 
       .links{
         width:100%;
@@ -386,18 +493,15 @@ import { signOut } from 'firebase/auth';
         padding: 0;
       }
 
-      .footer{
-        display:none;
-      }
+      .footer{ display:none; }
 
       .item{
         width:46px;
         height:46px;
         border-radius:16px;
-        background: rgba(255,255,255,0.04);
       }
 
-      /* Bottom indicator on active */
+      /* active indicator bottom */
       .item.active::before{
         left: 50%;
         top: auto;
@@ -408,19 +512,28 @@ import { signOut } from 'firebase/auth';
         border-radius: 999px;
       }
 
-      /* Create FAB */
+      /* create FAB */
       .item.create{
-        width:54px;
-        height:54px;
+        width:56px;
+        height:56px;
         border-radius:20px;
         transform: translateY(-16px);
         box-shadow:
-          0 22px 70px var(--glow),
-          0 8px 28px rgba(0,0,0,0.45);
+          0 24px 75px rgba(124,58,237,0.30),
+          0 10px 30px rgba(0,0,0,0.45);
       }
+
       .item.create:hover{
-        transform: translateY(-18px) scale(1.03);
+        transform: translateY(-18px) scale(1.04);
       }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      .navGlow{ animation:none !important; }
+      .logo::after{ animation:none !important; }
+      .pulse{ animation:none !important; }
+      .item, .logout{ transition:none !important; }
     }
   `],
 })

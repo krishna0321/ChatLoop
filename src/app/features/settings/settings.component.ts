@@ -71,7 +71,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
       this.sub = this.settingsService.getSettings(user.uid).subscribe({
         next: (data) => {
-          // ✅ Merge + keep UI defaults
+          // ✅ merge + keep UI defaults
           this.settings = { ...this.settings, ...data, uid: user.uid };
 
           // ✅ clone for comparison
@@ -101,7 +101,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
   // ✅ runs every time user changes something
   trackChanges() {
     if (!this.originalSettings) return;
-
     this.hasChanges =
       JSON.stringify(this.settings) !== JSON.stringify(this.originalSettings);
   }

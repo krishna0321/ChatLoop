@@ -8,11 +8,11 @@
   <!-- HEADER -->
   <header class="listHeader">
     <div class="headerTitle">
-      Chats
+      💬 Chats
       <span class="count">{{ chats.length }}</span>
     </div>
 
-    <a class="addBtn" [routerLink]="['/app/create-room']">➕</a>
+    <a class="addBtn" routerLink="/app/group/create" title="Create group/channel">➕</a>
   </header>
 
   <!-- LOADING -->
@@ -32,31 +32,29 @@
     </button>
 
     <div class="tip">
-      Tip: Open <b>Users</b> and tap anyone to chat
+      Tip: Open <b>Users</b> and tap anyone
     </div>
   </div>
 
   <!-- CHAT LIST -->
   <div *ngIf="!loading && chats.length > 0" class="chatList">
+
     <a
       class="chatItem"
       *ngFor="let c of chats; trackBy: trackByChatId"
       [routerLink]="['/chat', c.id]"
+      routerLinkActive="active"
     >
-
-      <!-- AVATAR -->
       <div class="avatar">
         {{ iconByType(c.type) }}
       </div>
 
-      <!-- INFO -->
       <div class="info">
         <div class="row1">
           <div class="title">{{ c.title }}</div>
 
           <span
             class="badge"
-            [class.dm]="c.type==='dm'"
             [class.group]="c.type==='group'"
             [class.channel]="c.type==='channel'"
           >
@@ -65,15 +63,15 @@
         </div>
 
         <div class="subtitle">
-          {{ c.lastMessage || 'No messages yet...' }}
+          {{ c.lastMessage || 'No messages yet…' }}
         </div>
       </div>
 
-      <!-- UNREAD -->
       <div class="unread" *ngIf="c.unread > 0">
         {{ c.unread }}
       </div>
     </a>
+
   </div>
 
 </div>

@@ -62,7 +62,9 @@
         <div class="chips" *ngIf="selected.size > 0; else noMembers">
           <div class="chip" *ngFor="let uid of selected">
             <span class="txt">{{ getUserLabel(uid) }}</span>
-            <button class="x" (click)="remove(uid)">✖</button>
+
+            <!-- ✅ FIX: stopPropagation -->
+            <button class="x" (click)="remove(uid, $event)">✖</button>
           </div>
         </div>
 

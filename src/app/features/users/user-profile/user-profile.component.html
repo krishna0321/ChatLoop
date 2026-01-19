@@ -14,7 +14,7 @@
       <div class="t2">{{ u.phone || u.email }}</div>
     </div>
 
-    <button class="mini" (click)="copy(profileLink)">🔗</button>
+    <button class="mini" (click)="copy(profileLink)" title="Copy share link">🔗</button>
   </header>
 
   <!-- CONTENT -->
@@ -22,8 +22,14 @@
 
     <!-- LEFT PROFILE -->
     <aside class="left fadeUp">
-      <div class="avatar">
-        {{ (u.name || 'U')[0] }}
+
+      <div class="avatarBox">
+        <div class="avatar">
+          {{ (u.name || 'U')[0] }}
+        </div>
+        <div class="status">
+          <span class="dot"></span> Active
+        </div>
       </div>
 
       <div class="name">{{ u.name || 'User' }}</div>
@@ -31,7 +37,7 @@
 
       <div class="chips">
         <span class="chip mono">UID: {{ u.uid }}</span>
-        <span class="chip danger" *ngIf="isBlocked">Blocked</span>
+        <span class="chip danger" *ngIf="isBlocked">⛔ Blocked</span>
       </div>
 
       <div class="buttons" *ngIf="!isMe">
@@ -60,7 +66,10 @@
 
       <!-- INFO CARD -->
       <section class="card fadeUp">
-        <h3>📌 Info</h3>
+        <div class="cardHead">
+          <h3>📌 Info</h3>
+          <span class="tag">Profile</span>
+        </div>
 
         <div class="row">
           <span>Phone</span>
@@ -87,10 +96,17 @@
         <div class="qrText">
           <h3>📷 QR Code</h3>
           <p>Scan to open this profile in Chatloop</p>
+
           <div class="mono small">{{ profileLink }}</div>
+
+          <button class="copyBtn ghostBtn" (click)="copy(profileLink)">
+            🔗 Copy Link
+          </button>
         </div>
 
-        <img class="qr" [src]="qrDataUrl" alt="QR Code" />
+        <div class="qrBox">
+          <img class="qr" [src]="qrDataUrl" alt="QR Code" />
+        </div>
       </section>
 
     </main>
@@ -98,5 +114,8 @@
 </div>
 
 <ng-template #loadingTpl>
-  <div class="loading">Loading profile...</div>
+  <div class="loading">
+    <div class="spinner"></div>
+    Loading profile...
+  </div>
 </ng-template>

@@ -11,177 +11,179 @@ import { LeftbarComponent } from '../../layout/leftbar/leftbar.component';
   template: `
     <div class="appShell">
 
-      <!-- ✅ Premium Background -->
+      <!-- 🌌 Premium Background -->
       <div class="bg"></div>
       <div class="orb orb1"></div>
       <div class="orb orb2"></div>
       <div class="grain"></div>
 
-      <!-- ✅ LEFT / BOTTOM BAR -->
+      <!-- ✅ LEFT / BOTTOM NAV -->
       <app-leftbar></app-leftbar>
 
       <!-- ✅ MAIN CONTENT -->
-      <div class="main">
+      <main class="main">
         <div class="routeWrap">
           <router-outlet></router-outlet>
         </div>
-      </div>
+      </main>
 
     </div>
   `,
   styles: [`
-    :host{
-      display:block;
-      height:100vh;
-      width:100%;
-      overflow:hidden;
-    }
+/* =========================================================
+   ✅ Chatloop AppLayout – FINAL FIX
+   - No white space
+   - Correct height
+   - Single scroll container
+========================================================= */
 
-    /* ✅ THEME SYSTEM (change only these 2 colors) */
-    :host{
-      --theme: #ff2d95;
-      --theme-2: #8b5cf6;
+:host{
+  display:flex;
+  width:100%;
+  height:100vh;           /* ✅ FULL SCREEN */
+  min-height:0;
+}
 
-      --bg: #020617;
-      --panel: rgba(3,7,18,0.82);
+/* =========================================================
+   THEME VARIABLES (SAFE FALLBACKS)
+========================================================= */
+:host{
+  --theme:#7c3aed;
+  --theme-2:#3b82f6;
 
-      --text: rgba(226,232,240,0.95);
-      --muted: rgba(255,255,255,0.60);
+  --bg:#050816;
+  --text:rgba(255,255,255,0.92);
+  --border:rgba(255,255,255,0.10);
+}
 
-      --border: rgba(255,255,255,0.10);
-      --glow: color-mix(in srgb, var(--theme) 42%, transparent);
+*{ box-sizing:border-box; }
 
-      --radius: 22px;
-    }
+/* =========================================================
+   ROOT SHELL
+========================================================= */
+.appShell{
+  position:relative;
+  width:100%;
+  height:100%;
+  min-height:0;
 
-    /* ✅ ROOT APP SHELL */
-    .appShell{
-      position:relative;
-      display:flex;
-      height:100vh;
-      width:100%;
-      background: var(--bg);
-      color: var(--text);
-      overflow:hidden;
-      isolation:isolate;
-    }
+  display:flex;
+  align-items:stretch;
 
-    /* ✅ Background Glow */
-    .bg{
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      background:
-        radial-gradient(circle at 20% 10%, color-mix(in srgb, var(--theme) 22%, transparent), transparent 45%),
-        radial-gradient(circle at 80% 30%, color-mix(in srgb, var(--theme-2) 20%, transparent), transparent 55%),
-        radial-gradient(circle at 45% 95%, color-mix(in srgb, var(--theme) 12%, transparent), transparent 60%);
-      filter: blur(90px);
-      opacity: 0.95;
-      z-index:0;
-    }
+  background: var(--bg);
+  color: var(--text);
 
-    /* ✅ Floating Orbs */
-    .orb{
-      position:fixed;
-      width:520px;
-      height:520px;
-      border-radius:999px;
-      filter: blur(165px);
-      opacity:.22;
-      pointer-events:none;
-      z-index:0;
-      animation: floatOrb 10s ease-in-out infinite;
-    }
+  overflow:hidden;        /* ✅ CRITICAL */
+  isolation:isolate;
+}
 
-    .orb1{
-      background: var(--theme);
-      top:-240px;
-      left:-240px;
-    }
+/* =========================================================
+   🌌 BACKGROUND EFFECTS
+========================================================= */
+.bg,
+.orb,
+.grain{
+  pointer-events:none;
+}
 
-    .orb2{
-      background: var(--theme-2);
-      bottom:-260px;
-      right:-260px;
-      animation-delay:2.4s;
-    }
+.bg{
+  position:absolute;
+  inset:0;
+  z-index:0;
 
-    @keyframes floatOrb{
-      0%,100%{ transform: translate(0,0); }
-      50%{ transform: translate(38px,-26px); }
-    }
+  background:
+    radial-gradient(1000px 720px at 18% 10%, rgba(124,58,237,0.20), transparent 55%),
+    radial-gradient(950px 700px at 86% 28%, rgba(59,130,246,0.18), transparent 62%),
+    radial-gradient(800px 600px at 50% 100%, rgba(34,211,238,0.10), transparent 60%);
 
-    /* ✅ Premium grain overlay */
-    .grain{
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      opacity: .06;
-      z-index:1;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
-      mix-blend-mode: overlay;
-    }
+  filter: blur(92px);
+}
 
-    /* ✅ MAIN ROUTED CONTENT */
-    .main{
-      position:relative;
-      z-index:2;
-      flex:1;
-      min-width:0;
-      height:100vh;
+.orb{
+  position:absolute;
+  width:560px;
+  height:560px;
+  border-radius:999px;
 
-      overflow:auto;
-      display:flex;
-      flex-direction:column;
+  filter: blur(175px);
+  opacity:.20;
+  z-index:0;
 
-      scroll-behavior:smooth;
-      -webkit-overflow-scrolling: touch;
+  animation: orbFloat 11s ease-in-out infinite;
+}
 
-      animation: fadeIn .25s ease;
-      scrollbar-color: rgba(255,255,255,0.10) transparent; /* firefox */
-    }
+.orb1{
+  top:-280px;
+  left:-280px;
+  background: var(--theme);
+}
 
-    /* ✅ Route wrapper */
-    .routeWrap{
-      min-height:100%;
-      display:flex;
-      flex-direction:column;
-      min-width:0;
-      padding: 0;
-    }
+.orb2{
+  bottom:-300px;
+  right:-300px;
+  background: var(--theme-2);
+  animation-delay: 2.8s;
+}
 
-    @keyframes fadeIn{
-      from{ opacity:.75; transform: translateY(2px); }
-      to{ opacity:1; transform: translateY(0); }
-    }
+@keyframes orbFloat{
+  0%,100%{ transform: translate(0,0); }
+  50%{ transform: translate(45px,-26px); }
+}
 
-    /* ✅ Scrollbar */
-    .main::-webkit-scrollbar{ width:10px; }
-    .main::-webkit-scrollbar-thumb{
-      background: rgba(255,255,255,0.10);
-      border-radius:999px;
-    }
-    .main::-webkit-scrollbar-thumb:hover{
-      background: rgba(255,255,255,0.15);
-    }
+.grain{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  opacity:.06;
+  mix-blend-mode: overlay;
+}
 
-    /* ===========================
-       📱 MOBILE FIX
-    ============================ */
-    @media (max-width: 900px){
-      .appShell{
-        flex-direction:column;
-      }
-      .main{
-        height: calc(100vh - 66px); /* bottom bar */
-      }
-    }
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+.main{
+  position:relative;
+  z-index:2;
 
-    /* ✅ Reduce motion support */
-    @media (prefers-reduced-motion: reduce){
-      .orb{ animation: none !important; }
-      .main{ animation: none !important; }
-    }
+  flex:1;
+  min-width:0;
+  min-height:0;
+
+  display:flex;
+  flex-direction:column;
+}
+
+/* ✅ ONLY THIS SCROLLS */
+.routeWrap{
+  flex:1;
+  min-width:0;
+  min-height:0;
+
+  overflow:auto;
+  scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* Scrollbar */
+.routeWrap::-webkit-scrollbar{ width:10px; }
+.routeWrap::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,0.12);
+  border-radius:999px;
+}
+.routeWrap::-webkit-scrollbar-track{ background:transparent; }
+
+/* =========================================================
+   MOBILE FIX (BOTTOM NAV)
+========================================================= */
+@media (max-width:900px){
+  .routeWrap{
+    padding-bottom:86px; /* ✅ avoids nav overlap */
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .orb{ animation:none !important; }
+}
   `]
 })
 export class AppLayoutComponent {}

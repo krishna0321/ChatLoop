@@ -9,7 +9,7 @@ import { RegisterComponent } from './features/auth/register/register.component';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-  // ✅ AUTH
+  // ✅ AUTH LAYOUT
   {
     path: '',
     component: AuthLayoutComponent,
@@ -20,7 +20,7 @@ export const routes: Routes = [
     ],
   },
 
-  // ✅ APP
+  // ✅ MAIN APP LAYOUT
   {
     path: 'app',
     component: AppLayoutComponent,
@@ -35,7 +35,7 @@ export const routes: Routes = [
           import('./features/chats/chats.component').then((m) => m.ChatsComponent),
       },
 
-      // ✅ ROOM CHAT (direct)
+      // ✅ DM / ROOM CHAT
       {
         path: 'chat/:id',
         loadComponent: () =>
@@ -61,7 +61,6 @@ export const routes: Routes = [
             (m) => m.CreateGroupComponent
           ),
       },
-
       {
         path: 'group/:id',
         loadComponent: () =>
@@ -69,7 +68,6 @@ export const routes: Routes = [
             (m) => m.GroupChatComponent
           ),
       },
-
       {
         path: 'group/:id/info',
         loadComponent: () =>
@@ -77,7 +75,6 @@ export const routes: Routes = [
             (m) => m.GroupInfoComponent
           ),
       },
-
       {
         path: 'group/:id/add-members',
         loadComponent: () =>
@@ -130,7 +127,7 @@ export const routes: Routes = [
       },
     ],
   },
-    
-  // ✅ fallback
-  { path: '**', redirectTo: 'login' },
+
+  // ✅ FALLBACK
+  { path: '**', redirectTo: '/login' },
 ];

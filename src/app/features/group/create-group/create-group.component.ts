@@ -3,8 +3,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
-
 import { Subscription } from 'rxjs';
+
 import { UserService, AppUser } from '../../../core/services/user.service';
 import { RoomService } from '../../../core/services/room.service';
 
@@ -28,7 +28,6 @@ export class CreateGroupComponent implements OnInit, OnDestroy {
   users: AppUser[] = [];
   filtered: AppUser[] = [];
 
-  // selected member UIDs
   selected = new Set<string>();
 
   loading = false;
@@ -66,34 +65,18 @@ export class CreateGroupComponent implements OnInit, OnDestroy {
     this.err = '';
   }
 
-  // ✅ Angular template safe helper
-  getUser(uid: string): AppUser | undefined {
-    return (this.users || []).find((x) => x.uid === uid);
-  }
-
-  getUserLabel(uid: string): string {
-    const u = this.getUser(uid);
-    return u?.name || u?.email || u?.phone || 'User';
-  }
-
-  getInitial(u: AppUser): string {
-    return (u?.name || u?.email || 'U').slice(0, 1).toUpperCase();
-  }
-
   apply() {
     const t = this.search.trim().toLowerCase();
-
     if (!t) {
       this.filtered = [...this.users];
       return;
     }
 
     this.filtered = this.users.filter((u) => {
-      return (
-        (u.name || '').toLowerCase().includes(t) ||
-        (u.email || '').toLowerCase().includes(t) ||
-        (u.phone || '').toLowerCase().includes(t)
-      );
+      const name = (u.name || '').toLowerCase();
+      const email = (u.email || '').toLowerCase();
+      const phone = (u.phone || '').toLowerCase();
+      return name.includes(t) || email.includes(t) || phone.includes(t);
     });
   }
 
@@ -107,11 +90,25 @@ export class CreateGroupComponent implements OnInit, OnDestroy {
     return this.selected.has(uid);
   }
 
-  remove(uid: string) {
+  remove(uid: string, ev?: Event) {
+    ev?.stopPropagation();
     this.selected.delete(uid);
   }
 
-  validate(): string {
+  getUser(uid: string): AppUser | undefined {
+    return (this.users || []).find((x) => x.uid === uid);
+  }
+
+  getUserLabel(uid: string): string {
+    const u = this.getUser(uid);
+    return u?.name || u?.email || u?.phone || 'User';
+  }
+
+  getInitial(u: AppUser): string {
+    return (u?.name || u?.email || 'U').slice(0, 1).toUpperCase();
+  }
+
+  private validate(): string {
     const n = this.name.trim();
     const d = this.description.trim();
 
@@ -137,10 +134,11 @@ export class CreateGroupComponent implements OnInit, OnDestroy {
     try {
       this.loading = true;
 
-      // include me always
+      // ✅ include me always
       const members = Array.from(this.selected);
       if (!members.includes(this.me)) members.unshift(this.me);
 
+      // ✅ create room
       const roomId = await this.roomsService.createRoom({
         type: this.type,
         name: this.name.trim(),
@@ -150,9 +148,8 @@ export class CreateGroupComponent implements OnInit, OnDestroy {
 
       this.msg = 'Created ✅';
 
-      await this.router.navigate(['/app/chats'], {
-        queryParams: { room: roomId },
-      });
+      // ✅ open group chat directly
+      await this.router.navigate(['/app/group', roomId]);
     } catch (e: any) {
       console.error(e);
       this.err = e?.message || 'Create failed';

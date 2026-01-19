@@ -133,38 +133,28 @@
     </div>
   </aside>
 
-  <!-- RIGHT CONTENT -->
-  <main class="content">
+<main class="content">
 
-    <!-- DM Chat -->
-    <ng-container *ngIf="selectedUser">
-      <div class="mobileTopBar">
-        <button class="backBtn" (click)="backToList()">⬅</button>
-        <span class="mTitle">{{ selectedUser.name || selectedUser.email || 'Chat' }}</span>
-      </div>
-
+  <ng-container *ngIf="selectedUser">
+    <div class="chatWrap">
       <app-chat [user]="selectedUser"></app-chat>
-    </ng-container>
+    </div>
+  </ng-container>
 
-    <!-- Room Chat -->
-    <ng-container *ngIf="selectedRoomId && !selectedUser">
-      <div class="mobileTopBar">
-        <button class="backBtn" (click)="backToList()">⬅</button>
-        <span class="mTitle">Room</span>
-      </div>
-
+  <ng-container *ngIf="selectedRoomId && !selectedUser">
+    <div class="chatWrap">
       <app-chat-room [roomId]="selectedRoomId"></app-chat-room>
-    </ng-container>
+    </div>
+  </ng-container>
 
-    <!-- Empty -->
-    <ng-container *ngIf="!selectedUser && !selectedRoomId">
-      <div class="empty">
-        <div class="iconBig">💬</div>
-        <div class="t1">Select a chat</div>
-        <div class="t2">Choose from the left panel</div>
-      </div>
-    </ng-container>
+  <ng-container *ngIf="!selectedUser && !selectedRoomId">
+    <div class="empty">
+      <div class="iconBig">💬</div>
+      <div class="t1">Select a chat</div>
+      <div class="t2">Choose from the left panel</div>
+    </div>
+  </ng-container>
 
-  </main>
+</main>
 
 </div>

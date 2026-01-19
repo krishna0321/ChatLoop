@@ -14,9 +14,7 @@
 
       <div class="meta">
         <div class="name">{{ room?.name || 'Group' }}</div>
-        <div class="sub">
-          👥 {{ room?.members?.length || 0 }} members
-        </div>
+        <div class="sub">👥 {{ room?.members?.length || 0 }} members</div>
       </div>
     </div>
 
@@ -29,7 +27,7 @@
     Loading group chat...
   </div>
 
-  <!-- MESSAGES -->
+  <!-- ✅ MAIN SCROLL AREA -->
   <main class="msgs" #box *ngIf="!loading">
 
     <div
@@ -37,12 +35,9 @@
       class="bubble"
       [class.me]="m.senderId === myUid"
     >
-      <!-- Sender (only others) -->
       <div class="sender" *ngIf="m.senderId !== myUid">
         <span class="miniAv">{{ getInitial(m.senderId) }}</span>
-        <span class="senderName">
-          {{ getMemberName(m.senderId) }}
-        </span>
+        <span class="senderName">{{ getMemberName(m.senderId) }}</span>
       </div>
 
       <div class="text">{{ m.text }}</div>

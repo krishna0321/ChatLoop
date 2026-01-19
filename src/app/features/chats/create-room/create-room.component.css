@@ -1,178 +1,288 @@
-:host{
-  flex:1;
-  display:flex;
-  min-height:100%;
+ /* ==========================================
+   ✅ Chatloop - Create Room UI (Telegram Style)
+   file: create-room.component.css
+========================================== */
+
+:host {
+  display: block;
+  height: 100%;
 }
 
-/* Wrapper */
-.wrap{
-  flex:1;
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  padding:20px;
+/* ✅ page wrap */
+.wrap {
+  min-height: 100%;
+  padding: 26px 16px;
+
+  display: grid;
+  place-items: center;
 
   background:
-    radial-gradient(circle at 30% 0%, rgba(59,130,246,0.18), transparent 38%),
-    radial-gradient(circle at 70% 40%, rgba(139,92,246,0.14), transparent 45%),
-    #050b18;
+    radial-gradient(900px 600px at 20% 10%, rgba(124, 58, 237, 0.16), transparent 55%),
+    radial-gradient(800px 500px at 80% 80%, rgba(59, 130, 246, 0.12), transparent 60%),
+    #050816;
 
-  color:white;
+  color: rgba(255, 255, 255, 0.92);
 }
 
-/* Card */
-.card{
-  width:520px;
-  max-width:100%;
-  background: rgba(15,23,42,0.65);
-  border:1px solid rgba(255,255,255,0.09);
-  border-radius:24px;
-  padding:18px;
+/* ✅ card */
+.card {
+  width: min(520px, 94vw);
+  border-radius: 22px;
+  padding: 18px 18px 20px;
+
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(14px);
-  box-shadow: 0 20px 70px rgba(0,0,0,0.6);
+
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55);
+  animation: pop 0.22s ease;
 }
 
-/* Header */
-.head{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:10px;
-  margin-bottom:12px;
+@keyframes pop {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-h2{
-  margin:0;
-  font-weight:1000;
-}
-.sub{
-  margin:8px 0 0;
-  opacity:.75;
-  font-size:13px;
-}
+/* ==========================================
+   ✅ HEADER
+========================================== */
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
 
-.back{
-  text-decoration:none;
-  color: rgba(226,232,240,0.9);
-  font-weight:900;
-  font-size:13px;
-
-  padding:10px 12px;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,0.10);
-  background: rgba(2,6,23,0.35);
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 16px;
 }
 
-/* Tabs */
-.tabs{
-  display:flex;
-  gap:10px;
-  margin:14px 0;
+.head h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 1000;
+  letter-spacing: 0.2px;
 }
 
-.tabs button{
-  flex:1;
-  padding:12px;
-  border-radius:18px;
-  cursor:pointer;
+.sub {
+  margin: 6px 0 0;
+  font-size: 12px;
+  opacity: 0.72;
+  line-height: 1.35;
+}
 
-  border:1px solid rgba(255,255,255,0.10);
+/* ✅ back button */
+.back {
+  text-decoration: none;
+  white-space: nowrap;
+
+  padding: 10px 12px;
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.92);
+
+  font-size: 13px;
+  font-weight: 900;
+
+  transition: 0.2s ease;
+}
+
+.back:hover {
+  transform: translateY(-1px);
+  border-color: rgba(124, 58, 237, 0.32);
+  background: rgba(124, 58, 237, 0.12);
+}
+
+/* ==========================================
+   ✅ TABS
+========================================== */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin: 16px 0 18px;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 14px 12px;
+  border-radius: 18px;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.10);
+
   background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.85);
 
-  color:white;
-  font-weight:950;
-  text-align:left;
-  transition:.2s ease;
+  font-weight: 1000;
+  font-size: 14px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+
+  transition: 0.2s ease;
 }
 
-.tabs button.active{
-  background: rgba(37,99,235,0.22);
-  border-color: rgba(37,99,235,0.35);
-  box-shadow: 0 18px 50px rgba(37,99,235,0.14);
+.tabs button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(124,58,237,0.35);
 }
 
-.tiny{
-  display:block;
-  margin-top:4px;
-  font-size:12px;
-  opacity:.7;
+.tiny {
+  font-size: 11px;
+  font-weight: 800;
+  opacity: 0.70;
 }
 
-/* Fields */
-.field{ margin-top:12px; }
-
-label{
-  display:block;
-  font-size:12px;
-  opacity:.85;
-  font-weight:900;
-  margin-bottom:6px;
+/* ✅ active tab */
+.tabs button.active {
+  background: linear-gradient(135deg,
+    rgba(124, 58, 237, 0.85),
+    rgba(59, 130, 246, 0.75)
+  );
+  border-color: rgba(255, 255, 255, 0.18);
+  color: white;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
 }
 
-input, textarea{
-  width:100%;
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,0.10);
-  background: rgba(2,6,23,0.55);
-  color:white;
-  padding:12px;
-  outline:none;
-  font-size:13px;
+.tabs button.active .tiny {
+  opacity: 0.92;
 }
 
-textarea{
-  min-height:90px;
-  resize:none;
+/* ==========================================
+   ✅ FIELDS
+========================================== */
+.field {
+  margin-bottom: 14px;
 }
 
-input:focus, textarea:focus{
-  border-color: rgba(59,130,246,0.75);
-  box-shadow: 0 0 0 5px rgba(59,130,246,0.15);
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+  margin-bottom: 8px;
+  opacity: 0.88;
 }
 
-.help{
-  margin-top:6px;
-  font-size:12px;
-  opacity:.65;
-  text-align:right;
+.field input,
+.field textarea {
+  width: 100%;
+  border-radius: 16px;
+  padding: 12px 14px;
+
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.92);
+
+  outline: none;
+  font-size: 14px;
+
+  transition: 0.2s ease;
 }
 
-/* Button */
-.primary{
-  margin-top:16px;
-  width:100%;
-  height:46px;
-  border-radius:16px;
-  border:none;
-  cursor:pointer;
-
-  background: linear-gradient(135deg,#2563eb,#3b82f6);
-  color:white;
-  font-weight:1000;
-  box-shadow: 0 16px 45px rgba(37,99,235,0.25);
+/* textarea */
+.field textarea {
+  min-height: 110px;
+  resize: vertical;
 }
 
-.primary:disabled{
-  opacity:.6;
-  cursor:not-allowed;
+.field input::placeholder,
+.field textarea::placeholder {
+  color: rgba(255,255,255,0.55);
 }
 
-.ok{ margin-top:12px; color:#22c55e; font-weight:900; }
-.err{ margin-top:12px; color:#ef4444; font-weight:900; }
+.field input:focus,
+.field textarea:focus {
+  border-color: rgba(124, 58, 237, 0.55);
+  box-shadow: 0 0 0 4px rgba(124,58,237,0.18);
+}
 
-/* ✅ Mobile */
-@media(max-width:560px){
-  .wrap{
-    align-items:flex-start;
-    padding-top:40px;
+/* ✅ char count help */
+.help {
+  margin-top: 7px;
+  font-size: 11px;
+  opacity: 0.68;
+  text-align: right;
+}
+
+/* ==========================================
+   ✅ PRIMARY BUTTON
+========================================== */
+.primary {
+  width: 100%;
+  margin-top: 10px;
+
+  height: 50px;
+  border-radius: 16px;
+  border: 0;
+  cursor: pointer;
+
+  font-weight: 1000;
+  font-size: 14px;
+  letter-spacing: 0.2px;
+
+  color: white;
+  background: linear-gradient(135deg, #7c3aed, #3b82f6);
+
+  box-shadow: 0 20px 45px rgba(0,0,0,0.40);
+  transition: 0.2s ease;
+}
+
+.primary:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.07);
+}
+
+.primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ==========================================
+   ✅ SUCCESS + ERROR MSG
+========================================== */
+.ok,
+.err {
+  margin: 12px 0 0;
+  padding: 12px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  text-align: center;
+}
+
+.ok {
+  color: rgba(212, 255, 230, 0.95);
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.22);
+}
+
+.err {
+  color: rgba(255, 200, 200, 0.95);
+  background: rgba(255, 87, 87, 0.12);
+  border: 1px solid rgba(255, 87, 87, 0.22);
+}
+
+/* ==========================================
+   ✅ MOBILE
+========================================== */
+@media (max-width: 520px) {
+  .card {
+    padding: 16px 14px 18px;
+    border-radius: 20px;
   }
 
-  .tabs{
-    flex-direction:column;
+  .head h2 {
+    font-size: 17px;
   }
 
-  .back{
-    align-self:flex-start;
+  .tabs button {
+    padding: 13px 12px;
+    border-radius: 16px;
   }
 }

@@ -1,225 +1,405 @@
-/* =========================================
-   CHATLOOP CHAT ROOM (PREMIUM)
-========================================= */
+ /* ==========================================
+   ✅ Chatloop - Chat Room UI (Premium Dark)
+   file: chat-room.component.css
+========================================== */
 
-/* 🔥 CHANGE COLORS ONLY HERE */
-:root{
-  --theme: #2a9df4;       /* Telegram Blue */
-  --theme-2: #38bdf8;
-
-  /* other options
-  --theme:#ff2d95; --theme-2:#7c3aed;   Pink
-  --theme:#22c55e; --theme-2:#86efac;   Green
-  --theme:#7c3aed; --theme-2:#22d3ee;   Purple
-  --theme:#ef4444; --theme-2:#fb7185;   Red
-  */
-
-  --bg-main: #050816;
-  --bg-panel: rgba(15,23,42,0.75);
-  --bg-soft: rgba(2,6,23,0.55);
-
-  --text-main: rgba(255,255,255,0.92);
-  --text-muted: rgba(255,255,255,0.7);
-
-  --border-soft: rgba(255,255,255,0.10);
+:host {
+  display: block;
+  height: 100%;
 }
 
-/* WRAP */
-.chatRoomWrap{
-  height:100%;
-  display:flex;
-  flex-direction:column;
-  background:
-    radial-gradient(circle at 30% 0%, color-mix(in srgb, var(--theme) 20%, transparent), transparent 40%),
-    radial-gradient(circle at 70% 40%, color-mix(in srgb, var(--theme-2) 20%, transparent), transparent 45%),
-    var(--bg-main);
-  color:white;
+/* ✅ WRAPPER */
+.chatRoomWrap {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(1200px 800px at 20% 10%, rgba(124, 58, 237, 0.12), transparent 55%),
+              radial-gradient(900px 600px at 80% 80%, rgba(59, 130, 246, 0.10), transparent 60%),
+              #050816;
+  color: rgba(255, 255, 255, 0.92);
+  overflow: hidden;
 }
 
-/* ================= TOP BAR ================= */
-.topBar{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:12px 14px;
-  background: var(--bg-panel);
+/* ==========================================
+   ✅ TOP BAR
+========================================== */
+.topBar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+
+  background: rgba(8, 12, 26, 0.75);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(14px);
-  border-bottom:1px solid rgba(255,255,255,0.06);
 }
 
-.backBtn{
-  width:38px;
-  height:38px;
-  border-radius:14px;
-  display:grid;
-  place-items:center;
-  text-decoration:none;
-  color:white;
-  background: rgba(255,255,255,0.08);
-  border:1px solid var(--border-soft);
-  font-weight:1000;
+.backBtn {
+  height: 42px;
+  width: 42px;
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 18px;
+
+  transition: 0.2s ease;
 }
 
-.roomInfo{ min-width:0; }
-
-.roomTitle{
-  font-size:16px;
-  font-weight:1000;
-  display:flex;
-  align-items:center;
-  gap:8px;
+.backBtn:hover {
+  transform: translateY(-1px);
+  background: rgba(124, 58, 237, 0.16);
+  border-color: rgba(124, 58, 237, 0.35);
 }
 
-.type{
-  font-size:11px;
-  padding:2px 8px;
-  border-radius:999px;
-  font-weight:900;
-  border:1px solid rgba(255,255,255,0.12);
-  text-transform:uppercase;
-}
-.type.dm{ background: rgba(255,255,255,0.10); }
-.type.group{ background: rgba(34,197,94,0.25); }
-.type.channel{ background: rgba(59,130,246,0.25); }
-
-.roomSub{
-  font-size:12px;
-  opacity:.7;
-  margin-top:2px;
+/* ✅ room info */
+.roomInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
-/* ================= MESSAGES ================= */
-.msgArea{
-  flex:1;
-  padding:16px;
-  overflow:auto;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+.roomTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  font-size: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.msg{
-  display:flex;
-}
-.msg.me{ justify-content:flex-end; }
-
-.bubble{
-  max-width:70%;
-  padding:10px 12px;
-  border-radius:18px;
-  background: rgba(30,41,59,0.70);
-  border:1px solid rgba(255,255,255,0.08);
-  animation: pop .2s ease;
+.roomSub {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.68);
 }
 
-.msg.me .bubble{
-  background: linear-gradient(135deg, var(--theme), var(--theme-2));
+/* ✅ type badge */
+.type {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.06);
+  text-transform: uppercase;
 }
 
-@keyframes pop{
-  from{ transform: scale(.95); opacity:.5; }
-  to{ transform: scale(1); opacity:1; }
+.type.dm {
+  border-color: rgba(59, 130, 246, 0.35);
+  background: rgba(59, 130, 246, 0.12);
 }
 
-.msg.deleted .bubble{
-  opacity:.6;
-  font-style:italic;
+.type.group {
+  border-color: rgba(124, 58, 237, 0.40);
+  background: rgba(124, 58, 237, 0.14);
 }
 
-.text{
-  font-size:14px;
-  line-height:1.45;
+.type.channel {
+  border-color: rgba(34, 197, 94, 0.35);
+  background: rgba(34, 197, 94, 0.12);
 }
 
-.meta{
-  margin-top:6px;
-  font-size:11px;
-  opacity:.7;
-  display:flex;
-  gap:8px;
-  align-items:center;
+/* ==========================================
+   ✅ LOADING
+========================================== */
+.loadingBox {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  gap: 14px;
+  padding: 20px;
+  text-align: center;
 }
 
-.delBtn{
-  border:none;
-  background:none;
-  color:#ffb4b4;
-  cursor:pointer;
-  font-size:11px;
-  font-weight:900;
+.spinner {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: 4px solid rgba(255, 255, 255, 0.12);
+  border-top: 4px solid rgba(124, 58, 237, 0.9);
+  animation: spin 1s linear infinite;
 }
 
-/* ================= INPUT BAR ================= */
-.inputBar{
-  padding:12px;
-  background: var(--bg-panel);
+.loadingText {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ==========================================
+   ✅ MESSAGES AREA
+========================================== */
+.msgArea {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 16px 10px;
+  scroll-behavior: smooth;
+}
+
+/* smooth scrollbar */
+.msgArea::-webkit-scrollbar {
+  width: 10px;
+}
+.msgArea::-webkit-scrollbar-track {
+  background: transparent;
+}
+.msgArea::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.10);
+  border-radius: 999px;
+}
+
+/* ✅ each msg wrapper */
+.msg {
+  display: flex;
+  margin: 10px 0;
+}
+
+.msg.me {
+  justify-content: flex-end;
+}
+
+/* ✅ bubble base */
+.bubble {
+  max-width: min(78%, 520px);
+  padding: 12px 12px 8px;
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(10px);
+
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.30);
+  animation: popIn 0.18s ease;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.96); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ✅ message text */
+.text {
+  font-size: 14px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ✅ My messages bubble */
+.msg.me .bubble {
+  background: linear-gradient(135deg,
+    rgba(124, 58, 237, 0.75),
+    rgba(59, 130, 246, 0.70)
+  );
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+/* ==========================================
+   ✅ META (time, edited, delete)
+========================================== */
+.meta {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.time {
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+.edited {
+  font-size: 11px;
+  opacity: 0.75;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.10);
+}
+
+.delBtn {
+  border: none;
+  cursor: pointer;
+
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 700;
+
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.92);
+  transition: 0.2s ease;
+}
+
+.delBtn:hover {
+  background: rgba(255, 87, 87, 0.18);
+  color: #ffb4b4;
+  transform: translateY(-1px);
+}
+
+/* ✅ only show delete when hover (clean UI) */
+.msg .delBtn {
+  opacity: 0;
+  pointer-events: none;
+}
+.msg:hover .delBtn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ==========================================
+   ✅ DELETED MESSAGE STYLE
+========================================== */
+.msg.deleted .bubble {
+  opacity: 0.75;
+  background: rgba(255, 255, 255, 0.04);
+  border-style: dashed;
+}
+
+.msg.deleted .text {
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* ==========================================
+   ✅ INPUT BAR
+========================================== */
+.inputBar {
+  position: sticky;
+  bottom: 0;
+  z-index: 25;
+
+  padding: 12px 14px 14px;
+  background: rgba(8, 12, 26, 0.85);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(14px);
-  border-top:1px solid rgba(255,255,255,0.06);
 }
 
-.channelLocked{
-  text-align:center;
-  font-size:12px;
-  opacity:.8;
-  margin-bottom:8px;
+.channelLocked {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+
+  background: rgba(255, 193, 7, 0.10);
+  border: 1px solid rgba(255, 193, 7, 0.24);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
 }
 
-.inputRow{
-  display:flex;
-  gap:10px;
+/* ✅ input row */
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.inputRow input{
-  flex:1;
-  height:44px;
-  border-radius:14px;
-  border:1px solid var(--border-soft);
-  background: rgba(2,6,23,0.7);
-  color:white;
-  padding:0 14px;
-  outline:none;
+/* ✅ input box */
+.inputRow input {
+  flex: 1;
+  height: 48px;
+  padding: 0 14px;
+  font-size: 14px;
+
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.92);
+
+  outline: none;
+  transition: 0.2s ease;
 }
 
-.sendBtn{
-  width:44px;
-  height:44px;
-  border-radius:14px;
-  border:none;
-  cursor:pointer;
-  background: linear-gradient(135deg, var(--theme), var(--theme-2));
-  color:white;
-  font-weight:1000;
+.inputRow input::placeholder {
+  color: rgba(255, 255, 255, 0.55);
 }
 
-.sendBtn:disabled{
-  opacity:.5;
-  cursor:not-allowed;
+.inputRow input:focus {
+  border-color: rgba(124, 58, 237, 0.55);
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.18);
 }
 
-/* ================= LOADING ================= */
-.loadingBox{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  gap:12px;
+/* ✅ disabled input */
+.inputRow input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
-.spinner{
-  width:32px;
-  height:32px;
-  border-radius:50%;
-  border:3px solid rgba(255,255,255,0.3);
-  border-top-color:white;
-  animation: spin .8s linear infinite;
+/* ✅ send button */
+.sendBtn {
+  height: 48px;
+  width: 52px;
+  border: none;
+  cursor: pointer;
+
+  border-radius: 14px;
+  background: linear-gradient(135deg, #7c3aed, #3b82f6);
+  color: white;
+
+  font-size: 18px;
+  font-weight: 900;
+
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.35);
+  transition: 0.2s ease;
 }
 
-@keyframes spin{
-  to{ transform: rotate(360deg); }
+.sendBtn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
 }
 
-.loadingText{
-  font-size:13px;
-  opacity:.75;
+.sendBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ==========================================
+   ✅ MOBILE RESPONSIVE
+========================================== */
+@media (max-width: 520px) {
+  .topBar {
+    padding: 12px 12px;
+  }
+
+  .bubble {
+    max-width: 88%;
+    padding: 11px 11px 7px;
+    border-radius: 16px;
+  }
+
+  .roomTitle {
+    font-size: 15px;
+  }
+
+  .type {
+    padding: 4px 9px;
+    font-size: 10px;
+  }
+
+  .inputRow input {
+    height: 46px;
+  }
+
+  .sendBtn {
+    height: 46px;
+    width: 50px;
+  }
 }

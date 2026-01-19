@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './topbar.component.html',
-  styleUrl: './topbar.component.css'
+  styleUrls: ['./topbar.component.css']   // ✅ FIXED
 })
-export class TopbarComponent {
-
-}
+export class TopbarComponent {}

@@ -32,7 +32,7 @@ export class AddMembersComponent implements OnInit, OnDestroy {
   err = '';
 
   private subUsers?: Subscription;
-  private subRoom?: any;
+  private unsubRoom?: () => void;
 
   constructor(
     private auth: Auth,
@@ -45,17 +45,31 @@ export class AddMembersComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const u = this.auth.currentUser;
     if (!u) return;
+
     this.myUid = u.uid;
-
     this.roomId = this.route.snapshot.paramMap.get('id') || '';
-    if (!this.roomId) return;
 
-    this.subRoom = this.roomService.listenRoom(this.roomId, (r: any) => {
+    if (!this.roomId) {
+      this.err = 'Invalid group id';
+      this.loading = false;
+      return;
+    }
+
+    // ✅ listen room
+    this.unsubRoom = this.roomService.listenRoom(this.roomId, (r: any) => {
       this.room = r;
       this.loading = false;
+
+      if (!r) {
+        this.err = 'Group not found';
+        this.filtered = [];
+        return;
+      }
+
       this.apply();
     });
 
+    // ✅ users list
     this.subUsers = this.userService.getUsers().subscribe((list) => {
       this.users = (list || []).filter((x) => x.uid !== this.myUid);
       this.apply();
@@ -64,7 +78,7 @@ export class AddMembersComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subUsers?.unsubscribe();
-    this.subRoom?.();
+    this.unsubRoom?.();
   }
 
   apply() {
@@ -75,11 +89,10 @@ export class AddMembersComponent implements OnInit, OnDestroy {
 
     if (t) {
       list = list.filter((u) => {
-        return (
-          (u.name || '').toLowerCase().includes(t) ||
-          (u.email || '').toLowerCase().includes(t) ||
-          (u.phone || '').toLowerCase().includes(t)
-        );
+        const name = (u.name || '').toLowerCase();
+        const email = (u.email || '').toLowerCase();
+        const phone = (u.phone || '').toLowerCase();
+        return name.includes(t) || email.includes(t) || phone.includes(t);
       });
     }
 
@@ -87,11 +100,12 @@ export class AddMembersComponent implements OnInit, OnDestroy {
   }
 
   getInitial(u: AppUser) {
-    return (u.name || u.email || 'U').slice(0, 1).toUpperCase();
+    return (u?.name || u?.email || 'U').slice(0, 1).toUpperCase();
   }
 
   toggle(uid: string) {
     if (!uid) return;
+
     if (this.selected.has(uid)) this.selected.delete(uid);
     else this.selected.add(uid);
   }
@@ -102,6 +116,7 @@ export class AddMembersComponent implements OnInit, OnDestroy {
 
   async add() {
     this.err = '';
+
     if (this.selected.size === 0) {
       this.err = 'Select at least 1 user';
       return;
@@ -109,8 +124,11 @@ export class AddMembersComponent implements OnInit, OnDestroy {
 
     try {
       this.saving = true;
+
       await this.roomService.addMembers(this.roomId, Array.from(this.selected));
-      this.router.navigate(['/app/group', this.roomId, 'info']);
+
+      // ✅ go back to group info
+      await this.router.navigate(['/app/group', this.roomId, 'info']);
     } catch (e: any) {
       console.error(e);
       this.err = e?.message || 'Add members failed';

@@ -13,12 +13,20 @@
 
     <!-- Tabs -->
     <div class="tabs">
-      <button type="button" (click)="selectType('group')" [class.active]="type==='group'">
+      <button
+        type="button"
+        (click)="selectType('group')"
+        [class.active]="type==='group'"
+      >
         👥 Group
         <span class="tiny">Chat together</span>
       </button>
 
-      <button type="button" (click)="selectType('channel')" [class.active]="type==='channel'">
+      <button
+        type="button"
+        (click)="selectType('channel')"
+        [class.active]="type==='channel'"
+      >
         📢 Channel
         <span class="tiny">Broadcast only</span>
       </button>
@@ -27,17 +35,17 @@
     <!-- Form -->
     <div class="field">
       <label>Name</label>
-      <input [(ngModel)]="name" placeholder="Example: Anime Lovers" />
+      <input [(ngModel)]="name" placeholder="Example: Anime Lovers" maxlength="30" />
       <div class="help">{{ name.trim().length }}/30</div>
     </div>
 
     <div class="field">
       <label>Description (optional)</label>
-      <textarea [(ngModel)]="description" placeholder="Short description..."></textarea>
+      <textarea [(ngModel)]="description" placeholder="Short description..." maxlength="120"></textarea>
       <div class="help">{{ description.trim().length }}/120</div>
     </div>
 
-    <button class="primary" (click)="create()" [disabled]="loading">
+    <button class="primary" (click)="create()" [disabled]="loading || !name.trim()">
       {{ loading ? 'Creating...' : '✅ Create Room' }}
     </button>
 
