@@ -1,110 +1,115 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Auth } from '@angular/fire/auth';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
-import { RoomService } from '../../../core/services/room.service';
-import { UserService, AppUser } from '../../../core/services/user.service';
+import { Auth, onAuthStateChanged } from '@angular/fire/auth';
+
+import { RoomService, Room, RoomMessage } from '../../../core/services/room.service';
 
 @Component({
   selector: 'app-group-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './group-chat.component.html',
   styleUrls: ['./group-chat.component.css'],
 })
 export class GroupChatComponent implements OnInit, OnDestroy {
-  @ViewChild('box') box?: ElementRef<HTMLDivElement>;
+  @ViewChild('box') box?: ElementRef<HTMLElement>;
 
   roomId = '';
-  room: any = null;
+  myUid = '';
 
   loading = true;
   err = '';
 
-  messages: any[] = [];
+  room: Room | null = null;
+  messages: RoomMessage[] = [];
+
   text = '';
 
-  myUid = '';
-
+  private authUnsub?: () => void;
   private unsubRoom?: () => void;
   private unsubMsgs?: () => void;
 
-  // ✅ for showing member names
-  usersMap = new Map<string, AppUser>();
-  private subUsers?: any;
-
   constructor(
+    private auth: Auth,
     private route: ActivatedRoute,
     private router: Router,
-    private auth: Auth,
-    private roomService: RoomService,
-    private userService: UserService
+    private roomService: RoomService
   ) {}
 
   ngOnInit(): void {
-    const u = this.auth.currentUser;
-    if (!u) {
-      this.loading = false;
-      this.err = 'Not logged in';
-      return;
-    }
-    this.myUid = u.uid;
-
     this.roomId = this.route.snapshot.paramMap.get('id') || '';
+
     if (!this.roomId) {
-      this.loading = false;
-      this.err = 'Invalid group ID';
+      this.router.navigate(['/app/chats']);
       return;
     }
 
-    // ✅ cache all users for names
-    this.subUsers = this.userService.getUsers().subscribe((list: AppUser[]) => {
-      this.usersMap.clear();
-      (list || []).forEach((x) => this.usersMap.set(x.uid, x));
-    });
-
-    // ✅ listen room
-    this.unsubRoom = this.roomService.listenRoom(this.roomId, (room: any) => {
-      this.room = room;
-      this.loading = false;
-
-      if (!room) {
-        this.err = 'Group not found';
-      } else {
-        this.err = '';
+    this.authUnsub = onAuthStateChanged(this.auth, (u) => {
+      if (!u) {
+        this.router.navigate(['/login']);
+        return;
       }
-    });
 
-    // ✅ listen messages
-    this.unsubMsgs = this.roomService.listenRoomMessages(this.roomId, (msgs: any[]) => {
-      this.messages = msgs || [];
-      this.scrollToBottom();
+      this.myUid = u.uid;
+
+      // ✅ listen room doc
+      this.unsubRoom = this.roomService.listenRoom(this.roomId, (room) => {
+        this.room = room;
+      });
+
+      // ✅ listen messages
+      this.unsubMsgs = this.roomService.listenRoomMessages(
+        this.roomId,
+        (msgs) => {
+          this.messages = msgs || [];
+          this.loading = false;
+
+          // ✅ scroll bottom
+          setTimeout(() => this.scrollToBottom(), 50);
+
+          // ✅ mark as read (Telegram behavior)
+          this.roomService.markAsRead(this.roomId, this.myUid);
+        }
+      );
     });
   }
 
   ngOnDestroy(): void {
+    this.authUnsub?.();
     this.unsubRoom?.();
     this.unsubMsgs?.();
-    this.subUsers?.unsubscribe?.();
+  }
+
+  scrollToBottom() {
+    const el = this.box?.nativeElement;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
   }
 
   async send() {
-    const t = this.text.trim();
-    if (!t || !this.myUid || !this.roomId) return;
+    const value = (this.text || '').trim();
+    if (!value) return;
 
     try {
       await this.roomService.sendRoomMessage(this.roomId, {
-        text: t,
+        text: value,
         senderId: this.myUid,
       });
 
       this.text = '';
-      this.scrollToBottom(true);
-    } catch (e) {
-      console.error('send group message error', e);
-      this.err = 'Message sending failed';
+      setTimeout(() => this.scrollToBottom(), 50);
+    } catch (err) {
+      console.error('Send message error:', err);
+      this.err = '❌ Failed to send message';
     }
   }
 
@@ -112,24 +117,12 @@ export class GroupChatComponent implements OnInit, OnDestroy {
     this.router.navigate(['/app/group', this.roomId, 'info']);
   }
 
-  getMemberName(uid: string): string {
-    if (!uid) return 'User';
+  getInitial(uid: string) {
+    return (uid || 'U').slice(0, 1).toUpperCase();
+  }
+
+  getMemberName(uid: string) {
     if (uid === this.myUid) return 'You';
-    const u = this.usersMap.get(uid);
-    return u?.name || u?.email || 'User';
-  }
-
-  getInitial(uid: string): string {
-    const name = this.getMemberName(uid);
-    return (name || 'U').slice(0, 1).toUpperCase();
-  }
-
-  private scrollToBottom(force = false) {
-    setTimeout(() => {
-      const el = this.box?.nativeElement;
-      if (!el) return;
-      if (force) el.scrollTop = el.scrollHeight;
-      else el.scrollTop = el.scrollHeight;
-    }, 30);
+    return uid.slice(0, 8);
   }
 }

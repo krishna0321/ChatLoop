@@ -1,4 +1,5 @@
 <div class="chat-view" *ngIf="user" (click)="closeAllMenus()">
+
   <!-- HEADER -->
   <header class="header" (click)="$event.stopPropagation()">
     <div class="left" (click)="openProfileDrawer()">
@@ -39,13 +40,13 @@
     >
       <div class="text">
 
-        <!-- ✅ IMAGE MESSAGE -->
+        <!-- ✅ IMAGE -->
         <ng-container *ngIf="m.type === 'image' && m.fileUrl && !m.isDeleted">
           <img class="imgMsg" [src]="m.fileUrl" />
           <div class="caption" *ngIf="m.text">{{ m.text }}</div>
         </ng-container>
 
-        <!-- ✅ FILE MESSAGE -->
+        <!-- ✅ FILE -->
         <ng-container *ngIf="m.type === 'file' && m.fileUrl && !m.isDeleted">
           <a class="fileMsg" [href]="m.fileUrl" target="_blank" rel="noopener">
             <div class="fileIcon2">📎</div>
@@ -58,7 +59,7 @@
           </a>
         </ng-container>
 
-        <!-- ✅ TEXT/LINK MESSAGE -->
+        <!-- ✅ TEXT -->
         <ng-container *ngIf="(!m.type || m.type === 'text' || m.type === 'link') && !m.isDeleted">
           {{ m.text }}
         </ng-container>
@@ -99,12 +100,28 @@
     </div>
   </div>
 
-  <!-- COMPOSER -->
+  <!-- ✅ COMPOSER -->
   <div class="composer" (click)="$event.stopPropagation()">
-    <label class="attachBtn" [class.disabled]="sendingFile || isBlocked">
+
+    <!-- attach -->
+    <button
+      class="attachBtn"
+      [class.disabled]="sendingFile || isBlocked"
+      (click)="toggleAttachMenu($event)"
+      [disabled]="sendingFile || isBlocked"
+      type="button"
+    >
       📎
-      <input type="file" hidden (change)="pickFile($event)" />
-    </label>
+    </button>
+
+    <!-- attach menu -->
+    <div class="attachMenu" *ngIf="showAttachMenu" (click)="$event.stopPropagation()">
+      <button (click)="chooseAttachType('image')">🖼 Image</button>
+      <button (click)="chooseAttachType('document')">📄 Document</button>
+    </div>
+
+    <!-- hidden input -->
+    <input #fileInput type="file" hidden (change)="pickFile($event)" />
 
     <input
       [(ngModel)]="text"
@@ -113,9 +130,18 @@
       (keydown.enter)="send()"
     />
 
-    <button (click)="send()" [disabled]="isBlocked || !text.trim() || sendingFile">
+    <button (click)="send()" [disabled]="isBlocked || (!text.trim() && !selectedFile) || sendingFile">
       {{ sendingFile ? 'Uploading...' : 'Send' }}
     </button>
+  </div>
+
+  <!-- ✅ preview -->
+  <div class="filePreview" *ngIf="selectedFile">
+    <div class="fileInfo">
+      <div class="fileName">📎 {{ selectedFile.name }}</div>
+      <div class="fileSize">{{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB</div>
+    </div>
+    <button class="removeFile" type="button" (click)="clearSelectedFile()">✖</button>
   </div>
 
   <div class="uploadErr" *ngIf="fileError">{{ fileError }}</div>
@@ -124,10 +150,9 @@
     You blocked this user. Unblock to send messages.
   </div>
 
-  <!-- ✅ TELEGRAM PROFILE DRAWER -->
+  <!-- ✅ PROFILE DRAWER -->
   <div class="drawerBackdrop" *ngIf="showUserProfile" (click)="closeProfileDrawer()">
     <div class="drawer" (click)="$event.stopPropagation()">
-      <!-- hero -->
       <div class="dHero">
         <button class="dClose" (click)="closeProfileDrawer()">✖</button>
 
@@ -146,7 +171,6 @@
       </div>
 
       <div class="drawerBody">
-        <!-- Info Card -->
         <div class="card">
           <div class="row">
             <span>Phone</span>
@@ -176,29 +200,21 @@
           </div>
         </div>
 
-        <!-- Tabs -->
         <div class="tabs">
           <button (click)="setTab('media')" [class.active]="profileTab==='media'">Media</button>
           <button (click)="setTab('files')" [class.active]="profileTab==='files'">Files</button>
           <button (click)="setTab('links')" [class.active]="profileTab==='links'">Links</button>
         </div>
 
-        <!-- Media -->
         <div class="tabContent" *ngIf="profileTab==='media'">
-          <div *ngIf="sharedMedia.length === 0" class="emptyTab">
-            No media shared yet.
-          </div>
-
+          <div *ngIf="sharedMedia.length === 0" class="emptyTab">No media shared yet.</div>
           <div class="mediaGrid" *ngIf="sharedMedia.length > 0">
             <img *ngFor="let img of sharedMedia" [src]="img" class="mediaImg" />
           </div>
         </div>
 
-        <!-- Files -->
         <div class="tabContent" *ngIf="profileTab==='files'">
-          <div *ngIf="sharedFiles.length === 0" class="emptyTab">
-            No files shared yet.
-          </div>
+          <div *ngIf="sharedFiles.length === 0" class="emptyTab">No files shared yet.</div>
 
           <a class="fileRow" *ngFor="let f of sharedFiles" [href]="f.url" target="_blank">
             <div class="fileIcon">📄</div>
@@ -209,18 +225,13 @@
           </a>
         </div>
 
-        <!-- Links -->
         <div class="tabContent" *ngIf="profileTab==='links'">
-          <div *ngIf="sharedLinks.length === 0" class="emptyTab">
-            No links shared yet.
-          </div>
-
+          <div *ngIf="sharedLinks.length === 0" class="emptyTab">No links shared yet.</div>
           <a class="link" *ngFor="let l of sharedLinks" [href]="l.url" target="_blank">
             🔗 {{ l.url }}
           </a>
         </div>
 
-        <!-- QR -->
         <div class="card qrCard" *ngIf="qrDataUrl">
           <div>
             <div class="qrTitle">📷 QR Code</div>

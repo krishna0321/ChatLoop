@@ -31,7 +31,7 @@ import { LeftbarComponent } from '../../layout/leftbar/leftbar.component';
   `,
   styles: [`
 /* =========================================================
-   ✅ Chatloop AppLayout – FINAL FIX
+   ✅ Chatloop AppLayout – ULTRA PREMIUM (FINAL)
    - No white space
    - Correct height
    - Single scroll container
@@ -40,8 +40,13 @@ import { LeftbarComponent } from '../../layout/leftbar/leftbar.component';
 :host{
   display:flex;
   width:100%;
-  height:100vh;           /* ✅ FULL SCREEN */
+  height:100dvh;           /* ✅ BEST MOBILE FIX */
   min-height:0;
+}
+
+/* fallback for browsers without dvh */
+@supports not (height: 100dvh){
+  :host{ height:100vh; }
 }
 
 /* =========================================================
@@ -97,6 +102,7 @@ import { LeftbarComponent } from '../../layout/leftbar/leftbar.component';
     radial-gradient(800px 600px at 50% 100%, rgba(34,211,238,0.10), transparent 60%);
 
   filter: blur(92px);
+  opacity:.95;
 }
 
 .orb{
@@ -130,12 +136,16 @@ import { LeftbarComponent } from '../../layout/leftbar/leftbar.component';
   50%{ transform: translate(45px,-26px); }
 }
 
+/* ✅ Grain texture */
 .grain{
   position:absolute;
   inset:0;
   z-index:1;
   opacity:.06;
   mix-blend-mode: overlay;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
 }
 
 /* =========================================================
@@ -162,6 +172,9 @@ import { LeftbarComponent } from '../../layout/leftbar/leftbar.component';
   overflow:auto;
   scroll-behavior:smooth;
   -webkit-overflow-scrolling:touch;
+
+  /* prevents small white flicker */
+  background: transparent;
 }
 
 /* Scrollbar */

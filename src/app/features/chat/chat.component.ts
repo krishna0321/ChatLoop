@@ -22,6 +22,7 @@ import { AppUser, UserService } from '../../core/services/user.service';
 import { ContactService } from '../../core/services/contact.service';
 
 type ProfileTab = 'media' | 'files' | 'links';
+type AttachType = 'image' | 'document';
 
 @Component({
   selector: 'app-chat',
@@ -74,7 +75,14 @@ export class ChatComponent
   sendingFile = false;
   fileError = '';
 
+  // ✅ ATTACH MENU FEATURE
+  showAttachMenu = false;
+  attachType: AttachType | null = null;
+  selectedFile: File | null = null;
+
   @ViewChild('messagesBox') messagesBox!: ElementRef<HTMLDivElement>;
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+
   private lastCount = 0;
 
   private authUnsub?: () => void;
@@ -118,6 +126,7 @@ export class ChatComponent
       this.closeAllMenus();
       this.cancelEdit();
       this.closeProfileDrawer();
+      this.clearSelectedFile();
       this.loadChat();
     }
   }
@@ -135,14 +144,13 @@ export class ChatComponent
   private async loadChat() {
     if (!this.user?.uid || !this.myUid) return;
 
-    // prevent double load
     if (this.loading) return;
     this.loading = true;
 
     try {
       this.chatId = this.chatService.getChatId(this.myUid, this.user.uid);
 
-      // ✅ MAIN FIX: always ensure parent chat exists
+      // ✅ always ensure chat exists
       await this.chatService.ensureChat(this.chatId, [this.myUid, this.user.uid]);
 
       // ✅ chat meta listener (mute/pin)
@@ -181,13 +189,57 @@ export class ChatComponent
     this.menuMessageId = null;
     this.selectedMessage = null;
     this.showHeaderMenu = false;
+    this.showAttachMenu = false;
   }
 
   toggleHeaderMenu(e: MouseEvent) {
     e.stopPropagation();
     this.menuMessageId = null;
     this.selectedMessage = null;
+    this.showAttachMenu = false;
     this.showHeaderMenu = !this.showHeaderMenu;
+  }
+
+  // =====================
+  // ✅ ATTACH MENU
+  // =====================
+  toggleAttachMenu(e: MouseEvent) {
+    e.stopPropagation();
+    if (this.isBlocked || this.sendingFile) return;
+
+    this.showHeaderMenu = false;
+    this.menuMessageId = null;
+    this.selectedMessage = null;
+
+    this.showAttachMenu = !this.showAttachMenu;
+  }
+
+  chooseAttachType(type: AttachType) {
+    if (this.isBlocked || this.sendingFile) return;
+
+    this.attachType = type;
+    this.showAttachMenu = false;
+
+    const input = this.fileInput?.nativeElement;
+    if (!input) return;
+
+    input.value = '';
+
+    if (type === 'image') {
+      input.accept = 'image/*';
+    } else {
+      input.accept = '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.txt';
+    }
+
+    input.click();
+  }
+
+  clearSelectedFile() {
+    this.selectedFile = null;
+    this.attachType = null;
+
+    const input = this.fileInput?.nativeElement;
+    if (input) input.value = '';
   }
 
   // =====================
@@ -196,6 +248,7 @@ export class ChatComponent
   openMsgMenu(e: MouseEvent, m: ChatMessage) {
     e.stopPropagation();
     this.showHeaderMenu = false;
+    this.showAttachMenu = false;
 
     if (!m?.id) return;
 
@@ -213,25 +266,61 @@ export class ChatComponent
     this.selectedMessage = m;
   }
 
-  // ✅ MAIN SEND FUNCTION (fixed)
+  // =====================
+  // ✅ SEND (TEXT OR FILE)
+  // =====================
   async send() {
-    const v = (this.text || '').trim();
-    if (!v || !this.chatId) return;
     if (!this.myUid || !this.user?.uid) return;
+    if (!this.chatId) return;
     if (this.isBlocked) return;
 
+    // ✅ FILE SEND
+    if (this.selectedFile) {
+      try {
+        this.sendingFile = true;
+        this.fileError = '';
+
+        await this.chatService.ensureChat(this.chatId, [this.myUid, this.user.uid]);
+
+        // ✅ IMPORTANT: your ChatService should support sending images/files
+        // type: image => 'image', doc => 'file'
+        await this.chatService.sendFileMessage(
+          this.chatId,
+          this.selectedFile,
+          this.myUid,
+          this.user.uid,
+          this.attachType === 'image' ? 'image' : 'file',
+          (this.text || '').trim() // caption
+        );
+
+        this.text = '';
+        this.clearSelectedFile();
+      } catch (err: any) {
+        console.error(err);
+        this.fileError = err?.message || 'Upload failed';
+      } finally {
+        this.sendingFile = false;
+      }
+
+      return;
+    }
+
+    // ✅ NORMAL TEXT SEND
+    const v = (this.text || '').trim();
+    if (!v) return;
+
     try {
-      // ✅ ensure chat exists always
       await this.chatService.ensureChat(this.chatId, [this.myUid, this.user.uid]);
-
       await this.chatService.sendMessage(this.chatId, v, this.myUid, this.user.uid);
-
       this.text = '';
     } catch (err) {
       console.error('🔥 send() failed:', err);
     }
   }
 
+  // =====================
+  // EDIT / DELETE
+  // =====================
   clickEdit() {
     if (!this.selectedMessage?.id) return;
     this.editingId = this.selectedMessage.id;
@@ -312,7 +401,6 @@ export class ChatComponent
       this.qrDataUrl = '';
     }
 
-    // realtime contact check
     this.contactUnsub?.();
     this.contactUnsub = this.contactService.listenContacts(this.myUid, (list) => {
       this.isContact = !!(list || []).find((c: any) => c.uid === this.user.uid);
@@ -346,29 +434,46 @@ export class ChatComponent
   }
 
   // =====================
-  // FILE UPLOAD
+  // FILE PICK (NO AUTO UPLOAD)
   // =====================
-  async pickFile(e: Event) {
+  pickFile(e: Event) {
     const input = e.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
 
-    try {
-      this.sendingFile = true;
-      this.fileError = '';
-
-      // ✅ ensure chat exists first
-      await this.chatService.ensureChat(this.chatId, [this.myUid, this.user.uid]);
-
-      // ✅ send file message
-      await this.chatService.sendFileMessage(this.chatId, file, this.myUid, this.user.uid);
-    } catch (err: any) {
-      console.error(err);
-      this.fileError = err?.message || 'Upload failed';
-    } finally {
-      this.sendingFile = false;
-      input.value = '';
+    // ✅ validate image
+    if (this.attachType === 'image') {
+      if (!file.type.startsWith('image/')) {
+        alert('❌ Only image files allowed!');
+        input.value = '';
+        return;
+      }
     }
+
+    // ✅ validate document
+    if (this.attachType === 'document') {
+      const allowedExt = [
+        'pdf',
+        'doc',
+        'docx',
+        'xls',
+        'xlsx',
+        'ppt',
+        'pptx',
+        'zip',
+        'rar',
+        'txt',
+      ];
+      const ext = file.name.split('.').pop()?.toLowerCase() || '';
+      if (!allowedExt.includes(ext)) {
+        alert('❌ Only document files allowed!');
+        input.value = '';
+        return;
+      }
+    }
+
+    // ✅ set preview file (upload happens when press send)
+    this.selectedFile = file;
   }
 
   // =====================

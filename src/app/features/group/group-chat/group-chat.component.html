@@ -27,8 +27,8 @@
     Loading group chat...
   </div>
 
-  <!-- ✅ MAIN SCROLL AREA -->
-  <main class="msgs" #box *ngIf="!loading">
+  <!-- ✅ MAIN -->
+  <main class="msgs hideScroll" #box *ngIf="!loading">
 
     <div
       *ngFor="let m of messages"

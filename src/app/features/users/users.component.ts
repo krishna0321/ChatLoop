@@ -24,7 +24,6 @@ export class UsersComponent implements OnInit, OnDestroy {
   filtered: AppUser[] = [];
 
   selectedUser: AppUser | null = null;
-
   editUser: AppUser | null = null;
 
   private unsubAuth: any;
@@ -39,7 +38,10 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.unsubAuth = onAuthStateChanged(this.auth, (u) => {
-      if (!u) return;
+      if (!u) {
+        this.router.navigate(['/login']);
+        return;
+      }
 
       this.myUid = u.uid;
 
@@ -47,7 +49,6 @@ export class UsersComponent implements OnInit, OnDestroy {
         next: (list) => {
           // ✅ show everyone except me
           this.users = (list || []).filter((x) => x.uid !== this.myUid);
-          this.filtered = [...this.users];
           this.onSearch();
           this.loading = false;
         },
@@ -110,9 +111,10 @@ export class UsersComponent implements OnInit, OnDestroy {
       });
 
       this.editUser = null;
+      alert('✅ User updated');
     } catch (err) {
       console.error('Update user error:', err);
-      alert('Failed to update user');
+      alert('❌ Failed to update user');
     }
   }
 
@@ -128,9 +130,11 @@ export class UsersComponent implements OnInit, OnDestroy {
       // ✅ close panels if needed
       if (this.selectedUser?.uid === u.uid) this.selectedUser = null;
       if (this.editUser?.uid === u.uid) this.editUser = null;
+
+      alert('🗑 User deleted');
     } catch (err) {
       console.error('Delete user error:', err);
-      alert('Failed to delete user');
+      alert('❌ Failed to delete user');
     }
   }
 
@@ -141,7 +145,6 @@ export class UsersComponent implements OnInit, OnDestroy {
 
     await this.chatService.ensureChat(chatId, [this.myUid, u.uid]);
 
-    // ✅ open chats page AND auto-open chat with this user
     await this.router.navigate(['/app/chats'], {
       queryParams: { uid: u.uid },
     });

@@ -27,6 +27,7 @@
         <div class="avatar">
           {{ (u.name || 'U')[0] }}
         </div>
+
         <div class="status">
           <span class="dot"></span> Active
         </div>
@@ -40,6 +41,7 @@
         <span class="chip danger" *ngIf="isBlocked">⛔ Blocked</span>
       </div>
 
+      <!-- buttons -->
       <div class="buttons" *ngIf="!isMe">
         <button class="btn primary" (click)="message()">💬 Message</button>
 
@@ -59,6 +61,7 @@
           👤 Edit My Profile
         </button>
       </div>
+
     </aside>
 
     <!-- RIGHT INFO -->
@@ -113,6 +116,7 @@
   </div>
 </div>
 
+<!-- LOADING TEMPLATE -->
 <ng-template #loadingTpl>
   <div class="loading">
     <div class="spinner"></div>

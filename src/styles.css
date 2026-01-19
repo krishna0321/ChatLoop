@@ -1,15 +1,172 @@
-html, body {
+/* =========================================================
+   ✅ Chatloop Global Styles (Premium Telegram-like UI)
+   - One place control all colors
+   - Works in all pages
+   - Fixes scroll + white flash
+========================================================= */
+
+/* ✅ Font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* =========================================================
+   ✅ THEME CONTROL (change here = whole app changes)
+========================================================= */
+:root{
+  /* ✅ Theme */
+  --theme: #ff2d95;
+  --theme-2: #7c3aed;
+  --accent: color-mix(in srgb, var(--theme) 65%, white);
+
+  /* ✅ Backgrounds */
+  --bg: #050816;
+  --panel: rgba(15, 23, 42, 0.52);
+  --panel-2: rgba(15, 23, 42, 0.68);
+
+  /* ✅ Cards */
+  --card: rgba(255,255,255,0.05);
+  --card-2: rgba(255,255,255,0.08);
+
+  /* ✅ Text */
+  --text: rgba(255,255,255,0.92);
+  --muted: rgba(255,255,255,0.72);
+  --muted-2: rgba(255,255,255,0.55);
+
+  /* ✅ Border */
+  --border: rgba(255,255,255,0.12);
+
+  /* ✅ Radius */
+  --r-xl: 32px;
+  --r-lg: 24px;
+  --r-md: 18px;
+
+  /* ✅ Shadows */
+  --shadow-strong: 0 34px 140px rgba(0,0,0,0.84);
+  --shadow-soft: 0 18px 60px rgba(0,0,0,0.55);
+  --shadow: 0 22px 70px rgba(0,0,0,0.48);
+
+  /* ✅ Transition */
+  --t: .18s ease;
+}
+
+/* =========================================================
+   ✅ BASE RESET + GLOBAL FIXES
+========================================================= */
+*,
+*::before,
+*::after{
+  box-sizing: border-box;
+}
+
+*{
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body{
   height: 100%;
   margin: 0;
   padding: 0;
-  background: #050816; /* ✅ removes white */
+
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial;
 }
 
-body {
-  overflow: hidden; /* ✅ ONLY routeWrap scrolls */
+/* ✅ IMPORTANT FIX (DON'T HIDE OVERFLOW GLOBALLY) */
+body{
+  overflow: auto;
 }
 
-app-root {
+/* Angular root */
+app-root{
   display: block;
-  height: 100%;
+  min-height: 100vh;
+}
+
+/* links */
+a{
+  color: inherit;
+  text-decoration: none;
+}
+
+/* =========================================================
+   ✅ GLOBAL UTILITIES
+========================================================= */
+.flex{ display:flex; }
+.col{ flex-direction: column; }
+.center{ display:flex; align-items:center; justify-content:center; }
+.between{ display:flex; align-items:center; justify-content:space-between; }
+.gap-6{ gap:6px; }
+.gap-10{ gap:10px; }
+.gap-14{ gap:14px; }
+
+.text-muted{ color: var(--muted); }
+.text-soft{ color: var(--muted-2); }
+
+.hide-scrollbar{
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar{
+  width: 0;
+  height: 0;
+}
+
+/* =========================================================
+   ✅ GLOBAL BUTTONS + INPUTS (Reusable)
+========================================================= */
+.btn{
+  border: 0;
+  outline: 0;
+  cursor: pointer;
+  padding: 11px 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  transition: transform var(--t), box-shadow var(--t), opacity var(--t);
+}
+.btn:active{ transform: scale(0.98); }
+
+.btn-primary{
+  background: linear-gradient(135deg, var(--theme), var(--theme-2));
+  color: white;
+  box-shadow: 0 14px 30px rgba(124, 58, 237, 0.30);
+}
+.btn-primary:hover{
+  box-shadow: 0 18px 38px rgba(124, 58, 237, 0.40);
+}
+
+.btn-ghost{
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.btn-ghost:hover{
+  background: rgba(255,255,255,0.09);
+}
+
+.input{
+  width: 100%;
+  border-radius: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  background: rgba(2,6,23,0.45);
+  color: var(--text);
+  outline: none;
+  transition: border var(--t), box-shadow var(--t);
+}
+.input::placeholder{ color: rgba(255,255,255,0.45); }
+.input:focus{
+  border-color: color-mix(in srgb, var(--theme) 55%, white);
+  box-shadow: 0 0 0 4px rgba(124,58,237,0.15);
+}
+
+/* =========================================================
+   ✅ PREMIUM SCROLLBAR
+========================================================= */
+::-webkit-scrollbar{ width: 10px; }
+::-webkit-scrollbar-track{ background: rgba(255,255,255,0.04); }
+::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,0.16);
+  border-radius: 50px;
+}
+::-webkit-scrollbar-thumb:hover{
+  background: rgba(255,255,255,0.22);
 }

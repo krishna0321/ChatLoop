@@ -72,23 +72,13 @@
           </div>
         </div>
 
-        <button class="more" (click)="$event.stopPropagation(); openMenu($event, r)">
+        <!-- ⋮ MENU -->
+        <button
+          class="more"
+          (click)="$event.stopPropagation(); openMenu($event, r)"
+        >
           ⋮
         </button>
-
-        <div
-          class="dropdown"
-          *ngIf="menuRoomId === r.id"
-          (click)="$event.stopPropagation()"
-        >
-          <button (click)="$event.stopPropagation(); toggleMute(r)">
-            {{ isMuted(r) ? '🔔 Unmute' : '🔕 Mute' }}
-          </button>
-
-          <button (click)="$event.stopPropagation(); togglePin(r)">
-            {{ isPinned(r) ? '📌 Unpin' : '📌 Pin' }}
-          </button>
-        </div>
       </div>
 
       <!-- ✅ EMPTY CHATS -->
@@ -133,28 +123,59 @@
     </div>
   </aside>
 
-<main class="content">
+  <!-- RIGHT CONTENT -->
+  <main class="content">
 
-  <ng-container *ngIf="selectedUser">
-    <div class="chatWrap">
-      <app-chat [user]="selectedUser"></app-chat>
-    </div>
-  </ng-container>
+    <ng-container *ngIf="selectedUser">
+      <div class="chatWrap">
+        <app-chat [user]="selectedUser"></app-chat>
+      </div>
+    </ng-container>
 
-  <ng-container *ngIf="selectedRoomId && !selectedUser">
-    <div class="chatWrap">
-      <app-chat-room [roomId]="selectedRoomId"></app-chat-room>
-    </div>
-  </ng-container>
+    <ng-container *ngIf="selectedRoomId && !selectedUser">
+      <div class="chatWrap">
+        <app-chat-room [roomId]="selectedRoomId"></app-chat-room>
+      </div>
+    </ng-container>
 
-  <ng-container *ngIf="!selectedUser && !selectedRoomId">
-    <div class="empty">
-      <div class="iconBig">💬</div>
-      <div class="t1">Select a chat</div>
-      <div class="t2">Choose from the left panel</div>
-    </div>
-  </ng-container>
+    <ng-container *ngIf="!selectedUser && !selectedRoomId">
+      <div class="empty">
+        <div class="iconBig">💬</div>
+        <div class="t1">Select a chat</div>
+        <div class="t2">Choose from the left panel</div>
+      </div>
+    </ng-container>
 
-</main>
+  </main>
+
+  <!-- ✅ FIXED MENU (NOT INSIDE LIST → NO CLIPPING) -->
+  <div
+    class="dropdown fixedMenu"
+    *ngIf="menuRoomId"
+    [ngStyle]="{ top: menuPos.y + 'px', left: menuPos.x + 'px' }"
+    (click)="$event.stopPropagation()"
+  >
+    <button (click)="toggleMute(getMenuItem())">
+      {{ isMuted(getMenuItem()) ? '🔔 Unmute' : '🔕 Mute' }}
+    </button>
+
+    <button (click)="togglePin(getMenuItem())">
+      {{ isPinned(getMenuItem()) ? '📌 Unpin' : '📌 Pin' }}
+    </button>
+
+    <div class="menuDivider"></div>
+
+    <button class="danger" (click)="deleteChatForMe(getMenuItem())">
+      🗑 Delete chat
+    </button>
+
+    <button
+      class="danger2"
+      *ngIf="canDeleteRoom(getMenuItem())"
+      (click)="deleteChatForever(getMenuItem())"
+    >
+      ❌ Delete forever
+    </button>
+  </div>
 
 </div>

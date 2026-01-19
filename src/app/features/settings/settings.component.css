@@ -1,4 +1,4 @@
- /* ==========================================
+/* ==========================================
    ✅ Chatloop Settings (Ultra Premium)
    file: settings.component.css
 ========================================== */
@@ -10,9 +10,7 @@
 
 * { box-sizing: border-box; }
 
-/* ==========================================
-   ✅ Shell Layout
-========================================== */
+/* ✅ Shell Layout */
 .settings-shell {
   position: relative;
   height: 100%;
@@ -24,13 +22,11 @@
 
   padding: 16px;
 
-  background: #050816;
-  color: rgba(255,255,255,0.92);
+  background: var(--app-bg);
+  color: var(--app-text);
 }
 
-/* ==========================================
-   🌌 Background
-========================================== */
+/* 🌌 Background */
 .bg {
   position: absolute;
   inset: 0;
@@ -64,9 +60,7 @@
   50% { transform: translate(45px,-26px); }
 }
 
-/* ==========================================
-   ✅ Toast
-========================================== */
+/* ✅ Toast */
 .toast {
   position: fixed;
   top: 16px;
@@ -81,7 +75,6 @@
   font-weight: 1000;
   letter-spacing: .2px;
 
-  background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.12);
   backdrop-filter: blur(14px);
 
@@ -89,14 +82,23 @@
   animation: toastPop .2s ease;
 }
 
+.toast.ok{
+  background: rgba(34,197,94,0.14);
+  border-color: rgba(34,197,94,0.24);
+  color: rgba(215,255,235,0.95);
+}
+.toast.err{
+  background: rgba(255,87,87,0.14);
+  border-color: rgba(255,87,87,0.24);
+  color: rgba(255,200,200,0.95);
+}
+
 @keyframes toastPop {
   from { opacity: 0; transform: translateX(-50%) translateY(-6px) scale(.98); }
   to   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
 }
 
-/* ==========================================
-   ✅ Left Nav
-========================================== */
+/* ✅ Left Nav */
 .settings-nav {
   position: relative;
   z-index: 2;
@@ -104,8 +106,8 @@
   border-radius: 24px;
   padding: 14px;
 
-  background: rgba(8, 12, 26, 0.80);
-  border: 1px solid rgba(255,255,255,0.10);
+  background: var(--app-panel);
+  border: 1px solid var(--app-border);
   backdrop-filter: blur(16px);
 
   box-shadow: 0 22px 60px rgba(0,0,0,0.45);
@@ -116,7 +118,6 @@
   overflow: hidden;
 }
 
-/* nav title */
 .nav-title {
   display: flex;
   gap: 12px;
@@ -154,7 +155,6 @@
   font-weight: 800;
 }
 
-/* nav item button */
 .nav-item {
   width: 100%;
   border: 0;
@@ -199,9 +199,7 @@
   border: 1px solid rgba(255,255,255,0.10);
 }
 
-/* ==========================================
-   ✅ Main
-========================================== */
+/* ✅ Main */
 .settings-main {
   position: relative;
   z-index: 2;
@@ -209,8 +207,8 @@
   border-radius: 24px;
   padding: 14px;
 
-  background: rgba(8, 12, 26, 0.78);
-  border: 1px solid rgba(255,255,255,0.10);
+  background: var(--app-panel);
+  border: 1px solid var(--app-border);
   backdrop-filter: blur(16px);
 
   box-shadow: 0 22px 60px rgba(0,0,0,0.45);
@@ -293,9 +291,7 @@
   opacity: 0.75;
 }
 
-/* ==========================================
-   ✅ Cards
-========================================== */
+/* ✅ Cards */
 .card {
   padding: 16px;
   border-radius: 24px;
@@ -337,15 +333,8 @@
   box-shadow: 0 16px 40px rgba(0,0,0,0.35);
 }
 
-.big {
-  font-weight: 1000;
-  font-size: 14px;
-}
-.small {
-  margin-top: 4px;
-  font-size: 12px;
-  opacity: 0.72;
-}
+.big { font-weight: 1000; font-size: 14px; }
+.small { margin-top: 4px; font-size: 12px; opacity: 0.72; }
 
 /* fields */
 .field { margin-bottom: 14px; }
@@ -384,9 +373,7 @@
   box-shadow: 0 0 0 4px rgba(124,58,237,0.18);
 }
 
-/* ==========================================
-   ✅ Toggle rows
-========================================== */
+/* ✅ Toggle rows */
 .toggle-row {
   padding: 12px 12px;
   border-radius: 18px;
@@ -461,9 +448,7 @@
   transform: translate(22px, -50%);
 }
 
-/* ==========================================
-   ✅ Appearance preview
-========================================== */
+/* ✅ Appearance preview */
 .preview-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -491,15 +476,9 @@
   color: #0f172a;
 }
 
-.pTitle {
-  font-size: 12px;
-  font-weight: 1000;
-  opacity: 0.9;
-}
+.pTitle { font-size: 12px; font-weight: 1000; opacity: 0.9; }
 
-/* ==========================================
-   ✅ Account actions
-========================================== */
+/* ✅ Account actions */
 .action-row {
   display: flex;
   gap: 10px;
@@ -548,14 +527,11 @@
   font-weight: 900;
 }
 
-/* danger card */
 .card.danger {
   border-color: rgba(255,87,87,0.22);
 }
 
-/* ==========================================
-   ✅ Mobile Tabs
-========================================== */
+/* ✅ Mobile Tabs */
 .mobile-tabs {
   display: none;
   position: fixed;
@@ -599,35 +575,23 @@
   transform: translateY(-1px);
 }
 
-/* ==========================================
-   ✅ Animations
-========================================== */
+/* ✅ Animations */
 .fadeUp { animation: fadeUp .35s ease both; }
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ==========================================
-   ✅ Responsive
-========================================== */
+/* ✅ Responsive */
 @media (max-width: 980px) {
   .settings-shell {
     grid-template-columns: 1fr;
     padding-bottom: 88px;
   }
 
-  .settings-nav {
-    display: none;
-  }
-
-  .mobile-tabs {
-    display: flex;
-  }
-
-  .preview-row {
-    grid-template-columns: 1fr;
-  }
+  .settings-nav { display: none; }
+  .mobile-tabs { display: flex; }
+  .preview-row { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {

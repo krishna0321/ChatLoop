@@ -1,96 +1,167 @@
-<div class="chatRoomWrap">
+<div class="roomWrap" (click)="closeAllMenus()">
 
-  <!-- ✅ TOP BAR -->
-  <div class="topBar">
-    <a routerLink="/app/chats" class="backBtn">⬅</a>
-
-    <div class="roomInfo">
-      <div class="roomTitle">
-        {{ room?.name || 'Chat' }}
-
-        <span class="type"
-              [class.dm]="room?.type==='dm'"
-              [class.group]="room?.type==='group'"
-              [class.channel]="room?.type==='channel'">
-          {{ room?.type || 'dm' }}
-        </span>
+  <!-- ✅ HEADER -->
+  <header class="header" (click)="$event.stopPropagation()">
+    <div class="left">
+      <div class="avatar">
+        {{ (room?.name || 'G')[0] }}
       </div>
 
-      <div class="roomSub">
-        <span *ngIf="room?.type === 'channel'">
-          📢 Channel · {{ room?.members?.length || 0 }} members
-        </span>
-        <span *ngIf="room?.type === 'group'">
-          👥 Group · {{ room?.members?.length || 0 }} members
-        </span>
-        <span *ngIf="room?.type === 'dm'">
-          💬 Direct Chat
-        </span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ✅ LOADING -->
-  <div class="loadingBox" *ngIf="loading">
-    <div class="spinner"></div>
-    <div class="loadingText">Loading messages…</div>
-  </div>
-
-  <!-- ✅ MESSAGES -->
-  <div class="msgArea" *ngIf="!loading">
-    <div
-      class="msg"
-      *ngFor="let m of messages"
-      [class.me]="m.senderId === me"
-      [class.deleted]="m.isDeleted"
-    >
-      <div class="bubble">
-        <div class="text">
-          {{ m.isDeleted ? 'This message was deleted' : m.text }}
+      <div class="info">
+        <div class="title">{{ room?.name || 'Group' }}</div>
+        <div class="sub">
+          {{ room?.type || 'group' }} • {{ (room?.members?.length || 0) }} members
         </div>
-
-        <div class="meta" *ngIf="!m.isDeleted">
-  <span class="time">
-    {{ m.createdAt?.toDate()?.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) }}
-  </span>
-
-  <span *ngIf="m.editedAt" class="edited">edited</span>
-
-  <button
-    *ngIf="m.senderId === me"
-    class="delBtn"
-    (click)="deleteMessage(m)">
-    delete
-  </button>
-</div>
-
       </div>
     </div>
 
-    <div id="msgEnd"></div>
-  </div>
+    <button class="iconBtn" (click)="toggleHeaderMenu($event)">⋮</button>
 
-  <!-- ✅ INPUT -->
-  <div class="inputBar">
-    <div class="channelLocked" *ngIf="room?.type === 'channel' && !canSend()">
-      🔒 Only admins can send messages in this channel
-    </div>
-
-    <div class="inputRow">
-      <input
-        [(ngModel)]="text"
-        placeholder="Write a message..."
-        [disabled]="!canSend()"
-        (keyup.enter)="send()"
-      />
-
-      <button
-        class="sendBtn"
-        (click)="send()"
-        [disabled]="!canSend() || !text.trim()">
-        ➤
+    <div class="dropdown" *ngIf="showHeaderMenu" (click)="$event.stopPropagation()">
+      <button (click)="toggleMute()">
+        {{ isMuted ? '🔔 Unmute' : '🔕 Mute' }}
+      </button>
+      <button (click)="togglePin()">
+        {{ isPinned ? '📌 Unpin' : '📌 Pin' }}
+      </button>
+      <button class="danger" (click)="leaveGroup()">
+        🚪 Leave Group
+      </button>
+      <button class="danger2" *ngIf="isOwner" (click)="deleteGroupForever()">
+        ❌ Delete Group Forever
       </button>
     </div>
+  </header>
+
+  <!-- ✅ MESSAGES -->
+  <div class="messages" #messagesBox>
+    <div *ngIf="messages.length === 0" class="emptyMsgs">
+      No messages yet...
+    </div>
+
+    <div
+      *ngFor="let m of messages"
+      class="bubble"
+      [class.me]="m.senderId === myUid"
+      (click)="openMsgMenu($event, m)"
+    >
+      <!-- sender -->
+      <div class="sender" *ngIf="m.senderId !== myUid">
+        {{ getSenderName(m.senderId) }}
+      </div>
+
+      <div class="text">
+
+        <!-- ✅ IMAGE -->
+        <ng-container *ngIf="m.type === 'image' && m.fileUrl && !m.isDeleted">
+          <img class="imgMsg" [src]="m.fileUrl" />
+          <div class="caption" *ngIf="m.text">{{ m.text }}</div>
+        </ng-container>
+
+        <!-- ✅ FILE -->
+        <ng-container *ngIf="m.type === 'file' && m.fileUrl && !m.isDeleted">
+          <a class="fileMsg" [href]="m.fileUrl" target="_blank" rel="noopener">
+            <div class="fileIcon2">📎</div>
+            <div class="fileMeta">
+              <div class="fileName2">{{ m.fileName || 'File' }}</div>
+              <div class="fileSize2">
+                {{
+                  (m.fileSize || 0) > 0
+                    ? ((m.fileSize || 0) / 1024 / 1024).toFixed(1) + ' MB'
+                    : ''
+                }}
+              </div>
+            </div>
+          </a>
+        </ng-container>
+
+        <!-- ✅ TEXT -->
+        <ng-container *ngIf="(!m.type || m.type === 'text' || m.type === 'link') && !m.isDeleted">
+          {{ m.text }}
+        </ng-container>
+
+        <!-- ✅ DELETED -->
+        <ng-container *ngIf="m.isDeleted">
+          <span class="deletedText">This message was deleted</span>
+        </ng-container>
+
+      </div>
+
+      <div class="meta">
+        {{ formatTime(m.createdAt) }}
+      </div>
+    </div>
   </div>
+
+  <!-- ✅ MESSAGE MENU -->
+  <div
+    class="msgMenu"
+    *ngIf="menuMessageId"
+    [style.left.px]="menuX"
+    [style.top.px]="menuY"
+    (click)="$event.stopPropagation()"
+  >
+    <button (click)="clickEdit()">✏️ Edit</button>
+    <button class="danger" (click)="clickDelete()">🗑 Delete</button>
+  </div>
+
+  <!-- ✅ EDIT BAR -->
+  <div class="editBar" *ngIf="editingId" (click)="$event.stopPropagation()">
+    <div class="editTitle">Editing message</div>
+
+    <div class="editRow">
+      <input [(ngModel)]="editingText" placeholder="Edit message..." />
+      <button (click)="saveEdit()">Save</button>
+      <button class="ghost" (click)="cancelEdit()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ✅ COMPOSER -->
+  <div class="composer" (click)="$event.stopPropagation()">
+
+    <!-- ✅ attach -->
+    <button
+      class="attachBtn"
+      [class.disabled]="sendingFile"
+      (click)="toggleAttachMenu($event)"
+      type="button"
+    >
+      📎
+    </button>
+
+    <!-- ✅ attach menu -->
+    <div class="attachMenu" *ngIf="showAttachMenu" (click)="$event.stopPropagation()">
+      <button (click)="chooseAttachType('image')">🖼 Image</button>
+      <button (click)="chooseAttachType('document')">📄 Document</button>
+    </div>
+
+    <!-- hidden file input -->
+    <input #fileInput type="file" hidden (change)="pickFile($event)" />
+
+    <input
+      [(ngModel)]="text"
+      placeholder="Write a message..."
+      (keydown.enter)="send()"
+      [disabled]="sendingFile"
+    />
+
+    <button
+      (click)="send()"
+      [disabled]="sendingFile || (!text.trim() && !selectedFile)"
+    >
+      {{ sendingFile ? 'Uploading...' : 'Send' }}
+    </button>
+  </div>
+
+  <!-- ✅ preview -->
+  <div class="filePreview" *ngIf="selectedFile">
+    <div class="fileInfo">
+      <div class="fileName">📎 {{ selectedFile.name }}</div>
+      <div class="fileSize">{{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB</div>
+    </div>
+    <button class="removeFile" type="button" (click)="clearSelectedFile()">✖</button>
+  </div>
+
+  <div class="uploadErr" *ngIf="fileError">{{ fileError }}</div>
 
 </div>

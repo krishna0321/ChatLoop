@@ -25,7 +25,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   user: AppUser | null = null;
   isMe = false;
 
-  isBlocked = false; // i blocked him
+  isBlocked = false;
   isContact = false;
 
   profileLink = '';
@@ -61,7 +61,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         return;
       }
 
-      // ✅ get user details
+      // ✅ user details
       this.userSub = this.userService.getUser(this.uid).subscribe(async (data) => {
         this.user = data || null;
         this.loading = false;
@@ -70,7 +70,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
           // ✅ share link
           this.profileLink = `${location.origin}/app/user/${this.uid}`;
 
-          // ✅ QR
+          // ✅ QR create
           this.qrDataUrl = await QRCode.toDataURL(this.profileLink, {
             width: 230,
             margin: 1,
@@ -78,13 +78,13 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         }
       });
 
-      // ✅ block state
+      // ✅ block status
       this.meSub = this.userService.getUser(this.myUid).subscribe((me) => {
         const blocked = me?.blocked || [];
         this.isBlocked = blocked.includes(this.uid);
       });
 
-      // ✅ check contact exists
+      // ✅ contact exists
       this.contactService.listenContacts(this.myUid, (list) => {
         this.isContact = !!(list || []).find((c: any) => c.uid === this.uid);
       });
@@ -100,17 +100,15 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   async message() {
     if (!this.uid || this.uid === this.myUid) return;
 
-    await this.chatService.ensureChat(
-      this.chatService.getChatId(this.myUid, this.uid),
-      [this.myUid, this.uid]
-    );
+    const chatId = this.chatService.getChatId(this.myUid, this.uid);
+
+    await this.chatService.ensureChat(chatId, [this.myUid, this.uid]);
 
     this.router.navigate(['/app/chats'], { queryParams: { uid: this.uid } });
   }
 
   async addToContacts() {
     if (!this.user || !this.uid || this.uid === this.myUid) return;
-
     if (this.isContact) return;
 
     await this.contactService.addContact(this.myUid, {
@@ -128,12 +126,15 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     if (!this.isBlocked) {
       const ok = confirm('Block this user?');
       if (!ok) return;
+
       await this.userService.blockUser(this.myUid, this.uid);
       this.isBlocked = true;
+
       alert('⛔ User blocked');
     } else {
       await this.userService.unblockUser(this.myUid, this.uid);
       this.isBlocked = false;
+
       alert('✅ User unblocked');
     }
   }

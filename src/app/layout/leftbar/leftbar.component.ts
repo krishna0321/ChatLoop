@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
+
 import { Auth } from '@angular/fire/auth';
-import { signOut } from 'firebase/auth';
+import { signOut } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-leftbar',

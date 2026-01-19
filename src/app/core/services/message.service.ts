@@ -37,7 +37,7 @@ export class MessageService {
   }
 
   // ==========================
-  // ✅ SEND ROOM MESSAGE (FIXED)
+  // ✅ SEND ROOM MESSAGE
   // ==========================
   async sendRoomMessage(roomId: string, senderId: string, text: string) {
     const value = (text || '').trim();
@@ -52,8 +52,7 @@ export class MessageService {
       isDeleted: false,
     });
 
-    // ✅ MAIN FIX:
-    // update rooms/{roomId} -> updatedAt + lastMessage + unread
+    // ✅ update room meta
     await this.rooms.updateRoomMeta(roomId, senderId, value);
   }
 

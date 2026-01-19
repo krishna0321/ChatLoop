@@ -1,6 +1,7 @@
 /* =========================================================
    CHATLOOP – DASHBOARD (ULTRA PREMIUM)
-   ✅ NO GLOBAL CSS
+   ✅ GLOBAL THEME SUPPORT
+   file: dashboard.component.css
 ========================================================= */
 
 :host{
@@ -9,32 +10,21 @@
   min-width:0;
   min-height:0;
   height:100%;
-
-  /* 🎨 Theme */
-  --theme:#7c3aed;
-  --theme-2:#3b82f6;
-
-  --bg:#050816;
-  --panel: rgba(2,6,23,0.70);
-
-  --glass: rgba(255,255,255,0.06);
-  --glass2: rgba(255,255,255,0.10);
-
-  --border: rgba(255,255,255,0.10);
-  --text: rgba(255,255,255,0.94);
-  --muted: rgba(255,255,255,0.70);
-
-  --shadow: 0 22px 80px rgba(0,0,0,0.60);
-  --shadowSoft: 0 12px 32px rgba(0,0,0,0.32);
-
-  --glow: color-mix(in srgb, var(--theme) 42%, transparent);
-  --glow2: color-mix(in srgb, var(--theme-2) 35%, transparent);
-
-  --t: .18s ease;
 }
 
 *{ box-sizing:border-box; }
 
+/* local tokens only (not colors) */
+:host{
+  --shadow: 0 22px 80px rgba(0,0,0,0.60);
+  --shadowSoft: 0 12px 32px rgba(0,0,0,0.32);
+  --t: .18s ease;
+
+  --glow: color-mix(in srgb, var(--theme) 42%, transparent);
+  --glow2: color-mix(in srgb, var(--theme-2) 35%, transparent);
+}
+
+/* ✅ MAIN */
 .dash{
   position:relative;
   flex:1;
@@ -45,8 +35,8 @@
   overflow:auto;
   padding: 20px;
 
-  color: var(--text);
-  background: var(--bg);
+  color: var(--text, rgba(255,255,255,0.94));
+  background: var(--bg, #050816);
 }
 
 /* ✅ Premium background */
@@ -57,9 +47,9 @@
   z-index:0;
 
   background:
-    radial-gradient(900px circle at 22% 8%, rgba(124,58,237,0.22), transparent 55%),
-    radial-gradient(900px circle at 78% 30%, rgba(59,130,246,0.18), transparent 60%),
-    radial-gradient(850px circle at 45% 95%, rgba(34,211,238,0.10), transparent 60%);
+    radial-gradient(900px circle at 22% 8%, color-mix(in srgb, var(--theme) 22%, transparent), transparent 55%),
+    radial-gradient(900px circle at 78% 30%, color-mix(in srgb, var(--theme-2) 18%, transparent), transparent 60%),
+    radial-gradient(850px circle at 45% 95%, color-mix(in srgb, var(--theme-2) 12%, transparent), transparent 60%);
 
   filter: blur(90px);
   opacity:.95;
@@ -113,7 +103,7 @@
   padding:6px 12px;
   border-radius:999px;
 
-  border:1px solid rgba(255,255,255,0.12);
+  border: 1px solid var(--border, rgba(255,255,255,0.10));
   background: rgba(255,255,255,0.06);
 
   margin-bottom:10px;
@@ -132,7 +122,7 @@
 .head p{
   margin: 6px 0 0;
   font-size: 13px;
-  color: var(--muted);
+  color: var(--muted, rgba(255,255,255,0.70));
 }
 
 /* =======================
@@ -165,7 +155,7 @@
     rgba(255,255,255,0.08),
     rgba(255,255,255,0.05)
   );
-  border: 1px solid rgba(255,255,255,0.10);
+  border: 1px solid var(--border, rgba(255,255,255,0.10));
 
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -191,7 +181,7 @@
 
 .card:hover{
   transform: translateY(-2px);
-  border-color: rgba(124,58,237,0.22);
+  border-color: color-mix(in srgb, var(--theme) 22%, transparent);
   box-shadow: 0 28px 90px rgba(0,0,0,0.70);
 }
 .card:hover::after{
@@ -199,6 +189,7 @@
   transform: translateX(10%);
 }
 
+/* ICON */
 .icon{
   width: 52px;
   height: 52px;
@@ -215,15 +206,22 @@
 }
 
 .icon.grad1{
-  background: linear-gradient(135deg, rgba(124,58,237,1), rgba(59,130,246,1));
+  background: linear-gradient(135deg, var(--theme), var(--theme-2));
 }
 .icon.grad2{
-  background: linear-gradient(135deg, rgba(34,211,238,1), rgba(59,130,246,1));
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--theme-2) 60%, #22d3ee),
+    var(--theme-2)
+  );
 }
 .icon.grad3{
-  background: linear-gradient(135deg, rgba(236,72,153,1), rgba(124,58,237,1));
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--theme) 55%, #ec4899),
+    var(--theme)
+  );
 }
 
+/* META */
 .meta{
   flex:1;
   min-width:0;
@@ -242,7 +240,7 @@
 .sub{
   margin-top: 4px;
   font-size: 12px;
-  color: var(--muted);
+  color: var(--muted, rgba(255,255,255,0.70));
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -275,11 +273,14 @@
 .hint{
   padding: 12px 14px;
   border-radius: 20px;
+
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.10);
-  color: var(--muted);
+  border: 1px solid var(--border, rgba(255,255,255,0.10));
+
+  color: var(--muted, rgba(255,255,255,0.70));
   font-size: 12px;
   font-weight: 900;
+
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
@@ -296,6 +297,7 @@
   }
 }
 
+/* ✅ Accessibility */
 @media (prefers-reduced-motion: reduce){
   .orb{ animation:none !important; }
   .card{ transition:none !important; }

@@ -6,13 +6,14 @@ import { Subscription } from 'rxjs';
 
 import { RoomService, Room } from '../../core/services/room.service';
 
-type ChatItem = {
+export type ChatItem = {
   id: string;
   title: string;
   type: 'dm' | 'group' | 'channel';
   lastMessage: string;
   updatedAt?: any;
   unread: number;
+  ownerId?: string;
 };
 
 @Component({
@@ -28,14 +29,12 @@ export class ChatListComponent implements OnInit, OnDestroy {
 
   private sub?: Subscription;
 
-  constructor(private auth: Auth, private rooms: RoomService) {}
+  constructor(private auth: Auth, public rooms: RoomService) {}
 
   ngOnInit(): void {
     const user = this.auth.currentUser;
-
     if (!user) {
       this.loading = false;
-      this.chats = [];
       return;
     }
 
@@ -43,17 +42,7 @@ export class ChatListComponent implements OnInit, OnDestroy {
 
     this.sub = this.rooms.myRooms$().subscribe({
       next: (roomsList: Room[]) => {
-        const sorted = [...(roomsList || [])].sort((a: any, b: any) => {
-          const ap = a?.pinned?.[myUid] ? 1 : 0;
-          const bp = b?.pinned?.[myUid] ? 1 : 0;
-          if (bp !== ap) return bp - ap;
-
-          const at = a?.updatedAt?.seconds || 0;
-          const bt = b?.updatedAt?.seconds || 0;
-          return bt - at;
-        });
-
-        this.chats = sorted.map((r) => ({
+        this.chats = (roomsList || []).map((r) => ({
           id: r.id!,
           title:
             r.type === 'dm'
@@ -63,14 +52,14 @@ export class ChatListComponent implements OnInit, OnDestroy {
           lastMessage: r.lastMessage || '',
           updatedAt: r.updatedAt,
           unread: r.unread?.[myUid] || 0,
+          ownerId: r.ownerId,
         }));
 
         this.loading = false;
       },
       error: (err) => {
-        console.error('Room list error:', err);
+        console.error(err);
         this.loading = false;
-        this.chats = [];
       },
     });
   }
@@ -88,4 +77,52 @@ export class ChatListComponent implements OnInit, OnDestroy {
     if (type === 'channel') return '📢';
     return '💬';
   }
+
+  // ======================================================
+  // ✅ DELETE SINGLE CHAT FULL HISTORY
+  // ======================================================
+  async deleteChatHistory(c: ChatItem) {
+    const myUid = this.auth.currentUser?.uid;
+    if (!myUid) return;
+
+    const ok = confirm(
+      `Delete FULL chat history of "${c.title}"?\n\nThis will permanently delete room + all messages for everyone.`
+    );
+    if (!ok) return;
+
+    try {
+      // ✅ If group/channel and NOT owner => leave only
+      if ((c.type === 'group' || c.type === 'channel') && c.ownerId !== myUid) {
+        await this.rooms.leaveRoom(c.id, myUid);
+        alert('✅ You left this group/channel');
+        return;
+      }
+
+      // ✅ DM OR owner => delete fully (messages + room)
+      await this.rooms.deleteRoomWithMessages(c.id);
+      alert('✅ Chat deleted permanently!');
+    } catch (e) {
+      console.error(e);
+      alert('❌ Failed to delete chat');
+    }
+  }
+
+  // ======================================================
+  // ✅ DELETE ALL CHATS FULL HISTORY (Account)
+  // ======================================================
+  async deleteAllChatsHistory() {
+    const ok = confirm(
+      `Delete ALL chats history?\n\nThis will permanently delete all your DMs.\nGroup chats will be deleted only if you are owner, otherwise you will leave them.`
+    );
+    if (!ok) return;
+
+    try {
+      await this.rooms.deleteAllMyChats();
+      alert('✅ All chats deleted!');
+    } catch (e) {
+      console.error(e);
+      alert('❌ Failed to delete all chats');
+    }
+  }
+  
 }

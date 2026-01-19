@@ -44,6 +44,8 @@ export class ChatsComponent implements OnInit, OnDestroy {
 
   // menu dropdown
   menuRoomId: string | null = null;
+  menuItem: any = null;
+  menuPos = { x: 0, y: 0 };
 
   // mobile
   isMobile = false;
@@ -72,7 +74,7 @@ export class ChatsComponent implements OnInit, OnDestroy {
     return (this.searchText || '').trim().length > 0;
   }
 
-  // ✅ stable filtering (prevents flicker)
+  // ✅ stable filtering
   private scheduleFilter() {
     clearTimeout(this._filterTimer);
     this._filterTimer = setTimeout(() => {
@@ -94,7 +96,7 @@ export class ChatsComponent implements OnInit, OnDestroy {
         this.scheduleFilter();
       });
 
-      // ✅ users list (ALL USERS)
+      // ✅ users list
       this.usersSub = this.userService.getUsers().subscribe((users: AppUser[]) => {
         const safeUsers = users || [];
 
@@ -163,15 +165,41 @@ export class ChatsComponent implements OnInit, OnDestroy {
   }
 
   // ======================
-  // ✅ UI functions for HTML
+  // ✅ UI
   // ======================
   closeAll() {
-    if (this.menuRoomId) this.menuRoomId = null;
+    this.menuRoomId = null;
+    this.menuItem = null;
+  }
+
+  getMenuItem() {
+    return this.menuItem;
   }
 
   openMenu(event: MouseEvent, item: any) {
     event.stopPropagation();
-    this.menuRoomId = this.menuRoomId === item.id ? null : item.id;
+
+    // toggle same
+    if (this.menuRoomId === item.id) {
+      this.closeAll();
+      return;
+    }
+
+    this.menuRoomId = item.id;
+    this.menuItem = item;
+
+    const padding = 10;
+    const menuWidth = 200;
+    const menuHeight = 210;
+
+    let x = event.clientX - menuWidth;
+    let y = event.clientY + 10;
+
+    // keep inside screen
+    x = Math.max(padding, Math.min(x, window.innerWidth - menuWidth - padding));
+    y = Math.max(padding, Math.min(y, window.innerHeight - menuHeight - padding));
+
+    this.menuPos = { x, y };
   }
 
   // ======================
@@ -180,10 +208,8 @@ export class ChatsComponent implements OnInit, OnDestroy {
   applyFilter() {
     const t = (this.searchText || '').trim().toLowerCase();
 
-    // ✅ chats + rooms list
     let list = [...this.rooms, ...this.dmChats];
 
-    // pinned first, then updated
     list.sort((a, b) => {
       const ap = this.isPinned(a) ? 1 : 0;
       const bp = this.isPinned(b) ? 1 : 0;
@@ -194,7 +220,6 @@ export class ChatsComponent implements OnInit, OnDestroy {
       return bt - at;
     });
 
-    // ✅ filter chats/rooms
     this.filteredRooms = t
       ? list.filter((x) => {
           const name = this.getRoomTitle(x).toLowerCase();
@@ -203,10 +228,8 @@ export class ChatsComponent implements OnInit, OnDestroy {
         })
       : list;
 
-    // ✅ People only visible when searching
     const basePeopleUsers = this.shouldShowPeople() ? [...this.allUsers] : [];
 
-    // filter people
     this.filteredUsers = t
       ? basePeopleUsers.filter((u) => {
           const name = (u.name || '').toLowerCase();
@@ -228,7 +251,6 @@ export class ChatsComponent implements OnInit, OnDestroy {
     if (item?.type === 'group') return item?.name || 'Group';
     if (item?.type === 'channel') return item?.name || 'Channel';
 
-    // dm
     const otherUid = this.getOtherUid(item);
     const u = otherUid ? this.usersMap.get(otherUid) : null;
     return u?.name || u?.email || 'Unknown';
@@ -296,7 +318,6 @@ export class ChatsComponent implements OnInit, OnDestroy {
       const otherUid = this.getOtherUid(item);
       this.selectedUser = otherUid ? this.usersMap.get(otherUid) || null : null;
 
-      // ✅ ensure chat exists
       if (otherUid) {
         const chatId = this.chatService.getChatId(this.myUid, otherUid);
         this.chatService.ensureChat(chatId, [this.myUid, otherUid]);
@@ -306,30 +327,25 @@ export class ChatsComponent implements OnInit, OnDestroy {
     if (this.isMobile) this.mobileListOpen = false;
   }
 
-  // ✅ start DM from People list
   async startDmWithUser(user: AppUser) {
     if (!user?.uid || !this.myUid) return;
 
     const chatId = this.chatService.getChatId(this.myUid, user.uid);
-
     await this.chatService.ensureChat(chatId, [this.myUid, user.uid]);
 
     this.selectedRoomId = null;
     this.selectedUser = user;
 
-    // ✅ clear search to hide people again
     this.searchText = '';
     this.applyFilter();
 
     if (this.isMobile) this.mobileListOpen = false;
   }
 
-  // ✅ open DM from URL
   private async openDmByUid(uid: string) {
     if (!uid || !this.myUid) return;
 
     const chatId = this.chatService.getChatId(this.myUid, uid);
-
     await this.chatService.ensureChat(chatId, [this.myUid, uid]);
 
     this.openRoom({ id: chatId, users: [this.myUid, uid], type: 'dm' });
@@ -344,6 +360,8 @@ export class ChatsComponent implements OnInit, OnDestroy {
   // ✅ actions
   // ======================
   async toggleMute(item: any) {
+    if (!item) return;
+
     if (item?.type === 'group' || item?.type === 'channel') {
       await this.roomService.muteRoom(item.id, this.myUid, !this.isMuted(item));
     } else {
@@ -353,11 +371,67 @@ export class ChatsComponent implements OnInit, OnDestroy {
   }
 
   async togglePin(item: any) {
+    if (!item) return;
+
     if (item?.type === 'group' || item?.type === 'channel') {
       await this.roomService.pinRoom(item.id, this.myUid, !this.isPinned(item));
     } else {
       await this.chatService.pinChat(item.id, this.myUid, !this.isPinned(item));
     }
     this.closeAll();
+  }
+
+  // ✅ who can delete forever
+  canDeleteRoom(item: any) {
+    if (!item) return false;
+
+    // dm => allow
+    if (item?.type === 'dm') return true;
+
+    // group/channel only owner
+    return item?.ownerId === this.myUid;
+  }
+
+  // ✅ delete for me only
+  async deleteChatForMe(item: any) {
+    if (!item) return;
+
+    const title = this.getRoomTitle(item);
+    const ok = confirm(`Delete "${title}" chat from your list?`);
+    if (!ok) return;
+
+    try {
+      if (item?.type === 'group' || item?.type === 'channel') {
+        await this.roomService.leaveRoom(item.id, this.myUid);
+      } else {
+        await this.roomService.hideRoom(item.id, this.myUid);
+      }
+
+      this.closeAll();
+      alert('✅ Deleted');
+    } catch (e) {
+      console.error(e);
+      alert('❌ Failed to delete');
+    }
+  }
+
+  // ✅ delete forever
+  async deleteChatForever(item: any) {
+    if (!item) return;
+
+    const title = this.getRoomTitle(item);
+    const ok = confirm(
+      `Delete FULL history of "${title}"?\n\nThis will permanently delete chat for everyone.`
+    );
+    if (!ok) return;
+
+    try {
+      await this.roomService.deleteRoomWithMessages(item.id);
+      this.closeAll();
+      alert('✅ Deleted forever');
+    } catch (e) {
+      console.error(e);
+      alert('❌ Failed');
+    }
   }
 }

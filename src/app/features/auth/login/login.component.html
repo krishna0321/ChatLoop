@@ -1,23 +1,30 @@
 <div class="page">
-  <!-- Background -->
-  <div class="bg"></div>
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
+
+  <!-- ✅ Background Effects -->
+  <div class="glowBg"></div>
+  <div class="orb theme"></div>
+  <div class="orb theme2"></div>
 
   <div class="shell">
-    <!-- LEFT BRAND PANEL -->
+
+    <!-- ✅ LEFT BRAND PANEL -->
     <section class="brand">
       <div class="logoRow">
         <div class="logo">💬</div>
+
         <div class="brandText">
           <div class="name">Chatloop</div>
           <div class="tag">Secure • Fast • Modern</div>
         </div>
+
+        <span class="premium">PREMIUM</span>
       </div>
 
       <h1>Welcome back 👋</h1>
+
       <p class="desc">
-        Continue your chats with a premium experience. Built with Firebase, designed like a modern messenger.
+        Continue your chats with a premium experience.
+        Built with Firebase, designed like a modern messenger.
       </p>
 
       <div class="features">
@@ -42,9 +49,11 @@
       </div>
     </section>
 
-    <!-- RIGHT FORM CARD -->
+    <!-- ✅ RIGHT LOGIN CARD -->
     <section class="formWrap">
       <div class="card">
+
+        <!-- Top -->
         <div class="top">
           <div class="app">
             <div class="appIcon">✨</div>
@@ -57,14 +66,22 @@
 
         <!-- Social -->
         <div class="social">
-          <button class="socialBtn google" type="button" (click)="loginGoogle()">G Continue with Google</button>
-          <button class="socialBtn github" type="button" (click)="loginGithub()">🐙 Continue with GitHub</button>
+          <button class="socialBtn google" type="button" (click)="loginGoogle()">
+            <span class="sico">G</span>
+            Continue with Google
+          </button>
+
+          <button class="socialBtn github" type="button" (click)="loginGithub()">
+            <span class="sico">🐙</span>
+            Continue with GitHub
+          </button>
         </div>
 
         <div class="divider"><span>or</span></div>
 
         <!-- FORM -->
         <div class="form">
+
           <label>Email</label>
           <div class="inputWrap">
             <span class="ico">✉️</span>
@@ -85,6 +102,7 @@
               placeholder="Enter password"
               autocomplete="current-password"
             />
+
             <button
               type="button"
               class="eyeBtn"
@@ -120,13 +138,14 @@
           </p>
         </div>
 
-        <!-- Footer -->
         <div class="footer">
           <span>🔐 Secure Login</span>
           <span class="dot">•</span>
           <span>Firebase Auth</span>
         </div>
+
       </div>
     </section>
+
   </div>
 </div>

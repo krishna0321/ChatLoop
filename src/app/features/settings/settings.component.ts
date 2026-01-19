@@ -28,6 +28,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   // toast
   toastMsg = '';
   toastVisible = false;
+  toastType: 'ok' | 'err' = 'ok';
 
   // detect unsaved changes
   hasChanges = false;
@@ -63,7 +64,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
       this.uid = user.uid;
 
       try {
-        // ✅ Create default doc if missing
         await this.settingsService.createDefaultIfMissing(user.uid, user.email || '');
       } catch (err) {
         console.error('❌ Default settings create error:', err);
@@ -71,10 +71,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
       this.sub = this.settingsService.getSettings(user.uid).subscribe({
         next: (data) => {
-          // ✅ merge + keep UI defaults
           this.settings = { ...this.settings, ...data, uid: user.uid };
 
-          // ✅ clone for comparison
           this.originalSettings = structuredClone(this.settings);
           this.hasChanges = false;
 
@@ -84,7 +82,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
         error: (err) => {
           console.error('❌ Firestore settings read failed:', err);
           this.loading = false;
-          this.showToast("❌ Can't load settings. Check Firestore rules!");
+          this.showToast("❌ Can't load settings. Check Firestore rules!", 'err');
         },
       });
     });
@@ -94,25 +92,59 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.sub?.unsubscribe();
   }
 
+  // ✅ UI titles
+  getTabTitle() {
+    switch (this.activeTab) {
+      case 'profile': return '👤 Profile';
+      case 'appearance': return '🎨 Appearance';
+      case 'notifications': return '🔔 Notifications';
+      case 'privacy': return '🛡️ Privacy';
+      case 'account': return '🔐 Account';
+      default: return '⚙️ Settings';
+    }
+  }
+
+  getTabSubtitle() {
+    switch (this.activeTab) {
+      case 'profile': return 'Update your name, bio and phone';
+      case 'appearance': return 'Dark mode and UI appearance';
+      case 'notifications': return 'Sounds and message alerts';
+      case 'privacy': return 'Online status & requests';
+      case 'account': return 'Logout or delete permanently';
+      default: return 'Manage your Chatloop preferences';
+    }
+  }
+
   selectTab(tab: TabKey) {
     this.activeTab = tab;
   }
 
-  // ✅ runs every time user changes something
+  // ✅ Detect changes (ignore uid)
   trackChanges() {
     if (!this.originalSettings) return;
-    this.hasChanges =
-      JSON.stringify(this.settings) !== JSON.stringify(this.originalSettings);
+
+    const { uid: _a, ...cur } = this.settings;
+    const { uid: _b, ...orig } = this.originalSettings;
+
+    this.hasChanges = JSON.stringify(cur) !== JSON.stringify(orig);
   }
 
+  // ✅ Dark/Light theme toggle
   applyTheme() {
     const body = document.body;
-    if (this.settings.darkMode) body.classList.add('dark-mode');
-    else body.classList.remove('dark-mode');
+
+    if (this.settings.darkMode) {
+      body.classList.remove('light-mode');
+      body.classList.add('dark-mode');
+    } else {
+      body.classList.remove('dark-mode');
+      body.classList.add('light-mode');
+    }
   }
 
-  showToast(msg: string) {
+  showToast(msg: string, type: 'ok' | 'err' = 'ok') {
     this.toastMsg = msg;
+    this.toastType = type;
     this.toastVisible = true;
 
     setTimeout(() => {
@@ -131,10 +163,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
       this.hasChanges = false;
 
       this.applyTheme();
-      this.showToast('✅ Settings saved!');
+      this.showToast('✅ Settings saved!', 'ok');
     } catch (err) {
       console.error('❌ save error:', err);
-      this.showToast('❌ Failed to save settings');
+      this.showToast('❌ Failed to save settings', 'err');
     } finally {
       this.saving = false;
     }
@@ -154,11 +186,16 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
     try {
       await deleteUser(user);
-      this.showToast('✅ Account deleted');
+      this.showToast('✅ Account deleted', 'ok');
       this.router.navigate(['/register']);
     } catch (err) {
       console.error('❌ delete error:', err);
-      this.showToast('❌ Delete failed. Logout + login again then try.');
+      this.showToast('❌ Delete failed. Logout + login again then try.', 'err');
     }
+  }
+
+  // ✅ optional: click outside handler
+  closeAll() {
+    // placeholder - if you later add dropdowns etc.
   }
 }

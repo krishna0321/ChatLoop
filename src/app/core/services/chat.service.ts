@@ -18,12 +18,7 @@ import {
   deleteField,
 } from '@angular/fire/firestore';
 
-import {
-  Storage,
-  ref,
-  uploadBytes,
-  getDownloadURL,
-} from '@angular/fire/storage';
+import { Storage, ref, uploadBytes, getDownloadURL } from '@angular/fire/storage';
 
 export type ChatMessageType = 'text' | 'image' | 'file' | 'link';
 
@@ -194,12 +189,37 @@ export class ChatService {
     chatId: string,
     file: File,
     senderId: string,
-    receiverId: string
+    receiverId: string,
+    type: 'image' | 'file',
+    caption: string = ''
   ) {
     if (!file) throw new Error('No file selected');
 
-    const isImage = (file.type || '').startsWith('image/');
-    const msgType: ChatMessageType = isImage ? 'image' : 'file';
+    // ✅ strict validation
+    if (type === 'image') {
+      if (!(file.type || '').startsWith('image/')) {
+        throw new Error('Only image files allowed');
+      }
+    } else {
+      const allowedExt = [
+        'pdf',
+        'doc',
+        'docx',
+        'xls',
+        'xlsx',
+        'ppt',
+        'pptx',
+        'zip',
+        'rar',
+        'txt',
+      ];
+      const ext = file.name.split('.').pop()?.toLowerCase() || '';
+      if (!allowedExt.includes(ext)) {
+        throw new Error('Only document files allowed');
+      }
+    }
+
+    const msgType: ChatMessageType = type; // 'image' | 'file'
 
     // ✅ upload path
     const safeName = (file.name || 'file').replace(/[^\w.\-]+/g, '_');
@@ -209,11 +229,26 @@ export class ChatService {
     await uploadBytes(fileRef, file);
     const url = await getDownloadURL(fileRef);
 
+    // ✅ message text
+    const cleanCaption = (caption || '').trim();
+
+    // for image: caption can be shown
+    // for document: show filename (caption optional not needed)
+    const msgText =
+      msgType === 'image'
+        ? cleanCaption
+        : `📎 ${file.name}`;
+
+    const previewText =
+      msgType === 'image'
+        ? '📷 Photo'
+        : `📎 ${file.name}`;
+
     const msgRef = collection(this.firestore, `chats/${chatId}/messages`);
 
     await addDoc(msgRef, {
       type: msgType,
-      text: isImage ? '📷 Photo' : `📎 ${file.name}`,
+      text: msgText,
       senderId,
       receiverId,
 
@@ -229,9 +264,10 @@ export class ChatService {
       fileSize: file.size || 0,
     });
 
+    // ✅ update chat preview + unread
     const chatDoc = doc(this.firestore, `chats/${chatId}`);
     await updateDoc(chatDoc, {
-      lastMessage: isImage ? '📷 Photo' : `📎 ${file.name}`,
+      lastMessage: previewText,
       lastSenderId: senderId,
       updatedAt: serverTimestamp(),
       lastMessageAt: serverTimestamp(),
@@ -307,11 +343,7 @@ export class ChatService {
     }
   }
 
-  // ======================================================
-  // ✅ RECENT CHATS LIST (FULL FIX)
-  // Sorted query needs Firestore composite index.
-  // If missing, fallback query still shows chats after refresh.
-  // ======================================================
+  // ✅ recent chats list
   listenMyChats(myUid: string, callback: (chats: any[]) => void) {
     const chatsRef = collection(this.firestore, 'chats');
 
@@ -321,20 +353,15 @@ export class ChatService {
       orderBy('updatedAt', 'desc')
     );
 
-    const qFallback = query(
-      chatsRef,
-      where('users', 'array-contains', myUid)
-    );
+    const qFallback = query(chatsRef, where('users', 'array-contains', myUid));
 
     const applyPinnedSorting = (chats: any[]) => {
-      // ✅ pinned chats should come first
       chats = chats.sort((a: any, b: any) => {
         const ap = a?.pinned?.[myUid] ? 1 : 0;
         const bp = b?.pinned?.[myUid] ? 1 : 0;
         return bp - ap;
       });
 
-      // ✅ then sort inside pinned/unpinned by updatedAt locally
       chats = chats.sort((a: any, b: any) => {
         const ap = a?.pinned?.[myUid] ? 1 : 0;
         const bp = b?.pinned?.[myUid] ? 1 : 0;

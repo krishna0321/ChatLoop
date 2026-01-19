@@ -12,11 +12,11 @@
   height:100%;
   min-height:0;
 
-  /* ✅ local theme fallback */
-  --theme: var(--theme, #7c3aed);
-  --theme-2: var(--theme-2, #3b82f6);
+  /* ✅ GLOBAL THEME SUPPORT */
+  --theme: var(--app-theme, #7c3aed);
+  --theme-2: var(--app-theme-2, #3b82f6);
 
-  --bg: var(--bg, #050816);
+  --bg: var(--app-bg, #050816);
   --text: rgba(255,255,255,0.92);
   --muted: rgba(255,255,255,0.72);
   --border: rgba(255,255,255,0.10);
@@ -32,6 +32,7 @@
 
   --t: .18s ease;
 }
+
 
 *{ box-sizing:border-box; }
 

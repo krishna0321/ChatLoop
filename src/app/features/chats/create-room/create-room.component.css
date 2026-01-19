@@ -1,55 +1,57 @@
- /* ==========================================
-   ✅ Chatloop - Create Room UI (Telegram Style)
+/* ==========================================
+   ✅ Chatloop - Create Room UI (Premium Theme)
    file: create-room.component.css
 ========================================== */
 
-:host {
-  display: block;
-  height: 100%;
+:host{
+  display:block;
+  height:100%;
 }
 
+*{ box-sizing:border-box; }
+
 /* ✅ page wrap */
-.wrap {
-  min-height: 100%;
+.wrap{
+  min-height:100%;
   padding: 26px 16px;
 
-  display: grid;
-  place-items: center;
+  display:grid;
+  place-items:center;
 
   background:
-    radial-gradient(900px 600px at 20% 10%, rgba(124, 58, 237, 0.16), transparent 55%),
-    radial-gradient(800px 500px at 80% 80%, rgba(59, 130, 246, 0.12), transparent 60%),
-    #050816;
+    radial-gradient(900px 600px at 20% 10%, color-mix(in srgb, var(--theme) 16%, transparent), transparent 55%),
+    radial-gradient(800px 500px at 80% 80%, color-mix(in srgb, var(--theme-2) 12%, transparent), transparent 60%),
+    var(--bg, #050816);
 
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--text, rgba(255,255,255,0.92));
 }
 
 /* ✅ card */
-.card {
+.card{
   width: min(520px, 94vw);
   border-radius: 22px;
   padding: 18px 18px 20px;
 
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
   backdrop-filter: blur(14px);
 
-  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 22px 60px rgba(0,0,0,0.55);
   animation: pop 0.22s ease;
 }
 
-@keyframes pop {
-  from { opacity: 0; transform: translateY(8px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+@keyframes pop{
+  from{ opacity:0; transform: translateY(8px) scale(0.98); }
+  to{ opacity:1; transform: translateY(0) scale(1); }
 }
 
 /* ==========================================
    ✅ HEADER
 ========================================== */
-.head {
-  display: flex;
+.head{
+  display:flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items:flex-start;
   gap: 14px;
 
   padding-bottom: 14px;
@@ -57,14 +59,14 @@
   margin-bottom: 16px;
 }
 
-.head h2 {
-  margin: 0;
+.head h2{
+  margin:0;
   font-size: 18px;
   font-weight: 1000;
-  letter-spacing: 0.2px;
+  letter-spacing: .2px;
 }
 
-.sub {
+.sub{
   margin: 6px 0 0;
   font-size: 12px;
   opacity: 0.72;
@@ -72,104 +74,104 @@
 }
 
 /* ✅ back button */
-.back {
-  text-decoration: none;
+.back{
+  text-decoration:none;
   white-space: nowrap;
 
   padding: 10px 12px;
   border-radius: 14px;
 
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.12);
   color: rgba(255,255,255,0.92);
 
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 1000;
 
-  transition: 0.2s ease;
+  transition: .2s ease;
 }
 
-.back:hover {
+.back:hover{
   transform: translateY(-1px);
-  border-color: rgba(124, 58, 237, 0.32);
-  background: rgba(124, 58, 237, 0.12);
+  border-color: color-mix(in srgb, var(--theme) 30%, transparent);
+  background: color-mix(in srgb, var(--theme) 12%, rgba(255,255,255,0.06));
 }
 
 /* ==========================================
    ✅ TABS
 ========================================== */
-.tabs {
-  display: flex;
+.tabs{
+  display:flex;
   gap: 10px;
   margin: 16px 0 18px;
 }
 
-.tabs button {
+.tabs button{
   flex: 1;
   padding: 14px 12px;
   border-radius: 18px;
-  cursor: pointer;
-  border: 1px solid rgba(255,255,255,0.10);
+  cursor:pointer;
 
+  border: 1px solid rgba(255,255,255,0.10);
   background: rgba(255,255,255,0.06);
   color: rgba(255,255,255,0.85);
 
   font-weight: 1000;
   font-size: 14px;
 
-  display: flex;
+  display:flex;
   flex-direction: column;
   gap: 4px;
-  align-items: flex-start;
+  align-items:flex-start;
 
-  transition: 0.2s ease;
+  transition: .2s ease;
 }
 
-.tabs button:hover {
+.tabs button:hover{
   transform: translateY(-1px);
-  border-color: rgba(124,58,237,0.35);
+  border-color: color-mix(in srgb, var(--theme) 35%, transparent);
 }
 
-.tiny {
+.tiny{
   font-size: 11px;
-  font-weight: 800;
-  opacity: 0.70;
+  font-weight: 900;
+  opacity: .70;
 }
 
 /* ✅ active tab */
-.tabs button.active {
+.tabs button.active{
   background: linear-gradient(135deg,
-    rgba(124, 58, 237, 0.85),
-    rgba(59, 130, 246, 0.75)
+    color-mix(in srgb, var(--theme) 92%, transparent),
+    color-mix(in srgb, var(--theme-2) 80%, transparent)
   );
-  border-color: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255,255,255,0.18);
   color: white;
   box-shadow: 0 18px 40px rgba(0,0,0,0.35);
 }
 
-.tabs button.active .tiny {
+.tabs button.active .tiny{
   opacity: 0.92;
 }
 
 /* ==========================================
    ✅ FIELDS
 ========================================== */
-.field {
+.field{
   margin-bottom: 14px;
 }
 
-.field label {
-  display: block;
+.field label{
+  display:block;
   font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0.3px;
+  font-weight: 1000;
+  letter-spacing: .3px;
   margin-bottom: 8px;
-  opacity: 0.88;
+  opacity: .88;
 }
 
 .field input,
-.field textarea {
-  width: 100%;
+.field textarea{
+  width:100%;
   border-radius: 16px;
   padding: 12px 14px;
 
@@ -177,111 +179,108 @@
   background: rgba(255,255,255,0.06);
   color: rgba(255,255,255,0.92);
 
-  outline: none;
+  outline:none;
   font-size: 14px;
-
-  transition: 0.2s ease;
+  transition: .2s ease;
 }
 
-/* textarea */
-.field textarea {
+.field textarea{
   min-height: 110px;
   resize: vertical;
 }
 
 .field input::placeholder,
-.field textarea::placeholder {
+.field textarea::placeholder{
   color: rgba(255,255,255,0.55);
 }
 
 .field input:focus,
-.field textarea:focus {
-  border-color: rgba(124, 58, 237, 0.55);
-  box-shadow: 0 0 0 4px rgba(124,58,237,0.18);
+.field textarea:focus{
+  border-color: color-mix(in srgb, var(--theme) 60%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme) 18%, transparent);
 }
 
 /* ✅ char count help */
-.help {
+.help{
   margin-top: 7px;
   font-size: 11px;
-  opacity: 0.68;
-  text-align: right;
+  opacity: .68;
+  text-align:right;
 }
 
 /* ==========================================
    ✅ PRIMARY BUTTON
 ========================================== */
-.primary {
-  width: 100%;
+.primary{
+  width:100%;
   margin-top: 10px;
 
   height: 50px;
   border-radius: 16px;
   border: 0;
-  cursor: pointer;
+  cursor:pointer;
 
   font-weight: 1000;
   font-size: 14px;
-  letter-spacing: 0.2px;
+  letter-spacing: .2px;
 
-  color: white;
-  background: linear-gradient(135deg, #7c3aed, #3b82f6);
+  color:white;
+  background: linear-gradient(135deg, var(--theme), var(--theme-2));
 
   box-shadow: 0 20px 45px rgba(0,0,0,0.40);
-  transition: 0.2s ease;
+  transition: .2s ease;
 }
 
-.primary:hover {
+.primary:hover{
   transform: translateY(-1px);
   filter: brightness(1.07);
 }
 
-.primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
+.primary:disabled{
+  opacity: .5;
+  cursor:not-allowed;
+  transform:none;
 }
 
 /* ==========================================
    ✅ SUCCESS + ERROR MSG
 ========================================== */
 .ok,
-.err {
+.err{
   margin: 12px 0 0;
   padding: 12px 12px;
   border-radius: 16px;
+
   font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0.2px;
-  text-align: center;
+  font-weight: 1000;
+  letter-spacing: .2px;
+  text-align:center;
 }
 
-.ok {
-  color: rgba(212, 255, 230, 0.95);
-  background: rgba(34, 197, 94, 0.12);
-  border: 1px solid rgba(34, 197, 94, 0.22);
+.ok{
+  color: rgba(212,255,230,0.95);
+  background: rgba(34,197,94,0.12);
+  border: 1px solid rgba(34,197,94,0.22);
 }
 
-.err {
-  color: rgba(255, 200, 200, 0.95);
-  background: rgba(255, 87, 87, 0.12);
-  border: 1px solid rgba(255, 87, 87, 0.22);
+.err{
+  color: rgba(255,200,200,0.95);
+  background: rgba(255,87,87,0.12);
+  border: 1px solid rgba(255,87,87,0.22);
 }
 
 /* ==========================================
    ✅ MOBILE
 ========================================== */
-@media (max-width: 520px) {
-  .card {
+@media (max-width:520px){
+  .card{
     padding: 16px 14px 18px;
     border-radius: 20px;
   }
 
-  .head h2 {
-    font-size: 17px;
-  }
+  .head h2{ font-size: 17px; }
 
-  .tabs button {
+  .tabs button{
     padding: 13px 12px;
     border-radius: 16px;
   }

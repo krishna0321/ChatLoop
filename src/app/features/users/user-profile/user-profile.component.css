@@ -1,4 +1,4 @@
- /* ==========================================
+/* ==========================================
    ✅ Chatloop - User Profile Page (Premium)
    file: user-profile.component.css
 ========================================== */
@@ -369,7 +369,6 @@
   padding: 10px 0;
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
-
 .row:last-child{ border-bottom:0; }
 
 .row span{
@@ -411,6 +410,7 @@
   background: rgba(59,130,246,0.10);
 }
 
+/* QR Card */
 .qrCard{
   display:grid;
   grid-template-columns: 1fr 250px;
@@ -493,22 +493,12 @@
    ✅ Responsive
 ========================================== */
 @media (max-width: 960px){
-  .content{
-    grid-template-columns: 1fr;
-  }
+  .content{ grid-template-columns: 1fr; }
+  .qrCard{ grid-template-columns: 1fr; }
 
-  .qrCard{
-    grid-template-columns: 1fr;
-  }
+  .qr{ width: 200px; height: 200px; }
 
-  .qr{
-    width: 200px;
-    height: 200px;
-  }
-
-  .tinfo{
-    text-align:left;
-  }
+  .tinfo{ text-align:left; }
 }
 
 @media (max-width: 520px){

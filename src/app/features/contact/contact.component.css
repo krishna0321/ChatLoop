@@ -1,146 +1,148 @@
 /* ==========================================
-   ✅ Chatloop - Contacts Premium UI
+   ✅ Chatloop - Contacts Premium UI (Global Theme)
    file: contact.component.css
 ========================================== */
 
-:host {
-  display: block;
-  height: 100%;
+:host{
+  display:block;
+  height:100%;
 }
+
+*{ box-sizing:border-box; }
 
 /* ==========================================
    ✅ PANEL WRAP
 ========================================== */
-.contacts-panel {
+.contacts-panel{
   height: 100%;
-  display: flex;
+  display:flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow:hidden;
 
   padding: 18px 16px 18px;
 
   background:
-    radial-gradient(1100px 700px at 18% 10%, rgba(124, 58, 237, 0.16), transparent 55%),
-    radial-gradient(900px 650px at 85% 85%, rgba(59, 130, 246, 0.12), transparent 62%),
-    #050816;
+    radial-gradient(1100px 700px at 18% 10%, color-mix(in srgb, var(--theme) 16%, transparent), transparent 55%),
+    radial-gradient(900px 650px at 85% 85%, color-mix(in srgb, var(--theme-2) 12%, transparent), transparent 62%),
+    var(--bg, #050816);
 
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--text, rgba(255,255,255,0.92));
 }
 
 /* ==========================================
    ✅ HEADER
 ========================================== */
-.header {
-  display: flex;
-  align-items: flex-end;
+.header{
+  display:flex;
+  align-items:flex-end;
   justify-content: space-between;
   gap: 14px;
 
-  padding: 14px 14px 14px;
+  padding: 14px;
   border-radius: 20px;
 
-  background: rgba(8, 12, 26, 0.75);
+  background: rgba(8,12,26,0.78);
   border: 1px solid rgba(255,255,255,0.10);
   backdrop-filter: blur(14px);
 
   box-shadow: 0 22px 60px rgba(0,0,0,0.40);
 }
 
-.title {
+.title{
   font-size: 18px;
   font-weight: 1000;
-  letter-spacing: 0.2px;
+  letter-spacing: .2px;
 }
 
-.subtitle {
+.subtitle{
   margin-top: 6px;
   font-size: 12px;
   opacity: 0.72;
-  font-weight: 800;
+  font-weight: 900;
 }
 
-/* header actions */
-.header-actions {
-  display: flex;
+.header-actions{
+  display:flex;
   gap: 10px;
   flex-wrap: wrap;
 }
 
 /* ==========================================
-   ✅ BUTTONS (Shared)
+   ✅ BUTTONS (shared)
 ========================================== */
-.btn {
+.btn{
   height: 42px;
   padding: 0 14px;
   border-radius: 14px;
   border: 0;
-  cursor: pointer;
+  cursor:pointer;
 
   font-size: 13px;
   font-weight: 1000;
-  letter-spacing: 0.2px;
+  letter-spacing: .2px;
 
-  transition: 0.2s ease;
   user-select: none;
   white-space: nowrap;
+
+  transition: .2s ease;
 }
 
-.btn:hover {
+.btn:hover{
   transform: translateY(-1px);
   filter: brightness(1.05);
 }
 
-.btn:active {
-  transform: translateY(0px) scale(0.99);
+.btn:active{
+  transform: translateY(0) scale(0.99);
 }
 
-.btn.primary {
-  background: linear-gradient(135deg, #7c3aed, #3b82f6);
+.btn.primary{
+  background: linear-gradient(135deg, var(--theme), var(--theme-2));
   color: white;
   box-shadow: 0 18px 40px rgba(0,0,0,0.35);
 }
 
-.btn.ghost {
-  background: rgba(255, 255, 255, 0.06);
+.btn.ghost{
+  background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.12);
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(255,255,255,0.92);
 }
 
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-  filter: none;
+.btn:disabled{
+  opacity: .5;
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
 }
 
 /* ==========================================
    ✅ SEARCH
 ========================================== */
-.search-wrap {
+.search-wrap{
   margin-top: 14px;
   position: relative;
 
   border-radius: 18px;
-  padding: 12px 12px;
-  background: rgba(8, 12, 26, 0.65);
+  padding: 12px;
+
+  background: rgba(8,12,26,0.70);
   border: 1px solid rgba(255,255,255,0.10);
   backdrop-filter: blur(14px);
 }
 
-.search-wrap .icon {
-  position: absolute;
+.search-wrap .icon{
+  position:absolute;
   left: 18px;
   top: 50%;
   transform: translateY(-50%);
   font-size: 14px;
   opacity: 0.65;
-  pointer-events: none;
+  pointer-events:none;
 }
 
-.search {
-  width: 100%;
+.search{
+  width:100%;
   height: 44px;
-
   padding: 0 14px 0 44px;
   border-radius: 14px;
 
@@ -148,137 +150,134 @@
   background: rgba(255,255,255,0.06);
   color: rgba(255,255,255,0.92);
 
-  outline: none;
+  outline:none;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 900;
 
-  transition: 0.2s ease;
+  transition: .2s ease;
 }
 
-.search::placeholder {
-  color: rgba(255,255,255,0.55);
-}
+.search::placeholder{ color: rgba(255,255,255,0.55); }
 
-.search:focus {
-  border-color: rgba(124, 58, 237, 0.55);
-  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.18);
+.search:focus{
+  border-color: color-mix(in srgb, var(--theme) 60%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme) 18%, transparent);
 }
 
 /* ==========================================
    ✅ LIST
 ========================================== */
-.list {
+.list{
   margin-top: 14px;
   flex: 1;
-  overflow-y: auto;
+  overflow-y:auto;
   padding: 10px 4px 6px;
 }
 
-.list::-webkit-scrollbar {
-  width: 10px;
-}
-.list::-webkit-scrollbar-thumb {
+/* scrollbar */
+.list::-webkit-scrollbar{ width: 10px; }
+.list::-webkit-scrollbar-thumb{
   background: rgba(255,255,255,0.12);
   border-radius: 999px;
 }
-.list::-webkit-scrollbar-track {
-  background: transparent;
-}
+.list::-webkit-scrollbar-thumb:hover{ background: rgba(255,255,255,0.18); }
+.list::-webkit-scrollbar-track{ background: transparent; }
 
 /* ==========================================
    ✅ CONTACT ITEM
 ========================================== */
-.item {
-  display: flex;
-  align-items: center;
+.item{
+  display:flex;
+  align-items:center;
   gap: 12px;
 
-  padding: 14px 14px;
+  padding: 14px;
   margin: 10px 6px;
   border-radius: 20px;
 
-  cursor: pointer;
+  cursor:pointer;
 
   background: rgba(255,255,255,0.045);
   border: 1px solid rgba(255,255,255,0.09);
   backdrop-filter: blur(12px);
 
   box-shadow: 0 14px 40px rgba(0,0,0,0.25);
-  transition: 0.2s ease;
+  transition: .2s ease;
 }
 
-.item:hover {
+.item:hover{
   transform: translateY(-1px);
-  border-color: rgba(124,58,237,0.28);
+  border-color: color-mix(in srgb, var(--theme) 28%, transparent);
   background: rgba(255,255,255,0.06);
 }
 
-.avatar {
+.avatar{
   width: 50px;
   height: 50px;
   border-radius: 999px;
-  display: grid;
-  place-items: center;
+  display:grid;
+  place-items:center;
 
   font-weight: 1000;
   font-size: 18px;
 
-  background: linear-gradient(135deg, rgba(124,58,237,0.95), rgba(59,130,246,0.88));
+  background: linear-gradient(135deg, var(--theme), var(--theme-2));
   border: 1px solid rgba(255,255,255,0.18);
   box-shadow: 0 16px 38px rgba(0,0,0,0.35);
 }
 
-.info {
+.info{
   flex: 1;
-  min-width: 0;
+  min-width:0;
 }
 
-.info .name {
+.info .name{
   font-size: 14px;
   font-weight: 1000;
+
   white-space: nowrap;
-  overflow: hidden;
+  overflow:hidden;
   text-overflow: ellipsis;
 }
 
-.info .sub {
+.info .sub{
   margin-top: 6px;
   font-size: 12px;
   opacity: 0.74;
 
-  display: flex;
+  display:flex;
   gap: 10px;
-  align-items: center;
+  align-items:center;
 
   white-space: nowrap;
-  overflow: hidden;
+  overflow:hidden;
   text-overflow: ellipsis;
 }
 
-.tag {
+.tag{
   font-size: 10px;
   font-weight: 1000;
   padding: 3px 8px;
   border-radius: 999px;
+
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.06);
-  letter-spacing: 0.4px;
+
+  letter-spacing: .4px;
   text-transform: uppercase;
 }
 
-.tag.gray {
-  opacity: 0.75;
-}
+.tag.gray{ opacity: 0.75; }
 
 /* actions */
-.actions {
-  display: flex;
-  align-items: center;
+.actions{
+  display:flex;
+  align-items:center;
   gap: 8px;
 }
 
 .chat-btn,
-.icon-btn {
+.icon-btn{
   width: 44px;
   height: 44px;
   border-radius: 14px;
@@ -287,27 +286,27 @@
   background: rgba(255,255,255,0.06);
   color: rgba(255,255,255,0.92);
 
-  cursor: pointer;
+  cursor:pointer;
   font-size: 16px;
-  transition: 0.2s ease;
+  transition: .2s ease;
 }
 
 .chat-btn:hover,
-.icon-btn:hover {
+.icon-btn:hover{
   transform: translateY(-1px);
-  border-color: rgba(124, 58, 237, 0.32);
+  border-color: color-mix(in srgb, var(--theme) 32%, transparent);
 }
 
-.icon-btn.danger:hover {
-  border-color: rgba(255, 87, 87, 0.35);
-  background: rgba(255, 87, 87, 0.12);
-  color: rgba(255, 190, 190, 0.95);
+.icon-btn.danger:hover{
+  border-color: rgba(255,87,87,0.35);
+  background: rgba(255,87,87,0.12);
+  color: rgba(255,190,190,0.95);
 }
 
 /* ==========================================
    ✅ EMPTY STATE
 ========================================== */
-.empty {
+.empty{
   margin-top: 16px;
   border-radius: 22px;
   padding: 34px 20px;
@@ -315,22 +314,22 @@
   background: rgba(255,255,255,0.04);
   border: 1px dashed rgba(255,255,255,0.12);
 
-  display: grid;
-  place-items: center;
-  text-align: center;
+  display:grid;
+  place-items:center;
+  text-align:center;
 }
 
-.empty-emoji {
+.empty-emoji{
   font-size: 46px;
   margin-bottom: 10px;
 }
 
-.empty-title {
+.empty-title{
   font-weight: 1000;
   font-size: 16px;
 }
 
-.empty-sub {
+.empty-sub{
   margin-top: 7px;
   font-size: 13px;
   opacity: 0.72;
@@ -340,59 +339,56 @@
 /* ==========================================
    ✅ MODAL BASE
 ========================================== */
-.modal {
+.modal{
   position: fixed;
   inset: 0;
   z-index: 200;
 
-  display: grid;
-  place-items: center;
+  display:grid;
+  place-items:center;
   padding: 18px;
 
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0,0,0,0.55);
   backdrop-filter: blur(8px);
 }
 
-/* ✅ modal box */
-.box {
+.box{
   width: min(520px, 94vw);
   border-radius: 22px;
   padding: 16px;
 
-  background: rgba(8, 12, 26, 0.95);
+  background: rgba(8,12,26,0.95);
   border: 1px solid rgba(255,255,255,0.10);
   backdrop-filter: blur(18px);
 
   box-shadow: 0 28px 80px rgba(0,0,0,0.65);
-  animation: modalPop 0.22s ease;
+  animation: modalPop .22s ease;
 }
 
-@keyframes modalPop {
-  from { transform: translateY(8px) scale(0.98); opacity: 0; }
-  to { transform: translateY(0) scale(1); opacity: 1; }
+@keyframes modalPop{
+  from{ transform: translateY(8px) scale(0.98); opacity:0; }
+  to{ transform: translateY(0) scale(1); opacity:1; }
 }
 
-.mTitle {
+.mTitle{
   font-size: 16px;
   font-weight: 1000;
 }
 
-.mSub {
+.mSub{
   margin-top: 6px;
   font-size: 12px;
   opacity: 0.70;
-  font-weight: 800;
+  font-weight: 900;
 }
 
-/* scanner specific */
-.scanner-box {
-  width: min(620px, 96vw);
-}
+/* scanner */
+.scanner-box{ width: min(620px, 96vw); }
 
-.scanner {
+.scanner{
   margin-top: 14px;
   border-radius: 20px;
-  overflow: hidden;
+  overflow:hidden;
 
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.10);
@@ -400,69 +396,60 @@
   padding: 12px;
 }
 
-/* QR reader container (html5-qrcode) */
-#qr-reader {
+#qr-reader{
   border-radius: 18px;
-  overflow: hidden;
+  overflow:hidden;
 }
 
-/* ==========================================
-   ✅ SCAN RESULT USER
-========================================== */
-.result-box {
-  width: min(560px, 96vw);
-}
+/* scan result */
+.result-box{ width: min(560px, 96vw); }
 
-.result-user {
+.result-user{
   margin-top: 14px;
   padding: 14px;
   border-radius: 20px;
 
-  display: flex;
+  display:flex;
   gap: 12px;
-  align-items: center;
+  align-items:center;
 
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.10);
 }
 
-.result-user .avatar {
+.result-user .avatar{
   width: 52px;
   height: 52px;
   font-size: 18px;
 }
 
-.result-user .meta {
-  min-width: 0;
-}
+.result-user .meta{ min-width:0; }
 
-.result-user .name {
+.result-user .name{
   font-size: 14px;
   font-weight: 1000;
 }
 
-.result-user .uid {
+.result-user .uid{
   margin-top: 6px;
   font-size: 12px;
   opacity: 0.72;
 }
 
-.result-user .uid span {
+.result-user .uid span{
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   opacity: 0.92;
 }
 
-/* ==========================================
-   ✅ ADD FORM
-========================================== */
-.addForm {
+/* add form */
+.addForm{
   margin-top: 14px;
-  display: grid;
+  display:grid;
   gap: 12px;
 }
 
-.input {
-  width: 100%;
+.input{
+  width:100%;
   height: 46px;
   padding: 0 14px;
   border-radius: 16px;
@@ -471,29 +458,24 @@
   background: rgba(255,255,255,0.06);
   color: rgba(255,255,255,0.92);
 
-  outline: none;
+  outline:none;
   font-size: 13px;
-  font-weight: 800;
-
-  transition: 0.2s ease;
+  font-weight: 900;
+  transition: .2s ease;
 }
 
-.input::placeholder {
-  color: rgba(255,255,255,0.55);
+.input::placeholder{ color: rgba(255,255,255,0.55); }
+
+.input:focus{
+  border-color: color-mix(in srgb, var(--theme) 60%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme) 18%, transparent);
 }
 
-.input:focus {
-  border-color: rgba(124,58,237,0.55);
-  box-shadow: 0 0 0 4px rgba(124,58,237,0.18);
-}
-
-/* ==========================================
-   ✅ MODAL ACTION ROW
-========================================== */
-.actions2 {
+/* modal actions */
+.actions2{
   margin-top: 16px;
-  display: flex;
-  justify-content: flex-end;
+  display:flex;
+  justify-content:flex-end;
   gap: 10px;
   flex-wrap: wrap;
 }
@@ -501,51 +483,45 @@
 /* ==========================================
    ✅ MOBILE
 ========================================== */
-@media (max-width: 520px) {
-  .contacts-panel {
-    padding: 14px 12px 14px;
-  }
+@media (max-width:520px){
+  .contacts-panel{ padding: 14px 12px 14px; }
 
-  .header {
-    padding: 12px 12px;
+  .header{
+    padding: 12px;
     border-radius: 18px;
   }
 
-  .header-actions {
-    gap: 8px;
-  }
-
-  .btn {
+  .btn{
     height: 40px;
     padding: 0 12px;
     border-radius: 12px;
     font-size: 12px;
   }
 
-  .search-wrap {
+  .search-wrap{
     padding: 10px;
     border-radius: 16px;
   }
 
-  .item {
-    padding: 12px 12px;
+  .item{
+    padding: 12px;
     border-radius: 18px;
   }
 
-  .avatar {
+  .avatar{
     width: 46px;
     height: 46px;
     font-size: 17px;
   }
 
   .chat-btn,
-  .icon-btn {
+  .icon-btn{
     width: 42px;
     height: 42px;
     border-radius: 13px;
   }
 
-  .box {
+  .box{
     padding: 14px;
     border-radius: 20px;
   }

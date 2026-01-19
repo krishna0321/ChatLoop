@@ -1,53 +1,37 @@
 <div class="chatListShell">
 
-  <!-- 🌌 BACKGROUND -->
-  <div class="bg"></div>
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
-
-  <!-- HEADER -->
   <header class="listHeader">
     <div class="headerTitle">
       💬 Chats
       <span class="count">{{ chats.length }}</span>
     </div>
 
-    <a class="addBtn" routerLink="/app/group/create" title="Create group/channel">➕</a>
+    <!-- ✅ DELETE ALL -->
+    <button class="deleteAllBtn" (click)="deleteAllChatsHistory()" title="Delete all chats">
+      🗑 All
+    </button>
   </header>
 
-  <!-- LOADING -->
   <div class="loadingBox" *ngIf="loading">
     <div class="spinner"></div>
     <div class="loadingText">Loading chats...</div>
   </div>
 
-  <!-- EMPTY -->
   <div *ngIf="!loading && chats.length === 0" class="empty">
     <div class="emoji">💬</div>
     <h3>No chats yet</h3>
     <p>Start your first conversation</p>
-
-    <button class="primary" routerLink="/app/users">
-      ➕ Start Chat
-    </button>
-
-    <div class="tip">
-      Tip: Open <b>Users</b> and tap anyone
-    </div>
   </div>
 
-  <!-- CHAT LIST -->
   <div *ngIf="!loading && chats.length > 0" class="chatList">
 
     <a
       class="chatItem"
       *ngFor="let c of chats; trackBy: trackByChatId"
-      [routerLink]="['/chat', c.id]"
+      [routerLink]="['/app/chat', c.id]"
       routerLinkActive="active"
     >
-      <div class="avatar">
-        {{ iconByType(c.type) }}
-      </div>
+      <div class="avatar">{{ iconByType(c.type) }}</div>
 
       <div class="info">
         <div class="row1">
@@ -70,8 +54,17 @@
       <div class="unread" *ngIf="c.unread > 0">
         {{ c.unread }}
       </div>
+
+      <!-- ✅ DELETE SINGLE FULL HISTORY -->
+      <button
+        class="delBtn"
+        (click)="$event.preventDefault(); $event.stopPropagation(); deleteChatHistory(c)"
+        title="Delete full chat history"
+      >
+        🗑
+      </button>
+
     </a>
 
   </div>
-
 </div>

@@ -6,81 +6,161 @@ import { RouterOutlet } from '@angular/router';
   standalone: true,
   imports: [RouterOutlet],
   template: `
-    <div class="auth">
+    <div class="authShell">
+
+      <!-- 🌌 Premium Background -->
+      <div class="bg"></div>
       <div class="orb orb1"></div>
       <div class="orb orb2"></div>
+      <div class="grain"></div>
 
-      <div class="auth-inner">
+      <!-- ✅ CONTENT WRAPPER -->
+      <div class="authInner">
         <router-outlet></router-outlet>
       </div>
+
     </div>
   `,
   styles: [`
-    :host{
-      display:block;
-      height:100%;
-    }
+/* =========================================================
+   ✅ Chatloop Auth Layout – ULTRA PREMIUM ✅ FIXED
+   - Login / Register pages
+   - Allows big login shell width (1080px+)
+   - No squeezed UI issue
+========================================================= */
 
-    .auth{
-      min-height:100%;
-      width:100%;
+:host{
+  display:block;
+  width:100%;
+  height:100dvh;
+  min-height:0;
+}
 
-      background: var(--bg);
-      color: var(--text);
+/* fallback */
+@supports not (height: 100dvh){
+  :host{ height:100vh; }
+}
 
-      display:grid;
-      place-items:center;
-      padding:20px;
+/* =========================================================
+   THEME FALLBACKS
+========================================================= */
+:host{
+  --theme: var(--app-theme, #7c3aed);
+  --theme-2: var(--app-theme-2, #3b82f6);
+  --bg: var(--app-bg, #050816);
+  --text: rgba(255,255,255,0.92);
+}
 
-      position:relative;
-      isolation:isolate;
-    }
+*{ box-sizing:border-box; }
 
-    /* 🔮 Orbs stay visual only */
-    .orb{
-      position:absolute;
-      width:420px;
-      height:420px;
-      border-radius:50%;
-      filter: blur(120px);
-      opacity:.45;
-      pointer-events:none;
-      z-index:0;
-      animation: float 14s ease-in-out infinite;
-    }
+/* =========================================================
+   ROOT SHELL
+========================================================= */
+.authShell{
+  position:relative;
+  width:100%;
+  height:100%;
+  min-height:0;
 
-    .orb1{
-      background: radial-gradient(circle, var(--theme), transparent 60%);
-      top:-120px;
-      left:-120px;
-    }
+  display:grid;
+  place-items:center;
 
-    .orb2{
-      background: radial-gradient(circle, var(--theme-2), transparent 60%);
-      bottom:-120px;
-      right:-120px;
-      animation-delay:6s;
-    }
+  padding: 20px;
 
-    .auth-inner{
-      width:100%;
-      max-width:1100px;
-      position:relative;
-      z-index:2;
-    }
+  background: var(--bg);
+  color: var(--text);
 
-    @keyframes float{
-      0%,100%{ transform: translate(0,0); }
-      50%{ transform: translate(30px,-40px); }
-    }
+  overflow:hidden;
+  isolation:isolate;
+}
 
-    @media (max-width:480px){
-      .auth{
-        place-items:start center;
-        padding:14px;
-      }
-    }
+/* =========================================================
+   🌌 BACKGROUND EFFECTS
+========================================================= */
+.bg, .orb, .grain{ pointer-events:none; }
+
+.bg{
+  position:absolute;
+  inset:0;
+  z-index:0;
+
+  background:
+    radial-gradient(900px 620px at 20% 10%, rgba(124,58,237,0.22), transparent 55%),
+    radial-gradient(900px 620px at 80% 90%, rgba(59,130,246,0.18), transparent 60%);
+
+  filter: blur(90px);
+  opacity:.95;
+}
+
+.orb{
+  position:absolute;
+  width:420px;
+  height:420px;
+  border-radius:999px;
+
+  filter: blur(140px);
+  opacity:.35;
+  z-index:0;
+
+  animation: floatOrb 14s ease-in-out infinite;
+  will-change: transform;
+}
+
+.orb1{
+  top:-140px;
+  left:-140px;
+  background: var(--theme);
+}
+
+.orb2{
+  bottom:-140px;
+  right:-140px;
+  background: var(--theme-2);
+  animation-delay: 6s;
+}
+
+@keyframes floatOrb{
+  0%,100%{ transform: translate(0,0); }
+  50%{ transform: translate(30px,-40px); }
+}
+
+/* Grain */
+.grain{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  opacity:.06;
+  mix-blend-mode: overlay;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* =========================================================
+   ✅ AUTH CONTAINER (FIXED HERE ✅)
+========================================================= */
+.authInner{
+  position:relative;
+  z-index:2;
+
+  width: 100%;
+  max-width: min(1180px, 100%);  /* ✅ allow big login layout */
+  display: flex;
+  justify-content: center;
+}
+
+/* mobile tweak */
+@media (max-width:480px){
+  .authShell{
+    place-items:start center;
+    padding: 14px;
+  }
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .orb{ animation:none !important; }
+}
   `]
 })
 export class AuthLayoutComponent {}
-
