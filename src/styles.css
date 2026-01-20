@@ -1,20 +1,21 @@
 /* =========================================================
    ✅ Chatloop Global Styles (Premium Telegram-like UI)
+   file: src/styles.css
    - One place control all colors
    - Works in all pages
    - Fixes scroll + white flash
 ========================================================= */
 
 /* ✅ Font */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 /* =========================================================
    ✅ THEME CONTROL (change here = whole app changes)
 ========================================================= */
 :root{
-  /* ✅ Theme */
-  --theme: #ff2d95;
-  --theme-2: #7c3aed;
+  /* ✅ Theme (BLUE + PURPLE PREMIUM) */
+  --theme: #3b82f6;   /* ✅ BLUE */
+  --theme-2: #7c3aed; /* ✅ PURPLE */
   --accent: color-mix(in srgb, var(--theme) 65%, white);
 
   /* ✅ Backgrounds */
@@ -33,11 +34,13 @@
 
   /* ✅ Border */
   --border: rgba(255,255,255,0.12);
+  --border-2: rgba(255,255,255,0.18);
 
   /* ✅ Radius */
   --r-xl: 32px;
   --r-lg: 24px;
   --r-md: 18px;
+  --r-sm: 14px;
 
   /* ✅ Shadows */
   --shadow-strong: 0 34px 140px rgba(0,0,0,0.84);
@@ -46,6 +49,9 @@
 
   /* ✅ Transition */
   --t: .18s ease;
+
+  /* ✅ Focus ring */
+  --ring: 0 0 0 4px color-mix(in srgb, var(--theme) 22%, transparent);
 }
 
 /* =========================================================
@@ -69,6 +75,14 @@ html, body{
   background: var(--bg);
   color: var(--text);
   font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial;
+
+  /* ✅ FIX: stop white flash on refresh */
+  color-scheme: dark;
+
+  /* ✅ smooth */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ✅ IMPORTANT FIX (DON'T HIDE OVERFLOW GLOBALLY) */
@@ -76,10 +90,16 @@ body{
   overflow: auto;
 }
 
-/* Angular root */
+/* ✅ Angular root */
 app-root{
   display: block;
   min-height: 100vh;
+  background: var(--bg);
+}
+
+/* ✅ Force full height layouts support */
+html, body, app-root{
+  height: 100%;
 }
 
 /* links */
@@ -88,19 +108,33 @@ a{
   text-decoration: none;
 }
 
+/* ✅ Selection highlight */
+::selection{
+  background: color-mix(in srgb, var(--theme) 40%, transparent);
+  color: var(--text);
+}
+
 /* =========================================================
-   ✅ GLOBAL UTILITIES
+   ✅ GLOBAL UTILITIES (Reusable everywhere)
 ========================================================= */
 .flex{ display:flex; }
-.col{ flex-direction: column; }
+.col{ display:flex; flex-direction: column; }
 .center{ display:flex; align-items:center; justify-content:center; }
 .between{ display:flex; align-items:center; justify-content:space-between; }
+.wrap{ flex-wrap: wrap; }
+
 .gap-6{ gap:6px; }
 .gap-10{ gap:10px; }
 .gap-14{ gap:14px; }
+.gap-18{ gap:18px; }
 
 .text-muted{ color: var(--muted); }
 .text-soft{ color: var(--muted-2); }
+
+.w-100{ width:100%; }
+.h-100{ height:100%; }
+.min-h-0{ min-height:0; }
+.min-w-0{ min-width:0; }
 
 .hide-scrollbar{
   scrollbar-width: none;
@@ -110,6 +144,32 @@ a{
   height: 0;
 }
 
+/* ✅ Premium glass panels (Telegram-like blur) */
+.glass{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+}
+
+.glass-strong{
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(18px);
+}
+
+.card{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.card-soft{
+  background: var(--card-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+}
+
 /* =========================================================
    ✅ GLOBAL BUTTONS + INPUTS (Reusable)
 ========================================================= */
@@ -117,20 +177,30 @@ a{
   border: 0;
   outline: 0;
   cursor: pointer;
+
   padding: 11px 14px;
   border-radius: 12px;
-  font-weight: 700;
-  transition: transform var(--t), box-shadow var(--t), opacity var(--t);
+  font-weight: 800;
+  letter-spacing: 0.2px;
+
+  transition: transform var(--t), box-shadow var(--t), opacity var(--t), background var(--t);
 }
-.btn:active{ transform: scale(0.98); }
+
+.btn:active{ transform: scale(0.985); }
+
+.btn:disabled{
+  opacity: 0.55;
+  cursor: not-allowed;
+}
 
 .btn-primary{
   background: linear-gradient(135deg, var(--theme), var(--theme-2));
   color: white;
-  box-shadow: 0 14px 30px rgba(124, 58, 237, 0.30);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.35);
 }
+
 .btn-primary:hover{
-  box-shadow: 0 18px 38px rgba(124, 58, 237, 0.40);
+  box-shadow: 0 18px 38px rgba(0,0,0,0.46);
 }
 
 .btn-ghost{
@@ -138,35 +208,73 @@ a{
   border: 1px solid var(--border);
   color: var(--text);
 }
+
 .btn-ghost:hover{
-  background: rgba(255,255,255,0.09);
+  background: rgba(255,255,255,0.10);
+  border-color: var(--border-2);
 }
 
+.btn-danger{
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: rgba(255, 190, 190, 0.96);
+}
+
+.btn-danger:hover{
+  background: rgba(239, 68, 68, 0.20);
+}
+
+/* inputs */
 .input{
   width: 100%;
   border-radius: 14px;
   padding: 12px 14px;
+
   border: 1px solid var(--border);
   background: rgba(2,6,23,0.45);
   color: var(--text);
+
   outline: none;
-  transition: border var(--t), box-shadow var(--t);
+  transition: border var(--t), box-shadow var(--t), background var(--t);
 }
+
 .input::placeholder{ color: rgba(255,255,255,0.45); }
+
 .input:focus{
   border-color: color-mix(in srgb, var(--theme) 55%, white);
-  box-shadow: 0 0 0 4px rgba(124,58,237,0.15);
+  box-shadow: var(--ring);
+  background: rgba(2,6,23,0.55);
 }
 
 /* =========================================================
    ✅ PREMIUM SCROLLBAR
 ========================================================= */
-::-webkit-scrollbar{ width: 10px; }
+::-webkit-scrollbar{ width: 10px; height: 10px; }
 ::-webkit-scrollbar-track{ background: rgba(255,255,255,0.04); }
 ::-webkit-scrollbar-thumb{
   background: rgba(255,255,255,0.16);
   border-radius: 50px;
+  border: 2px solid rgba(0,0,0,0.10);
 }
 ::-webkit-scrollbar-thumb:hover{
   background: rgba(255,255,255,0.22);
+}
+
+/* =========================================================
+   ✅ GLOBAL ANIMATIONS (Small premium touch)
+========================================================= */
+@keyframes fadeUp{
+  from { opacity:0; transform: translateY(8px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+.fadeUp{
+  animation: fadeUp .22s ease both;
+}
+
+/* ✅ global form focus (buttons, inputs, etc.) */
+:focus-visible{
+  outline: none;
+  box-shadow: var(--ring);
+  border-radius: 12px;
 }

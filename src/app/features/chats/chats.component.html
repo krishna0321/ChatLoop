@@ -48,7 +48,11 @@
         [class.active]="selectedRoomId === r.id"
         (click)="openRoom(r)"
       >
-        <div class="avatar">
+        <!-- ✅ UNIQUE COLOR AVATAR -->
+        <div
+          class="avatar"
+          [ngStyle]="getAvatarStyleForRoom(r)"
+        >
           {{ (getRoomTitle(r)[0] || 'U').toUpperCase() }}
         </div>
 
@@ -96,7 +100,11 @@
         <div class="people-list">
           <div class="chat-item" *ngFor="let u of filteredUsers">
 
-            <div class="avatar small">
+            <!-- ✅ UNIQUE COLOR AVATAR -->
+            <div
+              class="avatar small"
+              [ngStyle]="getAvatarStyleForUser(u)"
+            >
               {{ (u.name || u.email || '?').slice(0,1).toUpperCase() }}
             </div>
 
@@ -148,7 +156,7 @@
 
   </main>
 
-  <!-- ✅ FIXED MENU (NOT INSIDE LIST → NO CLIPPING) -->
+  <!-- ✅ FIXED MENU -->
   <div
     class="dropdown fixedMenu"
     *ngIf="menuRoomId"

@@ -61,6 +61,20 @@ export class ChatsComponent implements OnInit, OnDestroy {
 
   private _filterTimer: any = null;
 
+  // ✅ avatar gradients list (Telegram-style)
+  private readonly avatarGradients: [string, string][] = [
+    ['#3b82f6', '#06b6d4'], // blue-cyan
+    ['#7c3aed', '#ec4899'], // purple-pink
+    ['#22c55e', '#14b8a6'], // green-teal
+    ['#f97316', '#f43f5e'], // orange-red
+    ['#a855f7', '#6366f1'], // violet-indigo
+    ['#eab308', '#f97316'], // yellow-orange
+    ['#10b981', '#3b82f6'], // emerald-blue
+    ['#ef4444', '#fb7185'], // red-pink
+    ['#0ea5e9', '#6366f1'], // sky-indigo
+    ['#f43f5e', '#8b5cf6'], // rose-violet
+  ];
+
   constructor(
     private auth: Auth,
     private chatService: ChatService,
@@ -433,5 +447,49 @@ export class ChatsComponent implements OnInit, OnDestroy {
       console.error(e);
       alert('❌ Failed');
     }
+  }
+
+  // ======================================================
+  // ✅ UNIQUE AVATAR COLORS (Telegram style)
+  // ======================================================
+
+  // ✅ stable color from seed
+  getAvatarColors(seed: string) {
+    const safe = (seed || 'x').toString();
+
+    let hash = 0;
+    for (let i = 0; i < safe.length; i++) {
+      hash = safe.charCodeAt(i) + ((hash << 5) - hash);
+      hash |= 0;
+    }
+
+    const idx = Math.abs(hash) % this.avatarGradients.length;
+    return { c1: this.avatarGradients[idx][0], c2: this.avatarGradients[idx][1] };
+  }
+
+  // ✅ for chats list avatar
+  getAvatarStyleForRoom(r: any) {
+    const seed =
+      r?.type === 'dm'
+        ? (this.getOtherUid(r) || r?.id || this.getRoomTitle(r))
+        : (r?.id || this.getRoomTitle(r));
+
+    const { c1, c2 } = this.getAvatarColors(seed);
+
+    return {
+      '--av1': c1,
+      '--av2': c2,
+    };
+  }
+
+  // ✅ for people list avatar
+  getAvatarStyleForUser(u: AppUser) {
+    const seed = u?.uid || u?.email || u?.name || 'user';
+    const { c1, c2 } = this.getAvatarColors(seed);
+
+    return {
+      '--av1': c1,
+      '--av2': c2,
+    };
   }
 }

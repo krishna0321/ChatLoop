@@ -9,11 +9,13 @@
 :host{
   display:block;
   height:100%;
+  min-height:0;
 }
 
 *{ box-sizing:border-box; }
 
-:root{
+/* ✅ Local vars (NOT :root) */
+:host{
   --panel: rgba(8,12,26,0.88);
   --panel2: rgba(10,14,30,0.90);
   --glass: rgba(255,255,255,0.06);
@@ -30,6 +32,7 @@
 .layout{
   position: relative;
   height: 100%;
+  min-height:0;
   overflow: hidden;
 
   display:grid;
@@ -105,6 +108,7 @@
   position:relative;
   z-index:5;
   height:100%;
+  min-height:0;
   overflow:hidden;
 
   border-right: 1px solid rgba(255,255,255,0.08);
@@ -209,6 +213,7 @@
 ========================================== */
 .list{
   flex: 1;
+  min-height:0;
   overflow-y:auto;
   padding: 10px 10px 14px;
 }
@@ -236,7 +241,7 @@
 }
 
 /* ==========================================
-   ✅ Chat item (ULTRA PREMIUM)
+   ✅ Chat item
 ========================================== */
 .item{
   position:relative;
@@ -266,16 +271,17 @@
   box-shadow: 0 18px 46px rgba(0,0,0,0.40);
 }
 
+/* ✅ Active uses avatar colors too */
 .item.active{
   background: linear-gradient(135deg,
-    color-mix(in srgb, var(--theme) 64%, transparent),
-    color-mix(in srgb, var(--theme-2) 52%, transparent)
+    color-mix(in srgb, var(--av1, var(--theme)) 70%, transparent),
+    color-mix(in srgb, var(--av2, var(--theme-2)) 55%, transparent)
   );
   border-color: rgba(255,255,255,0.16);
   box-shadow: 0 22px 55px rgba(0,0,0,0.42);
 }
 
-/* avatar */
+/* ✅ avatar = UNIQUE per user/room */
 .item .avatar{
   width:48px;
   height:48px;
@@ -286,26 +292,22 @@
   font-weight: 1000;
   font-size: 16px;
 
-  background: radial-gradient(circle at 30% 25%,
-      rgba(255,255,255,0.14),
-      rgba(255,255,255,0.06) 56%,
-      rgba(0,0,0,0.10)
-  );
-  border: 1px solid rgba(255,255,255,0.12);
+  background: linear-gradient(135deg, var(--av1, #3b82f6), var(--av2, #7c3aed));
+  border: 1px solid rgba(255,255,255,0.16);
+
   box-shadow:
-    inset 0 0 0 1px rgba(0,0,0,0.25),
-    0 10px 26px rgba(0,0,0,0.25);
+    0 14px 32px rgba(0,0,0,0.35),
+    inset 0 0 0 1px rgba(0,0,0,0.18);
 }
 
 .item.active .avatar{
   border-color: rgba(255,255,255,0.22);
-  background: rgba(0,0,0,0.20);
 }
 
 /* info */
 .item .info{ flex:1; min-width:0; }
 
-.row{
+.item .row{
   display:flex;
   align-items:center;
   justify-content: space-between;
@@ -429,7 +431,7 @@
 }
 
 /* ==========================================
-   ✅ People list (more clean)
+   ✅ People list
 ========================================== */
 .people-list{ margin-top: 6px; }
 
@@ -515,6 +517,7 @@
   z-index:5;
 
   height:100%;
+  min-height:0;
   overflow:hidden;
 
   display:flex;
@@ -524,10 +527,9 @@
 .chatWrap{
   flex:1;
   height:100%;
-  min-height:0;   /* ✅ REQUIRED */
+  min-height:0;
   overflow:hidden;
 }
-
 
 /* empty right */
 .empty{
@@ -548,7 +550,7 @@
 .t2{ margin-top: 6px; font-size: 13px; opacity: .70; }
 
 /* ==========================================
-   ✅ FIXED MENU (Perfect dropdown everywhere)
+   ✅ FIXED MENU
 ========================================== */
 .fixedMenu{
   position: fixed !important;
@@ -584,7 +586,6 @@
   border-radius: 999px;
 }
 
-/* menu buttons */
 .fixedMenu button{
   width:100%;
   display:flex;
@@ -612,11 +613,6 @@
   background: rgba(255,255,255,0.07);
 }
 
-.fixedMenu button:active{
-  transform: scale(0.99);
-}
-
-/* ✅ Delete styles */
 .fixedMenu button.danger{
   color: rgba(255,210,210,0.95);
   background: rgba(239,68,68,0.06);
@@ -628,7 +624,6 @@
   border-color: rgba(239,68,68,0.30);
 }
 
-/* ✅ Delete forever */
 .fixedMenu button.danger2{
   color: #ff9c9c;
   font-weight: 1000;
