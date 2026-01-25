@@ -6,12 +6,7 @@
   <div class="orb orb2"></div>
 
   <!-- ✅ Toast -->
-  <div
-    class="toast"
-    [class.ok]="toastType==='ok'"
-    [class.err]="toastType==='err'"
-    *ngIf="toastVisible"
-  >
+  <div class="toast" [class.ok]="toastType==='ok'" [class.err]="toastType==='err'" *ngIf="toastVisible">
     {{ toastMsg }}
   </div>
 
@@ -24,7 +19,7 @@
     <button (click)="selectTab('account')" [class.active]="activeTab==='account'">🔐</button>
   </div>
 
-  <!-- ✅ LEFT MENU (Desktop only) -->
+  <!-- ✅ LEFT MENU -->
   <aside class="settings-nav fadeUp" (click)="$event.stopPropagation()">
     <div class="nav-title">
       <div class="nav-icon">⚙️</div>
@@ -57,17 +52,14 @@
 
   <!-- ✅ MAIN -->
   <main class="settings-main fadeUp" (click)="$event.stopPropagation()">
+
     <div class="settings-header">
       <div>
         <h1>{{ getTabTitle() }}</h1>
         <p>{{ getTabSubtitle() }}</p>
       </div>
 
-      <button
-        class="save-btn"
-        (click)="save()"
-        [disabled]="saving || loading || !hasChanges"
-      >
+      <button class="save-btn" (click)="save()" [disabled]="saving || loading || !hasChanges">
         {{ saving ? 'Saving...' : (hasChanges ? 'Save ✅' : 'Saved ✅') }}
       </button>
     </div>
@@ -90,29 +82,17 @@
 
         <div class="field">
           <label>Name</label>
-          <input
-            [(ngModel)]="settings.name"
-            (ngModelChange)="trackChanges()"
-            placeholder="Enter your name"
-          />
+          <input [(ngModel)]="settings.name" (ngModelChange)="trackChanges()" placeholder="Enter your name" />
         </div>
 
         <div class="field">
           <label>Bio</label>
-          <textarea
-            [(ngModel)]="settings.bio"
-            (ngModelChange)="trackChanges()"
-            placeholder="Write something about you..."
-          ></textarea>
+          <textarea [(ngModel)]="settings.bio" (ngModelChange)="trackChanges()" placeholder="Write something about you..."></textarea>
         </div>
 
         <div class="field">
           <label>Phone</label>
-          <input
-            [(ngModel)]="settings.phone"
-            (ngModelChange)="trackChanges()"
-            placeholder="Optional phone number"
-          />
+          <input [(ngModel)]="settings.phone" (ngModelChange)="trackChanges()" placeholder="Optional phone number" />
         </div>
       </section>
 
@@ -120,29 +100,32 @@
       <section class="card" *ngIf="activeTab==='appearance'">
         <h3>🎨 Appearance</h3>
 
+        <!-- ✅ Dark Mode -->
         <div class="toggle-row">
           <div>
             <div class="toggle-title">Dark Mode</div>
-            <div class="toggle-sub">Reduce eye strain</div>
+            <div class="toggle-sub">Black / White mode switch</div>
           </div>
 
           <label class="switch">
-            <input
-              type="checkbox"
-              [(ngModel)]="settings.darkMode"
-              (ngModelChange)="applyTheme(); trackChanges()"
-            />
+            <input type="checkbox" [(ngModel)]="settings.darkMode" (ngModelChange)="applyTheme(); trackChanges()" />
             <span class="slider"></span>
           </label>
         </div>
 
-        <div class="preview-row">
-          <div class="preview dark">
-            <div class="pTitle">Dark</div>
+        <!-- ✅ Custom Theme Color -->
+        <div class="color-row">
+          <div>
+            <div class="toggle-title">Theme Color</div>
+            <div class="toggle-sub">Choose your custom main color</div>
           </div>
 
-          <div class="preview light">
-            <div class="pTitle">Light</div>
+          <div class="color-picker">
+            <input class="color-input" type="color"
+              [(ngModel)]="settings.themeColor"
+              (ngModelChange)="applyColor(); trackChanges()"
+            />
+            <div class="color-hex">{{ settings.themeColor }}</div>
           </div>
         </div>
       </section>
@@ -158,11 +141,7 @@
           </div>
 
           <label class="switch">
-            <input
-              type="checkbox"
-              [(ngModel)]="settings.notifyMessages"
-              (ngModelChange)="trackChanges()"
-            />
+            <input type="checkbox" [(ngModel)]="settings.notifyMessages" (ngModelChange)="trackChanges()" />
             <span class="slider"></span>
           </label>
         </div>
@@ -174,11 +153,7 @@
           </div>
 
           <label class="switch">
-            <input
-              type="checkbox"
-              [(ngModel)]="settings.notifySound"
-              (ngModelChange)="trackChanges()"
-            />
+            <input type="checkbox" [(ngModel)]="settings.notifySound" (ngModelChange)="trackChanges()" />
             <span class="slider"></span>
           </label>
         </div>
@@ -195,11 +170,7 @@
           </div>
 
           <label class="switch">
-            <input
-              type="checkbox"
-              [(ngModel)]="settings.showOnlineStatus"
-              (ngModelChange)="trackChanges()"
-            />
+            <input type="checkbox" [(ngModel)]="settings.showOnlineStatus" (ngModelChange)="trackChanges()" />
             <span class="slider"></span>
           </label>
         </div>
@@ -211,11 +182,7 @@
           </div>
 
           <label class="switch">
-            <input
-              type="checkbox"
-              [(ngModel)]="settings.allowFriendRequests"
-              (ngModelChange)="trackChanges()"
-            />
+            <input type="checkbox" [(ngModel)]="settings.allowFriendRequests" (ngModelChange)="trackChanges()" />
             <span class="slider"></span>
           </label>
         </div>

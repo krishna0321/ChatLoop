@@ -23,10 +23,11 @@
 
   <!-- ✅ HERO -->
   <section class="hero fadeUp">
+
     <div class="heroLeft">
       <!-- Avatar -->
       <div class="avatarArea">
-        <div class="avatarImg">
+        <div class="avatarImg" [class.loading]="uploading">
           <img *ngIf="u.photoURL" [src]="u.photoURL" class="img" alt="avatar" />
           <div *ngIf="!u.photoURL" class="txt">{{ (u.name || 'U')[0] }}</div>
         </div>
@@ -42,7 +43,7 @@
         </label>
 
         <div class="avatarHint">
-          {{ uploading ? 'Uploading photo...' : 'Upload profile photo' }}
+          {{ uploading ? 'Uploading photo...' : 'Upload profile photo (Max 2MB)' }}
         </div>
 
         <div class="avatarErr" *ngIf="avatarErr">{{ avatarErr }}</div>

@@ -27,18 +27,18 @@ export interface RoomMessage {
 export class MessageService {
   constructor(private fs: Firestore, private rooms: RoomService) {}
 
-  // ==========================
+  //   =
   // LISTEN ROOM MESSAGES
-  // ==========================
+  //   =
   getRoomMessages(roomId: string): Observable<RoomMessage[]> {
     const ref = collection(this.fs, `rooms/${roomId}/messages`);
     const q = query(ref, orderBy('createdAt', 'asc'));
     return collectionData(q, { idField: 'id' }) as Observable<RoomMessage[]>;
   }
 
-  // ==========================
+  //   =
   // ✅ SEND ROOM MESSAGE
-  // ==========================
+  //   =
   async sendRoomMessage(roomId: string, senderId: string, text: string) {
     const value = (text || '').trim();
     if (!value) return;
@@ -56,9 +56,9 @@ export class MessageService {
     await this.rooms.updateRoomMeta(roomId, senderId, value);
   }
 
-  // ==========================
+  //   =
   // DELETE MESSAGE
-  // ==========================
+  //   =
   async deleteRoomMessage(roomId: string, msgId: string) {
     const msgDoc = doc(this.fs, `rooms/${roomId}/messages/${msgId}`);
     await updateDoc(msgDoc, {

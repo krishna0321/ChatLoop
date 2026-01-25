@@ -20,7 +20,16 @@ export const routes: Routes = [
     ],
   },
 
-  // ✅ MAIN APP LAYOUT
+  // ✅ ✅ PUBLIC SHARE PROFILE (NO LOGIN REQUIRED)
+  {
+    path: 'u/:uid',
+    loadComponent: () =>
+      import('./features/users/user-profile/user-profile.component').then(
+        (m) => m.UserProfileComponent
+      ),
+  },
+
+  // ✅ MAIN APP LAYOUT (Protected)
   {
     path: 'app',
     component: AppLayoutComponent,
@@ -90,7 +99,7 @@ export const routes: Routes = [
           import('./features/users/users.component').then((m) => m.UsersComponent),
       },
 
-      // ✅ USER PROFILE
+      // ✅ USER PROFILE (Inside app, requires login)
       {
         path: 'user/:uid',
         loadComponent: () =>
@@ -124,6 +133,20 @@ export const routes: Routes = [
           import('./features/contact/contact.component').then(
             (m) => m.ContactComponent
           ),
+      },
+
+      // ✅ ABOUT
+      {
+        path: 'about',
+        loadComponent: () =>
+          import('./features/about/about.component').then((m) => m.AboutComponent),
+      },
+
+      // ✅ FAQ
+      {
+        path: 'faq',
+        loadComponent: () =>
+          import('./features/faq/faq.component').then((m) => m.FaqComponent),
       },
     ],
   },

@@ -11,7 +11,6 @@
     [class.mobileHide]="!mobileListOpen"
     (click)="$event.stopPropagation()"
   >
-
     <!-- TOP -->
     <div class="top">
       <div class="logoRow">
@@ -38,21 +37,15 @@
     <!-- LIST -->
     <div class="list">
 
-      <!-- ✅ CHATS TITLE -->
       <div class="section-title">Chats</div>
 
-      <!-- ✅ CHATS LIST -->
       <div
         *ngFor="let r of filteredRooms"
         class="item"
         [class.active]="selectedRoomId === r.id"
         (click)="openRoom(r)"
       >
-        <!-- ✅ UNIQUE COLOR AVATAR -->
-        <div
-          class="avatar"
-          [ngStyle]="getAvatarStyleForRoom(r)"
-        >
+        <div class="avatar" [ngStyle]="getAvatarStyleForRoom(r)">
           {{ (getRoomTitle(r)[0] || 'U').toUpperCase() }}
         </div>
 
@@ -76,19 +69,10 @@
           </div>
         </div>
 
-        <!-- ⋮ MENU -->
-        <button
-          class="more"
-          (click)="$event.stopPropagation(); openMenu($event, r)"
-        >
-          ⋮
-        </button>
+        <button class="more" (click)="$event.stopPropagation(); openMenu($event, r)">⋮</button>
       </div>
 
-      <!-- ✅ EMPTY CHATS -->
-      <div *ngIf="filteredRooms.length === 0" class="emptyLeft">
-        No chats found
-      </div>
+      <div *ngIf="filteredRooms.length === 0" class="emptyLeft">No chats found</div>
 
       <!-- ✅ PEOPLE SECTION -->
       <ng-container *ngIf="shouldShowPeople()">
@@ -100,11 +84,7 @@
         <div class="people-list">
           <div class="chat-item" *ngFor="let u of filteredUsers">
 
-            <!-- ✅ UNIQUE COLOR AVATAR -->
-            <div
-              class="avatar small"
-              [ngStyle]="getAvatarStyleForUser(u)"
-            >
+            <div class="avatar small" [ngStyle]="getAvatarStyleForUser(u)">
               {{ (u.name || u.email || '?').slice(0,1).toUpperCase() }}
             </div>
 
@@ -113,18 +93,13 @@
               <div class="sub">{{ u.email || u.phone || '' }}</div>
             </div>
 
-            <button
-              class="pillBtn"
-              (click)="$event.stopPropagation(); startDmWithUser(u)"
-            >
+            <button class="pillBtn" (click)="$event.stopPropagation(); startDmWithUser(u)">
               Start
             </button>
 
           </div>
 
-          <div *ngIf="filteredUsers.length === 0" class="emptyLeft">
-            No users found
-          </div>
+          <div *ngIf="filteredUsers.length === 0" class="emptyLeft">No users found</div>
         </div>
       </ng-container>
 
@@ -133,6 +108,12 @@
 
   <!-- RIGHT CONTENT -->
   <main class="content">
+
+    <!-- ✅ Telegram Mobile Header -->
+    <div class="mobileHeader" *ngIf="showMobileChatHeader()">
+      <button class="backBtn" (click)="backToList()">←</button>
+      <div class="mobileTitle">{{ getMobileChatTitle() }}</div>
+    </div>
 
     <ng-container *ngIf="selectedUser">
       <div class="chatWrap">

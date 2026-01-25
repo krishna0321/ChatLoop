@@ -1,6 +1,11 @@
-<div class="chat-view" *ngIf="user" (click)="closeAllMenus()">
+<div
+  class="chat-view"
+  *ngIf="user"
+  [class.kbOpen]="keyboardOpen"
+  (click)="closeAllMenus()"
+>
 
-  <!-- HEADER -->
+  <!-- ================= HEADER ================= -->
   <header class="header" (click)="$event.stopPropagation()">
     <div class="left" (click)="openProfileDrawer()">
       <div class="avatar">{{ (user.name || 'U')[0] }}</div>
@@ -29,7 +34,7 @@
     </div>
   </header>
 
-  <!-- MESSAGES -->
+  <!-- ================= MESSAGES ================= -->
   <div class="messages" #messagesBox>
     <div
       *ngFor="let m of messages"
@@ -40,44 +45,51 @@
     >
       <div class="text">
 
-        <!-- ✅ IMAGE -->
+        <!-- IMAGE -->
         <ng-container *ngIf="m.type === 'image' && m.fileUrl && !m.isDeleted">
           <img class="imgMsg" [src]="m.fileUrl" />
           <div class="caption" *ngIf="m.text">{{ m.text }}</div>
         </ng-container>
 
-        <!-- ✅ FILE -->
+        <!-- FILE -->
         <ng-container *ngIf="m.type === 'file' && m.fileUrl && !m.isDeleted">
           <a class="fileMsg" [href]="m.fileUrl" target="_blank" rel="noopener">
             <div class="fileIcon2">📎</div>
             <div class="fileMeta">
               <div class="fileName2">{{ m.fileName || 'File' }}</div>
               <div class="fileSize2">
-                {{ (m.fileSize || 0) > 0 ? ((m.fileSize || 0) / 1024 / 1024).toFixed(1) + ' MB' : '' }}
+                {{
+                  (m.fileSize || 0) > 0
+                    ? ((m.fileSize || 0) / 1024 / 1024).toFixed(1) + ' MB'
+                    : ''
+                }}
               </div>
             </div>
           </a>
         </ng-container>
 
-        <!-- ✅ TEXT -->
-        <ng-container *ngIf="(!m.type || m.type === 'text' || m.type === 'link') && !m.isDeleted">
+        <!-- TEXT -->
+        <ng-container
+          *ngIf="(!m.type || m.type === 'text' || m.type === 'link') && !m.isDeleted"
+        >
           {{ m.text }}
         </ng-container>
 
-        <!-- ✅ DELETED -->
+        <!-- DELETED -->
         <ng-container *ngIf="m.isDeleted">
           <span class="deletedText">This message was deleted</span>
         </ng-container>
-
       </div>
 
+      <!-- ✅ META (TIME + EDITED) -->
       <div class="meta" *ngIf="!m.isDeleted">
-        <span *ngIf="m.editedAt">edited</span>
+        <span class="time">{{ formatTime(m.createdAt) }}</span>
+        <span *ngIf="m.editedAt"> · edited</span>
       </div>
     </div>
   </div>
 
-  <!-- MESSAGE MENU -->
+  <!-- ================= MESSAGE MENU ================= -->
   <div
     class="msgMenu"
     *ngIf="menuMessageId"
@@ -89,7 +101,7 @@
     <button class="danger" (click)="clickDelete()">🗑 Delete</button>
   </div>
 
-  <!-- EDIT BAR -->
+  <!-- ================= EDIT BAR ================= -->
   <div class="editBar" *ngIf="editingId" (click)="$event.stopPropagation()">
     <div class="editTitle">Editing message</div>
 
@@ -100,46 +112,13 @@
     </div>
   </div>
 
-  <!-- ✅ COMPOSER -->
-  <div class="composer" (click)="$event.stopPropagation()">
-
-    <!-- attach -->
-    <button
-      class="attachBtn"
-      [class.disabled]="sendingFile || isBlocked"
-      (click)="toggleAttachMenu($event)"
-      [disabled]="sendingFile || isBlocked"
-      type="button"
-    >
-      📎
-    </button>
-
-    <!-- attach menu -->
-    <div class="attachMenu" *ngIf="showAttachMenu" (click)="$event.stopPropagation()">
-      <button (click)="chooseAttachType('image')">🖼 Image</button>
-      <button (click)="chooseAttachType('document')">📄 Document</button>
-    </div>
-
-    <!-- hidden input -->
-    <input #fileInput type="file" hidden (change)="pickFile($event)" />
-
-    <input
-      [(ngModel)]="text"
-      placeholder="Message..."
-      [disabled]="isBlocked || sendingFile"
-      (keydown.enter)="send()"
-    />
-
-    <button (click)="send()" [disabled]="isBlocked || (!text.trim() && !selectedFile) || sendingFile">
-      {{ sendingFile ? 'Uploading...' : 'Send' }}
-    </button>
-  </div>
-
-  <!-- ✅ preview -->
+  <!-- ================= FILE PREVIEW ================= -->
   <div class="filePreview" *ngIf="selectedFile">
     <div class="fileInfo">
       <div class="fileName">📎 {{ selectedFile.name }}</div>
-      <div class="fileSize">{{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB</div>
+      <div class="fileSize">
+        {{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB
+      </div>
     </div>
     <button class="removeFile" type="button" (click)="clearSelectedFile()">✖</button>
   </div>
@@ -150,95 +129,73 @@
     You blocked this user. Unblock to send messages.
   </div>
 
-  <!-- ✅ PROFILE DRAWER -->
-  <div class="drawerBackdrop" *ngIf="showUserProfile" (click)="closeProfileDrawer()">
+  <!-- ================= COMPOSER ================= -->
+  <div class="composer" (click)="$event.stopPropagation()">
+    <button
+      class="attachBtn"
+      [class.disabled]="sendingFile || isBlocked"
+      (click)="toggleAttachMenu($event)"
+      [disabled]="sendingFile || isBlocked"
+      type="button"
+    >
+      📎
+    </button>
+
+    <!-- ATTACH MENU -->
+    <div class="attachMenu" *ngIf="showAttachMenu" (click)="$event.stopPropagation()">
+      <button (click)="chooseAttachType('image')">🖼 Image</button>
+      <button (click)="chooseAttachType('document')">📄 Document</button>
+    </div>
+
+    <input #fileInput type="file" hidden (change)="pickFile($event)" />
+
+    <input
+      [(ngModel)]="text"
+      placeholder="Message..."
+      [disabled]="isBlocked || sendingFile"
+      (keydown.enter)="send()"
+      autocomplete="off"
+    />
+
+    <button
+      class="sendBtn"
+      (click)="send()"
+      [disabled]="isBlocked || (!text.trim() && !selectedFile) || sendingFile"
+    >
+      {{ sendingFile ? 'Uploading...' : 'Send' }}
+    </button>
+  </div>
+
+  <!-- ================= PROFILE DRAWER ================= -->
+  <div
+    class="drawerBackdrop"
+    *ngIf="showUserProfile"
+    (click)="closeProfileDrawer()"
+  >
     <div class="drawer" (click)="$event.stopPropagation()">
-      <div class="dHero">
-        <button class="dClose" (click)="closeProfileDrawer()">✖</button>
+      <button class="closeBtn" (click)="closeProfileDrawer()">✖</button>
 
-        <div class="dAvatar">{{ (user.name || 'U')[0] }}</div>
-        <div class="dName">{{ user.name || 'User' }}</div>
-        <div class="dStatus">
-          {{ user.phone || user.email || 'No info' }}
-        </div>
+      <div class="avatarLarge">{{ (user.name || 'U')[0] }}</div>
 
-        <div class="dActions">
-          <button class="act" (click)="callUser()">📞</button>
-          <button class="act" (click)="videoCallUser()">🎥</button>
-          <button class="act" (click)="searchInChat()">🔍</button>
-          <button class="act" (click)="copyText(user.uid)">📋</button>
-        </div>
+      <div class="infoSection">
+        <div class="label">Name</div>
+        <div class="value">{{ user.name || 'User' }}</div>
       </div>
 
-      <div class="drawerBody">
-        <div class="card">
-          <div class="row">
-            <span>Phone</span>
-            <b>{{ user.phone || '-' }}</b>
-          </div>
-          <div class="row">
-            <span>Bio</span>
-            <b>{{ user.bio || 'No bio' }}</b>
-          </div>
-          <div class="row">
-            <span>User ID</span>
-            <b class="mono">{{ user.uid }}</b>
-          </div>
+      <div class="infoSection">
+        <div class="label">Email</div>
+        <div class="value">{{ user.email || 'No email' }}</div>
+      </div>
 
-          <div class="btnRow">
-            <button class="btn ghost" (click)="copyText(profileLink)">🔗 Copy link</button>
-            <button class="btn ghost" (click)="copyText(user.uid)">📋 Copy UID</button>
-          </div>
+      <div class="infoSection">
+        <div class="label">Phone</div>
+        <div class="value">{{ user.phone || 'No phone' }}</div>
+      </div>
 
-          <div class="btnRow">
-            <button class="btn primary" (click)="addToContacts()" [disabled]="isContact">
-              {{ isContact ? '✅ Added' : '➕ Add Contact' }}
-            </button>
-            <button class="btn danger" (click)="toggleBlock()">
-              {{ isBlocked ? '✅ Unblock' : '⛔ Block' }}
-            </button>
-          </div>
-        </div>
-
-        <div class="tabs">
-          <button (click)="setTab('media')" [class.active]="profileTab==='media'">Media</button>
-          <button (click)="setTab('files')" [class.active]="profileTab==='files'">Files</button>
-          <button (click)="setTab('links')" [class.active]="profileTab==='links'">Links</button>
-        </div>
-
-        <div class="tabContent" *ngIf="profileTab==='media'">
-          <div *ngIf="sharedMedia.length === 0" class="emptyTab">No media shared yet.</div>
-          <div class="mediaGrid" *ngIf="sharedMedia.length > 0">
-            <img *ngFor="let img of sharedMedia" [src]="img" class="mediaImg" />
-          </div>
-        </div>
-
-        <div class="tabContent" *ngIf="profileTab==='files'">
-          <div *ngIf="sharedFiles.length === 0" class="emptyTab">No files shared yet.</div>
-
-          <a class="fileRow" *ngFor="let f of sharedFiles" [href]="f.url" target="_blank">
-            <div class="fileIcon">📄</div>
-            <div class="fileInfo">
-              <div class="fileName">{{ f.name }}</div>
-              <div class="fileSize">{{ f.size }}</div>
-            </div>
-          </a>
-        </div>
-
-        <div class="tabContent" *ngIf="profileTab==='links'">
-          <div *ngIf="sharedLinks.length === 0" class="emptyTab">No links shared yet.</div>
-          <a class="link" *ngFor="let l of sharedLinks" [href]="l.url" target="_blank">
-            🔗 {{ l.url }}
-          </a>
-        </div>
-
-        <div class="card qrCard" *ngIf="qrDataUrl">
-          <div>
-            <div class="qrTitle">📷 QR Code</div>
-            <div class="qrSub">Scan to open Chatloop profile</div>
-            <div class="mono small">{{ profileLink }}</div>
-          </div>
-          <img class="qr" [src]="qrDataUrl" />
+      <div class="infoSection">
+        <div class="label">Joined</div>
+        <div class="value">
+          {{ user.createdAt | date: 'mediumDate' }}
         </div>
       </div>
     </div>

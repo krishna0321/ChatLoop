@@ -24,30 +24,24 @@ export class ChatsComponent implements OnInit, OnDestroy {
   myUid = '';
   blockedUids: string[] = [];
 
-  // ✅ USERS MAP
   usersMap = new Map<string, AppUser>();
 
-  // ✅ all users (but we show only when searching)
   allUsers: AppUser[] = [];
   filteredUsers: AppUser[] = [];
 
-  // ✅ chats list
   dmChats: any[] = [];
   rooms: any[] = [];
   filteredRooms: any[] = [];
 
   searchText = '';
 
-  // selected
   selectedUser: AppUser | null = null;
   selectedRoomId: string | null = null;
 
-  // menu dropdown
   menuRoomId: string | null = null;
   menuItem: any = null;
   menuPos = { x: 0, y: 0 };
 
-  // mobile
   isMobile = false;
   mobileListOpen = true;
 
@@ -61,18 +55,17 @@ export class ChatsComponent implements OnInit, OnDestroy {
 
   private _filterTimer: any = null;
 
-  // ✅ avatar gradients list (Telegram-style)
   private readonly avatarGradients: [string, string][] = [
-    ['#3b82f6', '#06b6d4'], // blue-cyan
-    ['#7c3aed', '#ec4899'], // purple-pink
-    ['#22c55e', '#14b8a6'], // green-teal
-    ['#f97316', '#f43f5e'], // orange-red
-    ['#a855f7', '#6366f1'], // violet-indigo
-    ['#eab308', '#f97316'], // yellow-orange
-    ['#10b981', '#3b82f6'], // emerald-blue
-    ['#ef4444', '#fb7185'], // red-pink
-    ['#0ea5e9', '#6366f1'], // sky-indigo
-    ['#f43f5e', '#8b5cf6'], // rose-violet
+    ['#3b82f6', '#06b6d4'],
+    ['#7c3aed', '#ec4899'],
+    ['#22c55e', '#14b8a6'],
+    ['#f97316', '#f43f5e'],
+    ['#a855f7', '#6366f1'],
+    ['#eab308', '#f97316'],
+    ['#10b981', '#3b82f6'],
+    ['#ef4444', '#fb7185'],
+    ['#0ea5e9', '#6366f1'],
+    ['#f43f5e', '#8b5cf6'],
   ];
 
   constructor(
@@ -88,12 +81,9 @@ export class ChatsComponent implements OnInit, OnDestroy {
     return (this.searchText || '').trim().length > 0;
   }
 
-  // ✅ stable filtering
   private scheduleFilter() {
     clearTimeout(this._filterTimer);
-    this._filterTimer = setTimeout(() => {
-      this.applyFilter();
-    }, 50);
+    this._filterTimer = setTimeout(() => this.applyFilter(), 50);
   }
 
   ngOnInit(): void {
@@ -101,40 +91,34 @@ export class ChatsComponent implements OnInit, OnDestroy {
 
     this.unsubAuth = onAuthStateChanged(this.auth, (u) => {
       if (!u) return;
-
       this.myUid = u.uid;
 
-      // ✅ my user doc for blocked list
       this.meSub = this.userService.getUser(this.myUid).subscribe((me: any) => {
         this.blockedUids = me?.blocked || [];
         this.scheduleFilter();
       });
 
-      // ✅ users list
       this.usersSub = this.userService.getUsers().subscribe((users: AppUser[]) => {
         const safeUsers = users || [];
 
         this.usersMap.clear();
         safeUsers.forEach((us) => this.usersMap.set(us.uid, us));
 
-        // ✅ store all users except me + blocked
-        this.allUsers = safeUsers.filter((u) => {
-          if (!u?.uid) return false;
-          if (u.uid === this.myUid) return false;
-          if ((this.blockedUids || []).includes(u.uid)) return false;
+        this.allUsers = safeUsers.filter((x) => {
+          if (!x?.uid) return false;
+          if (x.uid === this.myUid) return false;
+          if ((this.blockedUids || []).includes(x.uid)) return false;
           return true;
         });
 
         this.scheduleFilter();
       });
 
-      // ✅ DM Chats
       this.unsubDm = this.chatService.listenMyChats(this.myUid, (data: any[]) => {
         this.dmChats = (data || []).map((c) => ({ ...c, type: 'dm' as ListItemType }));
         this.scheduleFilter();
       });
 
-      // ✅ Rooms (Groups / Channels)
       this.unsubRooms = this.roomService.listenMyRooms(this.myUid, (data: any[]) => {
         this.rooms = (data || []).map((r) => ({
           ...r,
@@ -143,7 +127,6 @@ export class ChatsComponent implements OnInit, OnDestroy {
         this.scheduleFilter();
       });
 
-      // ✅ open from url (?uid=xxx or ?room=xxx)
       this.qpSub = this.route.queryParamMap.subscribe(async (p) => {
         const uid = p.get('uid');
         const roomId = p.get('room');
@@ -171,11 +154,33 @@ export class ChatsComponent implements OnInit, OnDestroy {
   @HostListener('window:resize')
   checkMobile() {
     this.isMobile = window.innerWidth <= 900;
+
+    // ✅ when back to desktop always show list
     if (!this.isMobile) this.mobileListOpen = true;
+
+    // ✅ ensure not stuck in empty view
+    if (this.isMobile && (this.selectedRoomId || this.selectedUser)) {
+      this.mobileListOpen = false;
+    }
   }
 
   backToList() {
     this.mobileListOpen = true;
+    this.closeAll();
+  }
+
+  // ✅ show mobile top header only when in chat view
+  showMobileChatHeader(): boolean {
+    return this.isMobile && !this.mobileListOpen && (!!this.selectedUser || !!this.selectedRoomId);
+  }
+
+  getMobileChatTitle(): string {
+    if (this.selectedUser) return this.selectedUser?.name || this.selectedUser?.email || 'Chat';
+    if (this.selectedRoomId) {
+      const r = this.filteredRooms.find((x) => x.id === this.selectedRoomId);
+      return this.getRoomTitle(r || { id: this.selectedRoomId, type: 'group' });
+    }
+    return 'Chat';
   }
 
   // ======================
@@ -193,7 +198,6 @@ export class ChatsComponent implements OnInit, OnDestroy {
   openMenu(event: MouseEvent, item: any) {
     event.stopPropagation();
 
-    // toggle same
     if (this.menuRoomId === item.id) {
       this.closeAll();
       return;
@@ -203,15 +207,20 @@ export class ChatsComponent implements OnInit, OnDestroy {
     this.menuItem = item;
 
     const padding = 10;
-    const menuWidth = 200;
-    const menuHeight = 210;
+    const menuWidth = 240;
+    const menuHeight = 220;
 
     let x = event.clientX - menuWidth;
     let y = event.clientY + 10;
 
-    // keep inside screen
     x = Math.max(padding, Math.min(x, window.innerWidth - menuWidth - padding));
     y = Math.max(padding, Math.min(y, window.innerHeight - menuHeight - padding));
+
+    // ✅ mobile better position
+    if (this.isMobile) {
+      x = padding;
+      y = Math.max(padding, y);
+    }
 
     this.menuPos = { x, y };
   }
@@ -395,18 +404,12 @@ export class ChatsComponent implements OnInit, OnDestroy {
     this.closeAll();
   }
 
-  // ✅ who can delete forever
   canDeleteRoom(item: any) {
     if (!item) return false;
-
-    // dm => allow
     if (item?.type === 'dm') return true;
-
-    // group/channel only owner
     return item?.ownerId === this.myUid;
   }
 
-  // ✅ delete for me only
   async deleteChatForMe(item: any) {
     if (!item) return;
 
@@ -429,7 +432,6 @@ export class ChatsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ✅ delete forever
   async deleteChatForever(item: any) {
     if (!item) return;
 
@@ -449,10 +451,6 @@ export class ChatsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ======================================================
-  // ✅ UNIQUE AVATAR COLORS (Telegram style)
-  // ======================================================
-
   // ✅ stable color from seed
   getAvatarColors(seed: string) {
     const safe = (seed || 'x').toString();
@@ -467,7 +465,6 @@ export class ChatsComponent implements OnInit, OnDestroy {
     return { c1: this.avatarGradients[idx][0], c2: this.avatarGradients[idx][1] };
   }
 
-  // ✅ for chats list avatar
   getAvatarStyleForRoom(r: any) {
     const seed =
       r?.type === 'dm'
@@ -476,20 +473,13 @@ export class ChatsComponent implements OnInit, OnDestroy {
 
     const { c1, c2 } = this.getAvatarColors(seed);
 
-    return {
-      '--av1': c1,
-      '--av2': c2,
-    };
+    return { '--av1': c1, '--av2': c2 };
   }
 
-  // ✅ for people list avatar
   getAvatarStyleForUser(u: AppUser) {
     const seed = u?.uid || u?.email || u?.name || 'user';
     const { c1, c2 } = this.getAvatarColors(seed);
 
-    return {
-      '--av1': c1,
-      '--av2': c2,
-    };
+    return { '--av1': c1, '--av2': c2 };
   }
 }

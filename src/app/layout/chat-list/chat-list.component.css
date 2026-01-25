@@ -1,7 +1,7 @@
-/* ==========================================
+/*   =================
    ✅ Chatloop - Chat List (Premium)
    file: chat-list.component.css
-========================================== */
+  ================= */
 
 :host{ display:block; height:100%; }
 *{ box-sizing:border-box; }
@@ -12,7 +12,7 @@
   overflow-y:auto;
   padding: 16px 16px 24px;
 
-  background:#050816;
+  background:#1b3dd5;
   color: rgba(255,255,255,0.92);
 }
 
@@ -24,9 +24,9 @@
 }
 .chatListShell::-webkit-scrollbar-track{ background:transparent; }
 
-/* ==========================================
+/*   =================
    🌌 Background
-========================================== */
+  ================= */
 .bg{
   position:fixed;
   inset:0;
@@ -60,9 +60,9 @@
   50%{ transform: translate(45px,-26px); }
 }
 
-/* ==========================================
+/*   =================
    ✅ Header
-========================================== */
+  ================= */
 .listHeader{
   position:relative;
   z-index:2;
@@ -132,9 +132,9 @@
   filter: brightness(1.06);
 }
 
-/* ==========================================
+/*   =================
    ✅ Loading
-========================================== */
+  ================= */
 .loadingBox{
   position:relative;
   z-index:2;
@@ -165,9 +165,9 @@
 @keyframes spin{ to{ transform: rotate(360deg);} }
 .loadingText{ opacity:0.9; }
 
-/* ==========================================
+/*   =================
    ✅ Empty state
-========================================== */
+  ================= */
 .empty{
   position:relative;
   z-index:2;
@@ -228,9 +228,9 @@
   opacity: 0.70;
 }
 
-/* ==========================================
+/*   =================
    ✅ Chat list
-========================================== */
+  ================= */
 .chatList{
   position:relative;
   z-index:2;
@@ -386,9 +386,9 @@
   .orb{ animation:none !important; }
   .chatItem, .addBtn{ transition:none !important; }
 }
-/* ==========================================
+/*   =================
    ✅ DELETE BUTTON (Telegram-style)
-========================================== */
+  ================= */
 
 .chatItem{
   position: relative;
@@ -436,3 +436,69 @@
   color: #ffb4b4;
   transform: scale(1.06);
 }
+.delBtn{
+  margin-left: 10px;
+
+  border: 0;
+  outline: 0;
+  cursor: pointer;
+
+  width: 38px;
+  height: 38px;
+  border-radius: 14px;
+
+  display: grid;
+  place-items: center;
+
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.85);
+
+  transition: 0.2s ease;
+}
+
+.delBtn:hover{
+  background: rgba(239, 68, 68, 0.16);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #ffb4b4;
+  transform: scale(1.06);
+}
+
+.deleteAllBtn{
+  border: 0;
+  outline: 0;
+  cursor: pointer;
+
+  padding: 10px 12px;
+  border-radius: 14px;
+
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: rgba(255,255,255,0.92);
+  font-weight: 700;
+
+  transition: 0.2s ease;
+}
+
+.deleteAllBtn:hover{
+  transform: scale(1.05);
+  background: rgba(239, 68, 68, 0.22);
+}
+/* ===============================
+   📱 MOBILE TOUCH FIX
+   =============================== */
+
+@media (max-width: 900px) {
+  .chatListShell {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* always show delete button on mobile */
+  .chatItem .delBtn {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+}
+

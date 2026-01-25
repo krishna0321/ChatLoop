@@ -1,5 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  Input,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Auth, onAuthStateChanged } from '@angular/fire/auth';
 
@@ -55,6 +63,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
   // ✅ users map
   usersMap = new Map<string, any>();
 
+  // ✅ mobile keyboard fix
+  keyboardOpen = false;
+
   private unsubAuth: any;
   private unsubRoom: any;
   private unsubMsgs: any;
@@ -90,9 +101,25 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     if (this.usersSub) this.usersSub.unsubscribe?.();
   }
 
-  // ============================
+
+  // ✅ Keyboard support (Mobile)
+  @HostListener('window:focusin', ['$event'])
+  onFocusIn(e: any) {
+    const tag = (e?.target?.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea') {
+      this.keyboardOpen = true;
+      setTimeout(() => this.scrollToBottom(), 120);
+    }
+  }
+
+  @HostListener('window:focusout')
+  onFocusOut() {
+    this.keyboardOpen = false;
+  }
+
+  //   ===
   // ✅ LISTEN ROOM
-  // ============================
+
   private listenRoom() {
     this.unsubRoom = this.roomService.listenRoom(this.roomId, (r) => {
       this.room = r;
@@ -126,34 +153,35 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     } catch {}
   }
 
-  // ============================
+  //   ===
   // ✅ UI
-  // ============================
+  //   ===
   closeAllMenus() {
     this.showHeaderMenu = false;
     this.showAttachMenu = false;
 
     this.menuMessageId = null;
     this.menuMsg = null;
-
-    // keep editing only if want, else close it too
-    // this.editingId = null;
-    // this.editingText = '';
   }
 
   toggleHeaderMenu(event: MouseEvent) {
     event.stopPropagation();
     this.showHeaderMenu = !this.showHeaderMenu;
+
+    // close others
     this.menuMessageId = null;
     this.showAttachMenu = false;
   }
 
-  // ============================
+  //   ===
   // ✅ Attach Menu
-  // ============================
+  //   ===
   toggleAttachMenu(e: MouseEvent) {
     e.stopPropagation();
+    if (this.sendingFile) return;
+
     this.showAttachMenu = !this.showAttachMenu;
+
     this.showHeaderMenu = false;
     this.menuMessageId = null;
   }
@@ -182,7 +210,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     this.fileError = '';
 
-    // ✅ strict validation
     if (this.attachType === 'image' && !(file.type || '').startsWith('image/')) {
       this.fileError = 'Only image allowed';
       input.value = '';
@@ -191,7 +218,18 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     if (this.attachType === 'document') {
       const ext = file.name.split('.').pop()?.toLowerCase() || '';
-      const allowed = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'zip', 'rar', 'txt'];
+      const allowed = [
+        'pdf',
+        'doc',
+        'docx',
+        'xls',
+        'xlsx',
+        'ppt',
+        'pptx',
+        'zip',
+        'rar',
+        'txt',
+      ];
 
       if (!allowed.includes(ext)) {
         this.fileError = 'Only document allowed';
@@ -202,6 +240,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     this.selectedFile = file;
     input.value = '';
+
+    // ✅ scroll so preview visible
+    setTimeout(() => this.scrollToBottom(), 80);
   }
 
   clearSelectedFile() {
@@ -209,9 +250,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.fileError = '';
   }
 
-  // ============================
+  //   ===
   // ✅ MENU actions (Mute / Pin)
-  // ============================
+  //   ===
   async toggleMute() {
     if (!this.roomId || !this.myUid) return;
     await this.roomService.muteRoom(this.roomId, this.myUid, !this.isMuted);
@@ -224,9 +265,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.showHeaderMenu = false;
   }
 
-  // ============================
+  //   ===
   // ✅ GROUP actions
-  // ============================
+  //   ===
   async leaveGroup() {
     if (!this.roomId || !this.myUid) return;
     const ok = confirm('Leave this group?');
@@ -250,9 +291,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.showHeaderMenu = false;
   }
 
-  // ============================
+  //   ===
   // ✅ message menu
-  // ============================
+  //   ===
   openMsgMenu(event: MouseEvent, msg: any) {
     event.stopPropagation();
 
@@ -260,14 +301,21 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.menuMsg = msg;
 
     const pad = 10;
-    const menuW = 190;
-    const menuH = 130;
+    const menuW = 200;
+    const menuH = 132;
 
     let x = event.clientX;
     let y = event.clientY;
 
     x = Math.max(pad, Math.min(x, window.innerWidth - menuW - pad));
     y = Math.max(pad, Math.min(y, window.innerHeight - menuH - pad));
+
+    // ✅ on mobile: always show menu centered-bottom
+    if (window.innerWidth <= 900) {
+      x = Math.max(pad, (window.innerWidth - menuW) / 2);
+      y = window.innerHeight - menuH - 110;
+      y = Math.max(pad, y);
+    }
 
     this.menuX = x;
     this.menuY = y;
@@ -286,6 +334,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     this.editingId = this.menuMsg.id;
     this.editingText = this.menuMsg.text || '';
     this.menuMessageId = null;
+
+    setTimeout(() => this.scrollToBottom(), 80);
   }
 
   async clickDelete() {
@@ -315,24 +365,23 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     if (!v) return;
 
     await this.roomService.editRoomMessage(this.roomId, this.editingId, v);
-
     this.cancelEdit();
   }
 
-  // ============================
+  //   ===
   // ✅ send message
-  // ============================
+  //   ===
   async send() {
     if (!this.roomId || !this.myUid) return;
 
-    // ✅ if file selected: upload and send file message
+    // ✅ file message
     if (this.selectedFile) {
       try {
         this.sendingFile = true;
         this.fileError = '';
 
         const type = this.attachType === 'image' ? 'image' : 'file';
-        const caption = (this.text || '').trim(); // caption for image
+        const caption = (this.text || '').trim();
 
         await this.roomService.sendRoomFileMessage(
           this.roomId,
@@ -344,7 +393,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
         this.selectedFile = null;
         this.text = '';
-        setTimeout(() => this.scrollToBottom(), 50);
+        setTimeout(() => this.scrollToBottom(), 70);
       } catch (err: any) {
         console.error(err);
         this.fileError = err?.message || 'Upload failed';
@@ -354,7 +403,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // ✅ normal text message
+    // ✅ text message
     const t = (this.text || '').trim();
     if (!t) return;
 
@@ -367,9 +416,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     setTimeout(() => this.scrollToBottom(), 30);
   }
 
-  // ============================
+  //   ===
   // ✅ helpers
-  // ============================
+  //   ===
   getSenderName(uid: string) {
     const u = this.usersMap.get(uid);
     return u?.name || u?.email || 'User';
@@ -391,3 +440,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     }
   }
 }
+function closeAllMenus() {
+  throw new Error('Function not implemented.');
+}
+

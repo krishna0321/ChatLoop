@@ -1,0 +1,95 @@
+<div class="page">
+  <!-- ✅ HEADER -->
+  <div class="top">
+    <div>
+      <h1>Help Center</h1>
+      <p class="sub">
+        Chatloop FAQ & Support
+        <span class="count">{{ visibleCount }}/{{ totalCount }}</span>
+      </p>
+    </div>
+
+    <div class="actions">
+      <a routerLink="/app/about" class="btn ghost">About</a>
+      <a routerLink="/app/chats" class="btn">Back</a>
+    </div>
+  </div>
+
+  <!-- ✅ TOOLBAR -->
+  <div class="toolbar">
+    <div class="searchBox">
+      <span class="sIcon">🔎</span>
+
+      <input
+        class="search"
+        type="text"
+        [(ngModel)]="searchText"
+        placeholder="Search: login, group, theme..."
+      />
+
+      <button class="clear" *ngIf="searchText" (click)="clearSearch()" title="Clear">
+        ✖
+      </button>
+    </div>
+
+    <div class="toolBtns">
+      <button class="tbtn ghost" (click)="expandAll()">Expand</button>
+      <button class="tbtn ghost" (click)="collapseAll()">Collapse</button>
+    </div>
+  </div>
+
+  <!-- ✅ FILTER TAGS -->
+  <div class="tags">
+    <button
+      class="chip"
+      *ngFor="let t of tags"
+      [class.active]="activeTag === t.key"
+      (click)="setTag(t.key)"
+    >
+      <span class="chipIcon">{{ t.icon }}</span>
+      <span>{{ t.label }}</span>
+    </button>
+  </div>
+
+  <!-- ✅ LIST -->
+  <div class="list" *ngIf="filtered.length; else empty">
+    <div class="qa" *ngFor="let item of filtered">
+      <button class="q" (click)="toggle(item.id)">
+        <div class="qLeft">
+          <div class="qIcon">{{ item.icon }}</div>
+
+          <div class="qText">
+            <div class="qTitle">{{ item.q }}</div>
+            <div class="qMeta">
+              <span class="tag" [attr.data-tag]="item.tag">{{ item.tag }}</span>
+              <span class="hint">Click to open answer</span>
+            </div>
+          </div>
+        </div>
+
+        <span class="chev" [class.open]="item.open">⌄</span>
+      </button>
+
+      <div class="aWrap" *ngIf="item.open">
+        <div class="a">{{ item.a }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ EMPTY -->
+  <ng-template #empty>
+    <div class="empty">
+      <div class="emoji">🥲</div>
+      <div class="title">No results found</div>
+      <div class="desc">Try another keyword or reset filters.</div>
+      <button class="tbtn" (click)="setTag('all'); clearSearch()">Reset</button>
+    </div>
+  </ng-template>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <a routerLink="/app/contact" class="link">Contact</a>
+    <a routerLink="/app/settings" class="link">Settings</a>
+    <a routerLink="/app/profile" class="link">Profile</a>
+  </div>
+</div>

@@ -3,7 +3,7 @@
 
     <!-- Header -->
     <div class="head">
-      <div>
+      <div class="left">
         <h2>➕ Create Room</h2>
         <p class="sub">Create Group / Channel like Telegram</p>
       </div>
@@ -35,13 +35,23 @@
     <!-- Form -->
     <div class="field">
       <label>Name</label>
-      <input [(ngModel)]="name" placeholder="Example: Anime Lovers" maxlength="30" />
+      <input
+        [(ngModel)]="name"
+        placeholder="Example: Anime Lovers"
+        maxlength="30"
+        inputmode="text"
+        autocomplete="off"
+      />
       <div class="help">{{ name.trim().length }}/30</div>
     </div>
 
     <div class="field">
       <label>Description (optional)</label>
-      <textarea [(ngModel)]="description" placeholder="Short description..." maxlength="120"></textarea>
+      <textarea
+        [(ngModel)]="description"
+        placeholder="Short description..."
+        maxlength="120"
+      ></textarea>
       <div class="help">{{ description.trim().length }}/120</div>
     </div>
 

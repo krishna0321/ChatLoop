@@ -24,7 +24,6 @@ export class UsersComponent implements OnInit, OnDestroy {
   filtered: AppUser[] = [];
 
   selectedUser: AppUser | null = null;
-  editUser: AppUser | null = null;
 
   private unsubAuth: any;
   private usersSub: any;
@@ -49,7 +48,10 @@ export class UsersComponent implements OnInit, OnDestroy {
         next: (list) => {
           // ✅ show everyone except me
           this.users = (list || []).filter((x) => x.uid !== this.myUid);
+
+          // ✅ default filtered list
           this.onSearch();
+
           this.loading = false;
         },
         error: (err) => {
@@ -83,70 +85,26 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   openDetails(u: AppUser) {
     this.selectedUser = u;
-    this.editUser = null;
   }
 
   closeDetails() {
     this.selectedUser = null;
   }
 
-  openEdit(u: AppUser) {
-    // ✅ clone object (so UI updates only on save)
-    this.editUser = { ...u };
-    this.selectedUser = null;
-  }
-
-  closeEdit() {
-    this.editUser = null;
-  }
-
-  async saveEdit() {
-    if (!this.editUser?.uid) return;
-
-    try {
-      await this.userService.updateUser(this.editUser.uid, {
-        name: this.editUser.name || '',
-        email: this.editUser.email || '',
-        phone: this.editUser.phone || '',
-      });
-
-      this.editUser = null;
-      alert('✅ User updated');
-    } catch (err) {
-      console.error('Update user error:', err);
-      alert('❌ Failed to update user');
-    }
-  }
-
-  async deleteUser(u: AppUser) {
-    if (!u?.uid) return;
-
-    const ok = confirm(`Delete user: ${u.name || u.email || u.uid} ?`);
-    if (!ok) return;
-
-    try {
-      await this.userService.deleteUser(u.uid);
-
-      // ✅ close panels if needed
-      if (this.selectedUser?.uid === u.uid) this.selectedUser = null;
-      if (this.editUser?.uid === u.uid) this.editUser = null;
-
-      alert('🗑 User deleted');
-    } catch (err) {
-      console.error('Delete user error:', err);
-      alert('❌ Failed to delete user');
-    }
-  }
-
   async startChat(u: AppUser) {
     if (!this.myUid || !u?.uid) return;
 
-    const chatId = this.chatService.getChatId(this.myUid, u.uid);
+    try {
+      const chatId = this.chatService.getChatId(this.myUid, u.uid);
 
-    await this.chatService.ensureChat(chatId, [this.myUid, u.uid]);
+      await this.chatService.ensureChat(chatId, [this.myUid, u.uid]);
 
-    await this.router.navigate(['/app/chats'], {
-      queryParams: { uid: u.uid },
-    });
+      await this.router.navigate(['/app/chats'], {
+        queryParams: { uid: u.uid },
+      });
+    } catch (err) {
+      console.error('Start chat error:', err);
+      alert('❌ Failed to start chat');
+    }
   }
 }

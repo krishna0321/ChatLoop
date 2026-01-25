@@ -1,0 +1,105 @@
+<nav class="nav" aria-label="Chatloop Navigation">
+
+  <!-- glow background -->
+  <div class="navGlow"></div>
+
+  <!-- BRAND -->
+  <div class="brand" title="Chatloop">
+    <div class="logo">
+      <span class="bub">🫧</span>
+    </div>
+  </div>
+
+  <!-- LINKS -->
+  <div class="links">
+
+    <a
+      class="item"
+      routerLink="/app/chats"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      title="Chats"
+      data-tip="Chats"
+    >
+      <span class="ico">💬</span>
+    </a>
+
+    <a
+      class="item"
+      routerLink="/app/users"
+      routerLinkActive="active"
+      title="Users"
+      data-tip="Users"
+    >
+      <span class="ico">👥</span>
+    </a>
+
+    <a
+      class="item"
+      routerLink="/app/contact"
+      routerLinkActive="active"
+      title="Contacts"
+      data-tip="Contacts"
+    >
+      <span class="ico">📞</span>
+    </a>
+
+    <!-- ✅ NEW: ABOUT -->
+    <a
+      class="item"
+      routerLink="/app/about"
+      routerLinkActive="active"
+      title="About"
+      data-tip="About"
+    >
+      <span class="ico">ℹ️</span>
+    </a>
+
+    <a
+      class="item"
+      routerLink="/app/profile"
+      routerLinkActive="active"
+      title="Profile"
+      data-tip="Profile"
+    >
+      <span class="ico">👤</span>
+    </a>
+
+    <a
+      class="item"
+      routerLink="/app/settings"
+      routerLinkActive="active"
+      title="Settings"
+      data-tip="Settings"
+    >
+      <span class="ico">⚙️</span>
+    </a>
+
+    <!-- CREATE -->
+    <a
+      class="item create"
+      routerLink="/app/group/create"
+      routerLinkActive="active"
+      title="Create"
+      data-tip="Create"
+    >
+      <span class="ico">➕</span>
+      <span class="pulse"></span>
+    </a>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <button
+      class="logout"
+      (click)="logout()"
+      [disabled]="loading"
+      title="Logout"
+      data-tip="Logout"
+    >
+      <span class="ico">{{ loading ? '⏳' : '🚪' }}</span>
+    </button>
+  </div>
+
+</nav>

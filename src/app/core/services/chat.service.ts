@@ -48,55 +48,55 @@ export interface ChatMessage {
 export class ChatService {
   constructor(private firestore: Firestore, private storage: Storage) {}
 
-  // ✅ stable chatId for 2 users
-  getChatId(uid1: string, uid2: string): string {
-    return [uid1, uid2].sort().join('_');
-  }
+// ✅ stable chatId for 2 users
+getChatId(uid1: string, uid2: string): string {
+  return [uid1, uid2].sort().join('_');
+}
 
-  // ✅ Create chat if missing + patch old chats
-  async ensureChat(chatId: string, uids: string[]) {
-    const chatDoc = doc(this.firestore, `chats/${chatId}`);
-    const snap = await getDoc(chatDoc);
+// ✅ Create chat if missing + patch old chats
+async ensureChat(chatId: string, uids: string[]) {
+  const chatDoc = doc(this.firestore, `chats/${chatId}`);
+  const snap = await getDoc(chatDoc);
 
-    if (!snap.exists()) {
-      await setDoc(chatDoc, {
-        users: uids,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+  if (!snap.exists()) {
+    await setDoc(chatDoc, {
+      users: uids,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
 
-        lastMessage: '',
-        lastSenderId: '',
-        lastMessageAt: serverTimestamp(),
+      lastMessage: '',
+      lastSenderId: '',
+      lastMessageAt: serverTimestamp(),
 
-        unread: {
-          [uids[0]]: 0,
-          [uids[1]]: 0,
-        },
-
-        muted: {},
-        pinned: {},
-      });
-      return;
-    }
-
-    // ✅ patch old chats WITHOUT touching updatedAt
-    const data: any = snap.data();
-    const patch: any = {};
-
-    if (!data?.muted) patch.muted = {};
-    if (!data?.pinned) patch.pinned = {};
-    if (!data?.unread) {
-      patch.unread = {
+      unread: {
         [uids[0]]: 0,
         [uids[1]]: 0,
-      };
-    }
-    if (!data?.lastMessageAt) patch.lastMessageAt = serverTimestamp();
+      },
 
-    if (Object.keys(patch).length > 0) {
-      await updateDoc(chatDoc, patch);
-    }
+      muted: {},
+      pinned: {},
+    });
+    return;
   }
+
+  // ✅ patch old chats WITHOUT touching updatedAt
+  const data: any = snap.data();
+  const patch: any = {};
+
+  if (!data?.muted) patch.muted = {};
+  if (!data?.pinned) patch.pinned = {};
+  if (!data?.unread) {
+    patch.unread = {
+      [uids[0]]: 0,
+      [uids[1]]: 0,
+    };
+  }
+  if (!data?.lastMessageAt) patch.lastMessageAt = serverTimestamp();
+
+  if (Object.keys(patch).length > 0) {
+    await updateDoc(chatDoc, patch);
+  }
+}
 
   // ✅ realtime messages listener
   listenMessages(chatId: string, callback: (msgs: ChatMessage[]) => void) {

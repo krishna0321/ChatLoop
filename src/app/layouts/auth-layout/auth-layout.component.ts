@@ -22,12 +22,12 @@ import { RouterOutlet } from '@angular/router';
     </div>
   `,
   styles: [`
-/* =========================================================
+/*     =======
    ✅ Chatloop Auth Layout – ULTRA PREMIUM ✅ FIXED
    - Login / Register pages
    - Allows big login shell width (1080px+)
    - No squeezed UI issue
-========================================================= */
+    ======= */
 
 :host{
   display:block;
@@ -41,9 +41,9 @@ import { RouterOutlet } from '@angular/router';
   :host{ height:100vh; }
 }
 
-/* =========================================================
+/*     =======
    THEME FALLBACKS
-========================================================= */
+    ======= */
 :host{
   --theme: var(--app-theme, #7c3aed);
   --theme-2: var(--app-theme-2, #3b82f6);
@@ -53,9 +53,9 @@ import { RouterOutlet } from '@angular/router';
 
 *{ box-sizing:border-box; }
 
-/* =========================================================
+/*     =======
    ROOT SHELL
-========================================================= */
+    ======= */
 .authShell{
   position:relative;
   width:100%;
@@ -74,9 +74,9 @@ import { RouterOutlet } from '@angular/router';
   isolation:isolate;
 }
 
-/* =========================================================
+/*     =======
    🌌 BACKGROUND EFFECTS
-========================================================= */
+    ======= */
 .bg, .orb, .grain{ pointer-events:none; }
 
 .bg{
@@ -136,9 +136,9 @@ import { RouterOutlet } from '@angular/router';
   background-size: 180px 180px;
 }
 
-/* =========================================================
+/*     =======
    ✅ AUTH CONTAINER (FIXED HERE ✅)
-========================================================= */
+    ======= */
 .authInner{
   position:relative;
   z-index:2;

@@ -55,9 +55,9 @@ export class ContactComponent implements OnInit, OnDestroy {
     private router: Router
   ) {}
 
-  // =============================
+   
   // INIT
-  // =============================
+   
   ngOnInit() {
     onAuthStateChanged(this.auth, (u) => {
       if (!u) return;
@@ -80,9 +80,9 @@ export class ContactComponent implements OnInit, OnDestroy {
     });
   }
 
-  // =============================
+   
   // UI HELPERS
-  // =============================
+   
   showToast(msg: string, type: 'ok' | 'err' = 'ok') {
     this.toastMsg = msg;
     this.toastType = type;
@@ -105,9 +105,9 @@ export class ContactComponent implements OnInit, OnDestroy {
   }
 
 
-  // =============================
+   
   // ADD CONTACT
-  // =============================
+   
   openAdd() {
     this.showAdd = true;
     this.form = { name: '', phone: '' };
@@ -164,9 +164,9 @@ export class ContactComponent implements OnInit, OnDestroy {
     }
   }
 
-  // =============================
+   
   // OPEN CHAT (🔥 MAIN FIX)
-  // =============================
+   
   async openChatByUid(uid: string) {
     if (!this.myUid) {
       this.showToast('Loading user...', 'err');
@@ -201,9 +201,9 @@ export class ContactComponent implements OnInit, OnDestroy {
     }
   }
 
-  // =============================
+   
   // QR SCAN
-  // =============================
+   
   async openScanner() {
     this.showScanner = true;
     this.scannedUid = '';
@@ -268,9 +268,9 @@ export class ContactComponent implements OnInit, OnDestroy {
     await this.openChatByUid(this.scannedUid);
   }
 
-  // =============================
+   
   // DELETE
-  // =============================
+   
   async removeContact(c: Contact) {
     if (!confirm(`Delete ${c.name}?`)) return;
 
@@ -282,18 +282,18 @@ export class ContactComponent implements OnInit, OnDestroy {
     }
   }
    
-    // =============================
+     
 // ✅ CLOSE QR RESULT MODAL
-// =============================
+ 
 closeScanResult() {
   this.showScanResult = false;
   this.scannedUid = '';
   this.scannedUser = null;
 }
 
-// =============================
+ 
 // ✅ ADD FRIEND FROM QR SCAN
-// =============================
+ 
 async addFriendFromScan() {
   if (!this.myUid || !this.scannedUser) return;
 

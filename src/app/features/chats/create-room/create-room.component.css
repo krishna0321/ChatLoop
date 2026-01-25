@@ -1,18 +1,21 @@
-/* ==========================================
+/*   =================
    ✅ Chatloop - Create Room UI (Premium Theme)
    file: create-room.component.css
-========================================== */
+   ✅ Mobile Perfect Edition
+  ================= */
 
 :host{
   display:block;
   height:100%;
+  min-height:0;
 }
 
 *{ box-sizing:border-box; }
 
 /* ✅ page wrap */
 .wrap{
-  min-height:100%;
+  min-height: 100%;
+  min-height: 100dvh;
   padding: 26px 16px;
 
   display:grid;
@@ -24,6 +27,10 @@
     var(--bg, #050816);
 
   color: var(--text, rgba(255,255,255,0.92));
+
+  /* ✅ iPhone safe area */
+  padding-bottom: calc(26px + env(safe-area-inset-bottom));
+  padding-top: calc(26px + env(safe-area-inset-top));
 }
 
 /* ✅ card */
@@ -35,9 +42,13 @@
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.12);
   backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 
   box-shadow: 0 22px 60px rgba(0,0,0,0.55);
   animation: pop 0.22s ease;
+
+  /* ✅ prevent overflow on mobile */
+  overflow:hidden;
 }
 
 @keyframes pop{
@@ -45,9 +56,9 @@
   to{ opacity:1; transform: translateY(0) scale(1); }
 }
 
-/* ==========================================
+/*   =================
    ✅ HEADER
-========================================== */
+  ================= */
 .head{
   display:flex;
   justify-content: space-between;
@@ -57,6 +68,10 @@
   padding-bottom: 14px;
   border-bottom: 1px solid rgba(255,255,255,0.08);
   margin-bottom: 16px;
+}
+
+.head .left{
+  min-width:0;
 }
 
 .head h2{
@@ -97,9 +112,9 @@
   background: color-mix(in srgb, var(--theme) 12%, rgba(255,255,255,0.06));
 }
 
-/* ==========================================
+/*   =================
    ✅ TABS
-========================================== */
+  ================= */
 .tabs{
   display:flex;
   gap: 10px;
@@ -153,9 +168,9 @@
   opacity: 0.92;
 }
 
-/* ==========================================
+/*   =================
    ✅ FIELDS
-========================================== */
+  ================= */
 .field{
   margin-bottom: 14px;
 }
@@ -189,6 +204,7 @@
   resize: vertical;
 }
 
+/* ✅ placeholders */
 .field input::placeholder,
 .field textarea::placeholder{
   color: rgba(255,255,255,0.55);
@@ -208,9 +224,9 @@
   text-align:right;
 }
 
-/* ==========================================
+/*   =================
    ✅ PRIMARY BUTTON
-========================================== */
+  ================= */
 .primary{
   width:100%;
   margin-top: 10px;
@@ -242,9 +258,9 @@
   transform:none;
 }
 
-/* ==========================================
+/*   =================
    ✅ SUCCESS + ERROR MSG
-========================================== */
+  ================= */
 .ok,
 .err{
   margin: 12px 0 0;
@@ -269,19 +285,64 @@
   border: 1px solid rgba(255,87,87,0.22);
 }
 
-/* ==========================================
-   ✅ MOBILE
-========================================== */
+/*   =================
+   ✅ MOBILE (VERY IMPORTANT FIXES)
+  ================= */
 @media (max-width:520px){
+
+  .wrap{
+    padding: 18px 12px;
+    padding-bottom: calc(18px + env(safe-area-inset-bottom));
+    padding-top: calc(18px + env(safe-area-inset-top));
+    place-items: stretch;
+  }
+
   .card{
+    width: 100%;
     padding: 16px 14px 18px;
     border-radius: 20px;
   }
 
+  /* ✅ sticky header in mobile */
+  .head{
+    position: sticky;
+    top: 0;
+    z-index: 5;
+
+    background: rgba(8,12,26,0.55);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
+    padding-top: 10px;
+    margin-top: -6px;
+  }
+
   .head h2{ font-size: 17px; }
+
+  .tabs{
+    gap: 10px;
+  }
 
   .tabs button{
     padding: 13px 12px;
     border-radius: 16px;
+  }
+
+  /* ✅ iOS zoom prevention */
+  .field input,
+  .field textarea{
+    font-size: 16px;
+  }
+
+  /* textarea nicer */
+  .field textarea{
+    min-height: 120px;
+    resize: none; /* ✅ better on mobile */
+  }
+
+  .primary{
+    height: 52px;
+    border-radius: 16px;
+    font-size: 15px;
   }
 }

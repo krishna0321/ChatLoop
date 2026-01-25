@@ -1,10 +1,7 @@
-/* ==========================================
+/*   =================
    ✅ Chatloop - Chats Layout (ULTRA Premium UI)
    file: chats.component.css
-   - Telegram + Discord Glass UI
-   - Uses global theme vars from styles.css:
-     --theme, --theme-2, --bg, --text, --border
-========================================== */
+  ================= */
 
 :host{
   display:block;
@@ -14,7 +11,7 @@
 
 *{ box-sizing:border-box; }
 
-/* ✅ Local vars (NOT :root) */
+/* ✅ Local vars */
 :host{
   --panel: rgba(8,12,26,0.88);
   --panel2: rgba(10,14,30,0.90);
@@ -42,9 +39,7 @@
   color: var(--text, rgba(255,255,255,0.92));
 }
 
-/* ==========================================
-   🌌 Background (More premium)
-========================================== */
+/* 🌌 Background */
 .bg{
   position:absolute;
   inset:0;
@@ -101,9 +96,7 @@
   50%{ transform: translate(-20px,-22px); }
 }
 
-/* ==========================================
-   ✅ Sidebar
-========================================== */
+/* ✅ Sidebar */
 .sidebar{
   position:relative;
   z-index:5;
@@ -114,6 +107,7 @@
   border-right: 1px solid rgba(255,255,255,0.08);
   background: linear-gradient(180deg, rgba(8,12,26,0.92), rgba(8,12,26,0.82));
   backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 
   display:flex;
   flex-direction: column;
@@ -122,7 +116,6 @@
 .top{
   padding: 16px 16px 14px;
   border-bottom: 1px solid rgba(255,255,255,0.08);
-
   background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent);
 }
 
@@ -208,23 +201,13 @@
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme) 18%, transparent);
 }
 
-/* ==========================================
-   ✅ Sidebar List
-========================================== */
+/* Sidebar List */
 .list{
   flex: 1;
   min-height:0;
   overflow-y:auto;
   padding: 10px 10px 14px;
 }
-
-.list::-webkit-scrollbar{ width:10px; }
-.list::-webkit-scrollbar-thumb{
-  background: rgba(255,255,255,0.12);
-  border-radius:999px;
-}
-.list::-webkit-scrollbar-thumb:hover{ background: rgba(255,255,255,0.18); }
-.list::-webkit-scrollbar-track{ background: transparent; }
 
 .section-title{
   padding: 10px 10px 6px;
@@ -240,9 +223,6 @@
   background: rgba(255,255,255,0.08);
 }
 
-/* ==========================================
-   ✅ Chat item
-========================================== */
 .item{
   position:relative;
   display:flex;
@@ -271,7 +251,6 @@
   box-shadow: 0 18px 46px rgba(0,0,0,0.40);
 }
 
-/* ✅ Active uses avatar colors too */
 .item.active{
   background: linear-gradient(135deg,
     color-mix(in srgb, var(--av1, var(--theme)) 70%, transparent),
@@ -281,7 +260,6 @@
   box-shadow: 0 22px 55px rgba(0,0,0,0.42);
 }
 
-/* ✅ avatar = UNIQUE per user/room */
 .item .avatar{
   width:48px;
   height:48px;
@@ -300,11 +278,6 @@
     inset 0 0 0 1px rgba(0,0,0,0.18);
 }
 
-.item.active .avatar{
-  border-color: rgba(255,255,255,0.22);
-}
-
-/* info */
 .item .info{ flex:1; min-width:0; }
 
 .item .row{
@@ -356,7 +329,6 @@
   filter: drop-shadow(0 10px 18px rgba(0,0,0,0.45));
 }
 
-/* unread badge */
 .badge{
   min-width: 24px;
   height: 24px;
@@ -379,9 +351,6 @@
   box-shadow: 0 14px 30px rgba(0,0,0,0.38);
 }
 
-.item.active .badge{ background: rgba(0,0,0,0.25); }
-
-/* more button */
 .more{
   position:absolute;
   top: 12px;
@@ -409,13 +378,6 @@
   transform: translateY(0) scale(1);
 }
 
-.more:hover{
-  border-color: color-mix(in srgb, var(--theme) 42%, transparent);
-  background: color-mix(in srgb, var(--theme) 14%, rgba(0,0,0,0.14));
-  box-shadow: 0 14px 30px rgba(0,0,0,0.40);
-}
-
-/* empty */
 .emptyLeft{
   margin: 12px 8px;
   padding: 14px;
@@ -430,9 +392,7 @@
   opacity: .8;
 }
 
-/* ==========================================
-   ✅ People list
-========================================== */
+/* People */
 .people-list{ margin-top: 6px; }
 
 .chat-item{
@@ -453,13 +413,6 @@
   transition: .2s ease;
 }
 
-.chat-item:hover{
-  transform: translateY(-2px);
-  border-color: rgba(255,255,255,0.15);
-  background: linear-gradient(180deg, rgba(255,255,255,0.065), rgba(255,255,255,0.03));
-  box-shadow: 0 18px 46px rgba(0,0,0,0.35);
-}
-
 .avatar.small{
   width: 42px !important;
   height: 42px !important;
@@ -472,24 +425,6 @@
   cursor:pointer;
 }
 
-.meta .title{
-  font-weight: 1000;
-  font-size: 14px;
-  white-space: nowrap;
-  overflow:hidden;
-  text-overflow: ellipsis;
-}
-
-.meta .sub{
-  margin-top: 4px;
-  font-size: 12px;
-  opacity: .72;
-  white-space: nowrap;
-  overflow:hidden;
-  text-overflow: ellipsis;
-}
-
-/* pill btn */
 .pillBtn{
   height: 36px;
   padding: 0 14px;
@@ -506,12 +441,7 @@
   transition: .2s ease;
 }
 
-.pillBtn:hover{ transform: translateY(-2px); }
-.pillBtn:active{ transform: translateY(0px); }
-
-/* ==========================================
-   ✅ Content area
-========================================== */
+/* Content */
 .content{
   position:relative;
   z-index:5;
@@ -531,30 +461,15 @@
   overflow:hidden;
 }
 
-/* empty right */
-.empty{
-  flex:1;
-  display:grid;
-  place-items:center;
-  text-align:center;
-  padding: 20px;
+/* ✅ Mobile header like Telegram */
+.mobileHeader{
+  display:none;
 }
 
-.iconBig{
-  font-size: 46px;
-  margin-bottom: 10px;
-  filter: drop-shadow(0 30px 60px rgba(0,0,0,0.55));
-}
-
-.t1{ font-size: 18px; font-weight: 1000; }
-.t2{ margin-top: 6px; font-size: 13px; opacity: .70; }
-
-/* ==========================================
-   ✅ FIXED MENU
-========================================== */
+/* Fixed Menu */
 .fixedMenu{
   position: fixed !important;
-  width: 230px;
+  width: 240px;
   z-index: 99999;
 
   padding: 10px;
@@ -566,94 +481,12 @@
   );
   border: 1px solid rgba(255,255,255,0.13);
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 
-  box-shadow:
-    0 25px 70px rgba(0,0,0,0.62),
-    inset 0 0 0 1px rgba(255,255,255,0.05);
-
-  animation: menuPop .18s ease both;
+  box-shadow: 0 25px 70px rgba(0,0,0,0.62);
 }
 
-@keyframes menuPop{
-  from { transform: translateY(-10px) scale(0.985); opacity: 0; }
-  to   { transform: translateY(0) scale(1); opacity: 1; }
-}
-
-.menuDivider{
-  height: 1px;
-  margin: 8px 6px;
-  background: rgba(255,255,255,0.10);
-  border-radius: 999px;
-}
-
-.fixedMenu button{
-  width:100%;
-  display:flex;
-  align-items:center;
-  gap: 10px;
-
-  text-align:left;
-  border: 0;
-  cursor:pointer;
-
-  padding: 10px 12px;
-  border-radius: 14px;
-
-  background: transparent;
-  color: rgba(255,255,255,0.92);
-
-  font-size: 13px;
-  font-weight: 1000;
-  letter-spacing: .2px;
-
-  transition: 0.18s ease;
-}
-
-.fixedMenu button:hover{
-  background: rgba(255,255,255,0.07);
-}
-
-.fixedMenu button.danger{
-  color: rgba(255,210,210,0.95);
-  background: rgba(239,68,68,0.06);
-  border: 1px solid rgba(239,68,68,0.18);
-}
-
-.fixedMenu button.danger:hover{
-  background: rgba(239,68,68,0.16);
-  border-color: rgba(239,68,68,0.30);
-}
-
-.fixedMenu button.danger2{
-  color: #ff9c9c;
-  font-weight: 1000;
-
-  background: linear-gradient(135deg,
-    rgba(239,68,68,0.22),
-    rgba(239,68,68,0.08)
-  );
-  border: 1px solid rgba(239,68,68,0.25);
-}
-
-.fixedMenu button.danger2:hover{
-  background: linear-gradient(135deg,
-    rgba(239,68,68,0.34),
-    rgba(239,68,68,0.12)
-  );
-  border-color: rgba(239,68,68,0.35);
-  animation: dangerShake .18s ease;
-}
-
-@keyframes dangerShake{
-  0%{ transform: translateX(0); }
-  35%{ transform: translateX(-2px); }
-  70%{ transform: translateX(2px); }
-  100%{ transform: translateX(0); }
-}
-
-/* ==========================================
-   ✅ Mobile responsive
-========================================== */
+/* ✅ Mobile responsive */
 @media (max-width:900px){
   .layout{ grid-template-columns: 1fr; }
 
@@ -673,5 +506,50 @@
     transform: translateX(-105%);
   }
 
-  .content{ width:100%; }
+  .content{
+    width:100%;
+    height:100%;
+  }
+
+  /* ✅ Show mobile header only in chat view */
+  .mobileHeader{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    height: 56px;
+
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.10);
+
+    background: rgba(8,12,26,0.72);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .backBtn{
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06);
+
+    color: white;
+    font-size: 18px;
+    font-weight: 1000;
+
+    cursor:pointer;
+  }
+
+  .mobileTitle{
+    font-weight: 1000;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
+  }
 }

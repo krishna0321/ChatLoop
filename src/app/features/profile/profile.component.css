@@ -1,44 +1,13 @@
-/* =========================================================
-   ✅ Chatloop Profile – ULTRA PREMIUM v2
-   file: profile.component.css
-   - smoother glass
-   - better responsive
-   - premium telegram style
-========================================================= */
-
 :host{
   display:block;
   width:100%;
   height:100%;
   min-height:0;
-
-  /* ✅ GLOBAL THEME SUPPORT */
-  --theme: var(--app-theme, #7c3aed);
-  --theme-2: var(--app-theme-2, #3b82f6);
-
-  --bg: var(--app-bg, #050816);
-  --text: rgba(255,255,255,0.92);
-  --muted: rgba(255,255,255,0.72);
-  --border: rgba(255,255,255,0.10);
-
-  --glass: rgba(255,255,255,0.05);
-  --glass2: rgba(255,255,255,0.08);
-
-  --shadow: 0 22px 70px rgba(0,0,0,0.48);
-  --shadowSoft: 0 12px 35px rgba(0,0,0,0.35);
-
-  --r: 24px;
-  --r2: 18px;
-
-  --t: .18s ease;
 }
-
 
 *{ box-sizing:border-box; }
 
-/* =========================================================
-   ✅ Page wrapper
-========================================================= */
+/* ✅ Page wrapper */
 .page{
   position:relative;
   height:100%;
@@ -52,17 +21,11 @@
   isolation:isolate;
 }
 
-/* scrollbar */
 .page::-webkit-scrollbar{ width:10px; }
-.page::-webkit-scrollbar-thumb{
-  background: rgba(255,255,255,0.12);
-  border-radius:999px;
-}
+.page::-webkit-scrollbar-thumb{ background: rgba(255,255,255,0.12); border-radius:999px; }
 .page::-webkit-scrollbar-track{ background: transparent; }
 
-/* =========================================================
-   🌌 Background (PERFORMANCE SAFE)
-========================================================= */
+/* 🌌 Background */
 .bg{
   position:fixed;
   inset:0;
@@ -70,10 +33,9 @@
   z-index:0;
 
   background:
-    radial-gradient(900px 650px at 14% 10%, rgba(124,58,237,0.20), transparent 55%),
-    radial-gradient(900px 650px at 88% 85%, rgba(59,130,246,0.16), transparent 62%),
+    radial-gradient(900px 650px at 14% 10%, color-mix(in srgb, var(--theme) 22%, transparent), transparent 55%),
+    radial-gradient(900px 650px at 88% 85%, color-mix(in srgb, var(--theme-2) 18%, transparent), transparent 62%),
     radial-gradient(800px 550px at 50% 105%, rgba(34,211,238,0.10), transparent 62%);
-
   filter: blur(90px);
   opacity: .95;
 }
@@ -89,7 +51,6 @@
   z-index:0;
   animation: floatOrb 11s ease-in-out infinite;
 }
-
 .orb1{ top:-300px; left:-280px; background: var(--theme); }
 .orb2{ bottom:-320px; right:-320px; background: var(--theme-2); animation-delay:2.6s; }
 
@@ -98,9 +59,7 @@
   50%{ transform: translate(46px,-28px); }
 }
 
-/* =========================================================
-   ✅ Header
-========================================================= */
+/* ✅ Header */
 .topbar{
   position: sticky;
   top: 12px;
@@ -112,7 +71,7 @@
   gap: 14px;
 
   padding: 14px 14px;
-  border-radius: var(--r);
+  border-radius: 24px;
 
   background: rgba(8, 12, 26, 0.76);
   border: 1px solid var(--border);
@@ -120,40 +79,31 @@
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 
-  box-shadow: var(--shadowSoft);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.35);
 }
 
-.tLeft{
-  min-width:0;
-}
-
+.tLeft{ min-width:0; }
 .hTitle{
   font-size:18px;
   font-weight:1000;
-  letter-spacing:.2px;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
 }
-
 .hSub{
   margin-top:6px;
   font-size:12px;
   font-weight:900;
   color: var(--muted);
-  letter-spacing:.2px;
-
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
 }
 
-/* =========================================================
-   ✅ Toast (Premium)
-========================================================= */
+/* ✅ Toast */
 .toast{
   position: fixed;
-  top: 18px;
+  top: 88px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 999;
@@ -163,7 +113,6 @@
 
   font-size: 13px;
   font-weight: 1000;
-  letter-spacing: 0.2px;
 
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -173,12 +122,10 @@
 
   animation: toastPop .22s ease both;
 }
-
 @keyframes toastPop{
   from{ transform: translateX(-50%) translateY(-10px) scale(.98); opacity:0; }
   to{ transform: translateX(-50%) translateY(0px) scale(1); opacity:1; }
 }
-
 .toast.ok{
   background: rgba(34,197,94,0.14);
   color: rgba(215,255,235,0.95);
@@ -190,9 +137,7 @@
   border-color: rgba(255,87,87,0.24);
 }
 
-/* =========================================================
-   ✅ Buttons (shared)
-========================================================= */
+/* ✅ Buttons */
 .btn{
   height:44px;
   padding:0 14px;
@@ -202,40 +147,29 @@
 
   font-size:13px;
   font-weight:1000;
-  letter-spacing:.2px;
 
-  transition: var(--t);
+  transition: .18s ease;
   user-select:none;
   white-space:nowrap;
 }
-
-.btn:hover{
-  transform: translateY(-1px);
-  filter: brightness(1.05);
-}
-.btn:active{
-  transform: translateY(0) scale(.98);
-}
+.btn:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+.btn:active{ transform: translateY(0) scale(.98); }
 
 .btn.primary{
   color:white;
   background: linear-gradient(135deg, var(--theme), var(--theme-2));
   box-shadow: 0 18px 40px rgba(0,0,0,0.35);
 }
-
 .btn.ghost{
   color: rgba(255,255,255,0.92);
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.12);
 }
 
-/* =========================================================
-   ✅ HERO
-========================================================= */
+/* ✅ HERO */
 .hero{
   position:relative;
   z-index:2;
-
   margin-top: 16px;
 
   display:grid;
@@ -245,16 +179,16 @@
 
 .heroLeft,
 .qrBox{
-  border-radius: var(--r);
+  border-radius: 24px;
   padding: 16px;
 
-  background: var(--glass);
+  background: rgba(255,255,255,0.05);
   border: 1px solid var(--border);
 
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 
-  box-shadow: var(--shadow);
+  box-shadow: 0 22px 70px rgba(0,0,0,0.48);
 }
 
 .heroLeft{
@@ -264,16 +198,13 @@
   min-width:0;
 }
 
-/* =========================================================
-   ✅ Avatar Area
-========================================================= */
+/* ✅ Avatar */
 .avatarArea{
   width: 180px;
   flex-shrink:0;
   text-align:center;
   position:relative;
 }
-
 .avatarImg{
   width:120px;
   height:120px;
@@ -283,45 +214,19 @@
   display:grid;
   place-items:center;
 
-  background: linear-gradient(135deg, rgba(124,58,237,0.95), rgba(59,130,246,0.90));
+  background: linear-gradient(135deg, var(--theme), var(--theme-2));
   border: 1px solid rgba(255,255,255,0.18);
 
-  box-shadow:
-    0 20px 55px rgba(0,0,0,0.45),
-    inset 0 1px 0 rgba(255,255,255,0.14);
-
+  box-shadow: 0 20px 55px rgba(0,0,0,0.45);
   overflow:hidden;
   position:relative;
 }
+.avatarImg.loading{ opacity:.75; filter: grayscale(.2); }
 
-.avatarImg::after{
-  content:"";
-  position:absolute;
-  inset:-60%;
-  background: radial-gradient(circle, rgba(255,255,255,0.22), transparent 55%);
-  opacity:.16;
-  transform: translateX(-25%);
-  transition: .35s ease;
-}
+.avatarImg .txt{ font-weight:1000; font-size:42px; color:white; }
+.avatarImg .img{ width:100%; height:100%; object-fit:cover; }
 
-.avatarImg:hover::after{
-  opacity:.24;
-  transform: translateX(15%);
-}
-
-.avatarImg .txt{
-  font-weight:1000;
-  font-size:42px;
-  color:white;
-}
-
-.avatarImg .img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-/* ✅ Camera button improved */
+/* camera btn */
 .camBtn{
   position:absolute;
   right: 22px;
@@ -342,13 +247,9 @@
   color: rgba(255,255,255,0.92);
 
   box-shadow: 0 14px 40px rgba(0,0,0,0.55);
-  transition: var(--t);
+  transition: .18s ease;
 }
-
-.camBtn:hover{
-  transform: translateY(-2px);
-  border-color: rgba(124,58,237,0.35);
-}
+.camBtn:hover{ transform: translateY(-2px); border-color: rgba(124,58,237,0.35); }
 
 .avatarHint{
   margin-top:10px;
@@ -356,7 +257,6 @@
   color: var(--muted);
   font-weight:900;
 }
-
 .avatarErr{
   margin-top:8px;
   font-size:12px;
@@ -364,23 +264,15 @@
   color: rgba(255,190,190,0.95);
 }
 
-/* =========================================================
-   ✅ Hero Meta
-========================================================= */
-.heroMeta{
-  flex:1;
-  min-width:0;
-}
-
+/* hero meta */
+.heroMeta{ flex:1; min-width:0; }
 .pName{
   font-size: 20px;
   font-weight: 1000;
-  line-height:1.1;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
 }
-
 .pEmail{
   margin-top:6px;
   font-size:13px;
@@ -388,37 +280,30 @@
   word-break: break-word;
 }
 
-/* badges */
 .badges{
   margin-top: 12px;
   display:flex;
   gap: 10px;
   flex-wrap:wrap;
 }
-
 .pill{
   font-size: 11px;
   font-weight: 1000;
   letter-spacing: .45px;
-
   padding: 6px 10px;
   border-radius: 999px;
-
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.12);
 }
-
 .pill.mono{
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
   opacity:.88;
 }
-
 .pill.online{
   border-color: rgba(34,197,94,0.26);
   background: rgba(34,197,94,0.12);
   color: rgba(215,255,235,0.95);
 }
-
 .pill .dot{
   width: 8px;
   height: 8px;
@@ -428,7 +313,6 @@
   background: rgba(34,197,94,0.95);
 }
 
-/* hero buttons */
 .heroBtns{
   margin-top: 12px;
   display:flex;
@@ -436,9 +320,7 @@
   flex-wrap:wrap;
 }
 
-/* =========================================================
-   ✅ QR Box
-========================================================= */
+/* ✅ QR */
 .qrTop{ margin-bottom: 10px; }
 .qrTitle{ font-size:14px; font-weight:1000; }
 .qrSub{ margin-top:6px; font-size:12px; color: var(--muted); }
@@ -448,26 +330,20 @@
   max-width: 240px;
   margin: 12px auto 0;
   display:block;
-
   border-radius: 18px;
   background:white;
   padding: 8px;
-
-  border: 1px solid rgba(255,255,255,0.12);
   box-shadow: 0 18px 40px rgba(0,0,0,0.35);
 }
 
 .qrLink{
   margin-top: 12px;
-
   padding: 10px 10px;
   border-radius: 16px;
-
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap: 10px;
-
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.10);
 }
@@ -476,7 +352,6 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
   font-size: 12px;
   opacity: .84;
-
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
@@ -488,80 +363,48 @@
   border-radius: 999px;
   border:0;
   cursor:pointer;
-
   font-size:12px;
   font-weight:1000;
   color:white;
-
   background: linear-gradient(135deg, var(--theme), var(--theme-2));
-  transition: var(--t);
+  transition: .18s ease;
 }
-
 .mini:hover{ transform: translateY(-1px); }
-.mini:active{ transform: translateY(0) scale(.98); }
 
-/* =========================================================
-   ✅ GRID
-========================================================= */
+/* ✅ GRID */
 .grid{
   position:relative;
   z-index:2;
-
   margin-top: 14px;
-
   display:grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
 }
 
 .card{
-  border-radius: var(--r);
+  border-radius: 24px;
   padding: 16px;
-
-  background: var(--glass);
+  background: rgba(255,255,255,0.05);
   border: 1px solid var(--border);
-
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-
-  box-shadow: var(--shadowSoft);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.35);
 }
+.cardTitle{ font-weight: 1000; font-size: 14px; margin-bottom: 12px; }
 
-.cardTitle{
-  font-weight: 1000;
-  font-size: 14px;
-  margin-bottom: 12px;
-}
-
-/* info rows */
 .row{
   display:flex;
   justify-content:space-between;
   gap:12px;
-
   padding: 10px 0;
   border-bottom: 1px dashed rgba(255,255,255,0.10);
 }
-
 .row:last-child{ border-bottom:0; }
+.row span{ font-size:12px; color: var(--muted); }
+.row b{ font-size:12px; font-weight:1000; text-align:right; word-break: break-word; }
 
-.row span{
-  font-size:12px;
-  color: var(--muted);
-}
-
-.row b{
-  font-size:12px;
-  font-weight:1000;
-  text-align:right;
-  word-break: break-word;
-}
-
-/* =========================================================
-   ✅ FORM
-========================================================= */
+/* form */
 .form{ display:grid; gap: 12px; }
-
 .field label{
   display:block;
   font-size:12px;
@@ -569,90 +412,57 @@
   font-weight:900;
   margin-bottom:8px;
 }
-
 .field input{
   width:100%;
   height:46px;
   padding: 0 14px;
   border-radius: 16px;
-
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.06);
   color: var(--text);
-
   outline:none;
   font-size:13px;
   font-weight:800;
-
-  transition: var(--t);
 }
-
 .field input:focus{
-  border-color: rgba(124,58,237,0.55);
-  box-shadow: 0 0 0 4px rgba(124,58,237,0.18);
+  border-color: color-mix(in srgb, var(--theme) 55%, white);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme) 18%, transparent);
 }
 
-.actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap: 10px;
-}
+.actions{ display:flex; flex-wrap:wrap; gap: 10px; }
 
-/* =========================================================
-   ✅ Quick Action Buttons
-========================================================= */
+/* quick actions */
 .actionRow{
   width:100%;
   padding: 12px 12px;
   border-radius: 18px;
-
   display:flex;
   align-items:center;
   gap: 12px;
-
   border: 1px solid rgba(255,255,255,0.10);
   background: rgba(255,255,255,0.05);
-
   cursor:pointer;
-  transition: var(--t);
+  transition: .18s ease;
   margin-bottom: 10px;
-
   color: var(--text);
 }
-
 .actionRow:hover{
   transform: translateY(-1px);
-  border-color: rgba(124,58,237,0.26);
+  border-color: color-mix(in srgb, var(--theme) 22%, transparent);
   background: rgba(255,255,255,0.07);
 }
-
 .ic{
   width:40px;
   height:40px;
   border-radius: 14px;
   display:grid;
   place-items:center;
-
-  background: rgba(124,58,237,0.14);
-  border: 1px solid rgba(124,58,237,0.20);
+  background: color-mix(in srgb, var(--theme) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--theme) 22%, transparent);
 }
+.tx{ flex:1; text-align:left; font-weight:1000; font-size:13px; }
+.go{ font-size:18px; font-weight:1000; opacity:.75; }
 
-.tx{
-  flex:1;
-  text-align:left;
-  font-weight:1000;
-  font-size:13px;
-}
-
-.go{
-  font-size:18px;
-  font-weight:1000;
-  opacity:.75;
-}
-
-/* =========================================================
-   ✅ Animations
-========================================================= */
 .fadeIn{ animation: fadeIn .35s ease both; }
 .fadeUp{ animation: fadeUp .40s ease both; }
 
@@ -660,33 +470,22 @@
   from{ opacity:0; transform: translateY(-6px); }
   to{ opacity:1; transform: translateY(0); }
 }
-
 @keyframes fadeUp{
   from{ opacity:0; transform: translateY(10px); }
   to{ opacity:1; transform: translateY(0); }
 }
 
-/* =========================================================
-   ✅ Responsive
-========================================================= */
+/* ✅ Responsive */
 @media (max-width: 980px){
   .hero{ grid-template-columns: 1fr; }
-  .heroLeft{
-    flex-direction:column;
-    text-align:center;
-  }
-
+  .heroLeft{ flex-direction:column; text-align:center; }
   .avatarArea{ width:100%; }
-  .camBtn{ right: 50%; transform: translateX(56px); } /* ✅ keeps cam near avatar */
+  .camBtn{ right: 50%; transform: translateX(58px); }
   .heroBtns{ justify-content:center; }
   .qr{ max-width: 220px; }
-
   .grid{ grid-template-columns: 1fr; }
 }
 
-/* =========================================================
-   Reduced Motion
-========================================================= */
 @media (prefers-reduced-motion: reduce){
   .orb{ animation:none !important; }
   .fadeIn, .fadeUp{ animation:none !important; }

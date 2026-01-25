@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 import { LeftbarComponent } from '../../layout/leftbar/leftbar.component';
 
@@ -8,195 +9,17 @@ import { LeftbarComponent } from '../../layout/leftbar/leftbar.component';
   selector: 'app-app-layout',
   standalone: true,
   imports: [CommonModule, RouterOutlet, LeftbarComponent],
-  template: `
-    <div class="appShell">
+  templateUrl: './app-layout.component.html',
+  styleUrls: ['./app-layout.component.css'],
+})
+export class AppLayoutComponent {
+  isChatRoute = false;
 
-      <!-- 🌌 Premium Background -->
-      <div class="bg"></div>
-      <div class="orb orb1"></div>
-      <div class="orb orb2"></div>
-      <div class="grain"></div>
-
-      <!-- ✅ LEFT / BOTTOM NAV -->
-      <app-leftbar></app-leftbar>
-
-      <!-- ✅ MAIN CONTENT -->
-      <main class="main">
-        <div class="routeWrap">
-          <router-outlet></router-outlet>
-        </div>
-      </main>
-
-    </div>
-  `,
-  styles: [`
-/* =========================================================
-   ✅ Chatloop AppLayout – ULTRA PREMIUM (FINAL)
-   - No white space
-   - Correct height
-   - Single scroll container
-========================================================= */
-
-:host{
-  display:flex;
-  width:100%;
-  height:100dvh;           /* ✅ BEST MOBILE FIX */
-  min-height:0;
-}
-
-/* fallback for browsers without dvh */
-@supports not (height: 100dvh){
-  :host{ height:100vh; }
-}
-
-/* =========================================================
-   THEME VARIABLES (SAFE FALLBACKS)
-========================================================= */
-:host{
-  --theme:#7c3aed;
-  --theme-2:#3b82f6;
-
-  --bg:#050816;
-  --text:rgba(255,255,255,0.92);
-  --border:rgba(255,255,255,0.10);
-}
-
-*{ box-sizing:border-box; }
-
-/* =========================================================
-   ROOT SHELL
-========================================================= */
-.appShell{
-  position:relative;
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  display:flex;
-  align-items:stretch;
-
-  background: var(--bg);
-  color: var(--text);
-
-  overflow:hidden;        /* ✅ CRITICAL */
-  isolation:isolate;
-}
-
-/* =========================================================
-   🌌 BACKGROUND EFFECTS
-========================================================= */
-.bg,
-.orb,
-.grain{
-  pointer-events:none;
-}
-
-.bg{
-  position:absolute;
-  inset:0;
-  z-index:0;
-
-  background:
-    radial-gradient(1000px 720px at 18% 10%, rgba(124,58,237,0.20), transparent 55%),
-    radial-gradient(950px 700px at 86% 28%, rgba(59,130,246,0.18), transparent 62%),
-    radial-gradient(800px 600px at 50% 100%, rgba(34,211,238,0.10), transparent 60%);
-
-  filter: blur(92px);
-  opacity:.95;
-}
-
-.orb{
-  position:absolute;
-  width:560px;
-  height:560px;
-  border-radius:999px;
-
-  filter: blur(175px);
-  opacity:.20;
-  z-index:0;
-
-  animation: orbFloat 11s ease-in-out infinite;
-}
-
-.orb1{
-  top:-280px;
-  left:-280px;
-  background: var(--theme);
-}
-
-.orb2{
-  bottom:-300px;
-  right:-300px;
-  background: var(--theme-2);
-  animation-delay: 2.8s;
-}
-
-@keyframes orbFloat{
-  0%,100%{ transform: translate(0,0); }
-  50%{ transform: translate(45px,-26px); }
-}
-
-/* ✅ Grain texture */
-.grain{
-  position:absolute;
-  inset:0;
-  z-index:1;
-  opacity:.06;
-  mix-blend-mode: overlay;
-
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
-  background-size: 180px 180px;
-}
-
-/* =========================================================
-   MAIN CONTENT
-========================================================= */
-.main{
-  position:relative;
-  z-index:2;
-
-  flex:1;
-  min-width:0;
-  min-height:0;
-
-  display:flex;
-  flex-direction:column;
-}
-
-/* ✅ ONLY THIS SCROLLS */
-.routeWrap{
-  flex:1;
-  min-width:0;
-  min-height:0;
-
-  overflow:auto;
-  scroll-behavior:smooth;
-  -webkit-overflow-scrolling:touch;
-
-  /* prevents small white flicker */
-  background: transparent;
-}
-
-/* Scrollbar */
-.routeWrap::-webkit-scrollbar{ width:10px; }
-.routeWrap::-webkit-scrollbar-thumb{
-  background: rgba(255,255,255,0.12);
-  border-radius:999px;
-}
-.routeWrap::-webkit-scrollbar-track{ background:transparent; }
-
-/* =========================================================
-   MOBILE FIX (BOTTOM NAV)
-========================================================= */
-@media (max-width:900px){
-  .routeWrap{
-    padding-bottom:86px; /* ✅ avoids nav overlap */
+  constructor(private router: Router) {
+    this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe(() => {
+        this.isChatRoute = this.router.url.startsWith('/chat');
+      });
   }
 }
-
-@media (prefers-reduced-motion: reduce){
-  .orb{ animation:none !important; }
-}
-  `]
-})
-export class AppLayoutComponent {}

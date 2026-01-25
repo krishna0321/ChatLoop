@@ -84,15 +84,18 @@ export interface RoomMessage {
 
 @Injectable({ providedIn: 'root' })
 export class RoomService {
+  deleteAllMyChats() {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     private firestore: Firestore,
     private auth: Auth,
     private storage: Storage
   ) {}
 
-  // ==========================
+  //   =
   // ✅ DM room id
-  // ==========================
+  //   =
   getDmRoomId(uid1: string, uid2: string) {
     return [uid1, uid2].sort().join('_');
   }
@@ -131,9 +134,9 @@ export class RoomService {
     return roomId;
   }
 
-  // ==========================
+  //   =
   // ✅ CREATE GROUP / CHANNEL
-  // ==========================
+  //   =
   async createRoom(data: Partial<Room>) {
     const myUid = this.auth.currentUser?.uid;
     if (!myUid) throw new Error('Not logged in');
@@ -172,9 +175,9 @@ export class RoomService {
     return res.id;
   }
 
-  // ======================================================
+     
   // ✅ LISTEN ONE ROOM DOC
-  // ======================================================
+     
   listenRoom(roomId: string, cb: (room: Room | null) => void) {
     const ref = doc(this.firestore, `rooms/${roomId}`);
 
@@ -191,9 +194,9 @@ export class RoomService {
     );
   }
 
-  // ======================================================
+     
   // ✅ LISTEN ROOM MESSAGES
-  // ======================================================
+     
   listenRoomMessages(roomId: string, cb: (msgs: RoomMessage[]) => void) {
     const refCol = collection(this.firestore, `rooms/${roomId}/messages`);
     const qSorted = query(refCol, orderBy('createdAt', 'asc'));
@@ -214,9 +217,9 @@ export class RoomService {
     );
   }
 
-  // ======================================================
+     
   // ✅ SEND ROOM MESSAGE (text)
-  // ======================================================
+     
   async sendRoomMessage(roomId: string, data: { text: string; senderId: string }) {
     const txt = (data?.text || '').trim();
     if (!txt) return;
@@ -236,9 +239,9 @@ export class RoomService {
     await this.updateRoomMeta(roomId, data.senderId, txt);
   }
 
-  // ======================================================
+     
   // ✅ SEND ROOM FILE MESSAGE (image/document)
-  // ======================================================
+     
   async sendRoomFileMessage(
     roomId: string,
     file: File,
@@ -282,9 +285,9 @@ export class RoomService {
     await this.updateRoomMeta(roomId, senderId, previewText);
   }
 
-  // ======================================================
+     
   // ✅ EDIT ROOM MESSAGE
-  // ======================================================
+     
   async editRoomMessage(roomId: string, messageId: string, newText: string) {
     const value = (newText || '').trim();
     if (!value) return;
@@ -300,9 +303,9 @@ export class RoomService {
     });
   }
 
-  // ======================================================
+     
   // ✅ DELETE ROOM MESSAGE (soft delete)
-  // ======================================================
+     
   async deleteRoomMessage(roomId: string, messageId: string) {
     const msgDoc = doc(this.firestore, `rooms/${roomId}/messages/${messageId}`);
 
@@ -324,9 +327,9 @@ export class RoomService {
     });
   }
 
-  // ======================================================
+     
   // ✅ ADD MEMBERS
-  // ======================================================
+     
   async addMembers(roomId: string, memberUids: string[]) {
     const roomDoc = doc(this.firestore, `rooms/${roomId}`);
     const snap = await getDoc(roomDoc);
@@ -353,9 +356,9 @@ export class RoomService {
     });
   }
 
-  // ======================================================
+     
   // ✅ LEAVE ROOM
-  // ======================================================
+     
   async leaveRoom(roomId: string, uid: string) {
     if (!roomId || !uid) return;
 
@@ -374,17 +377,17 @@ export class RoomService {
     });
   }
 
-  // ======================================================
+     
   // ✅ DELETE ROOM ONLY
-  // ======================================================
+     
   async deleteRoom(roomId: string) {
     const roomDoc = doc(this.firestore, `rooms/${roomId}`);
     await deleteDoc(roomDoc);
   }
 
-  // ======================================================
+     
   // ✅ HIDE ROOM (delete chat ONLY for me)
-  // ======================================================
+     
   async hideRoom(roomId: string, myUid: string) {
     const roomDoc = doc(this.firestore, `rooms/${roomId}`);
     await updateDoc(roomDoc, {
@@ -403,9 +406,9 @@ export class RoomService {
     });
   }
 
-  // ======================================================
+     
   // ✅ DELETE ROOM + ALL MESSAGES
-  // ======================================================
+     
   async deleteRoomWithMessages(roomId: string) {
     const roomDoc = doc(this.firestore, `rooms/${roomId}`);
 
@@ -424,9 +427,9 @@ export class RoomService {
     await deleteDoc(roomDoc);
   }
 
-  // ======================================================
+     
   // ✅ LISTEN MY ROOMS
-  // ======================================================
+     
   listenMyRooms(myUid: string, callback: (rooms: Room[]) => void) {
     const roomsRef = collection(this.firestore, 'rooms');
 
@@ -487,9 +490,9 @@ export class RoomService {
     }) as any;
   }
 
-  // ======================================================
+   //  
   // ✅ Update room meta: last message + unread
-  // ======================================================
+   //  
   async updateRoomMeta(roomId: string, senderId: string, text: string) {
     const roomDoc = doc(this.firestore, `rooms/${roomId}`);
     const snap = await getDoc(roomDoc);
@@ -513,9 +516,9 @@ export class RoomService {
     });
   }
 
-  // ======================================================
+     
   // ✅ mark read
-  // ======================================================
+     
   async markAsRead(roomId: string, myUid: string) {
     const roomDoc = doc(this.firestore, `rooms/${roomId}`);
     await updateDoc(roomDoc, {
@@ -523,9 +526,9 @@ export class RoomService {
     });
   }
 
-  // ======================================================
+     
   // ✅ MUTE ROOM
-  // ======================================================
+     
   async muteRoom(roomId: string, myUid: string, mute: boolean) {
     const roomDoc = doc(this.firestore, `rooms/${roomId}`);
 
@@ -542,9 +545,9 @@ export class RoomService {
     }
   }
 
-  // ======================================================
+     
   // ✅ PIN ROOM
-  // ======================================================
+     
   async pinRoom(roomId: string, myUid: string, pin: boolean) {
     const roomDoc = doc(this.firestore, `rooms/${roomId}`);
 
@@ -561,9 +564,9 @@ export class RoomService {
     }
   }
 
-  // ==========================
+  //   =
   // ✅ helper: detect url
-  // ==========================
+  //   =
   private detectMessageType(text: string): RoomMessageType {
     const hasUrl = /https?:\/\/[^\s]+/i.test(text);
     return hasUrl ? 'link' : 'text';

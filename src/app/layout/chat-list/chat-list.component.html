@@ -6,8 +6,11 @@
       <span class="count">{{ chats.length }}</span>
     </div>
 
-    <!-- ✅ DELETE ALL -->
-    <button class="deleteAllBtn" (click)="deleteAllChatsHistory()" title="Delete all chats">
+    <button
+      class="deleteAllBtn"
+      (click)="deleteAllChatsHistory()"
+      title="Delete all chats"
+    >
       🗑 All
     </button>
   </header>
@@ -25,11 +28,10 @@
 
   <div *ngIf="!loading && chats.length > 0" class="chatList">
 
-    <a
+    <div
       class="chatItem"
       *ngFor="let c of chats; trackBy: trackByChatId"
-      [routerLink]="['/app/chat', c.id]"
-      routerLinkActive="active"
+      (click)="openChat(c)"
     >
       <div class="avatar">{{ iconByType(c.type) }}</div>
 
@@ -55,16 +57,15 @@
         {{ c.unread }}
       </div>
 
-      <!-- ✅ DELETE SINGLE FULL HISTORY -->
       <button
         class="delBtn"
-        (click)="$event.preventDefault(); $event.stopPropagation(); deleteChatHistory(c)"
+        (click)="$event.stopPropagation(); deleteChatHistory(c)"
         title="Delete full chat history"
       >
         🗑
       </button>
 
-    </a>
+    </div>
 
   </div>
 </div>

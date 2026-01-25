@@ -1,4 +1,4 @@
-<div class="roomWrap" (click)="closeAllMenus()">
+<div class="roomWrap" [class.kbOpen]="keyboardOpen" (click)="closeAllMenus()">
 
   <!-- ✅ HEADER -->
   <header class="header" (click)="$event.stopPropagation()">
@@ -24,20 +24,16 @@
       <button (click)="togglePin()">
         {{ isPinned ? '📌 Unpin' : '📌 Pin' }}
       </button>
-      <button class="danger" (click)="leaveGroup()">
-        🚪 Leave Group
-      </button>
+      <button class="danger" (click)="leaveGroup()">🚪 Leave Group</button>
       <button class="danger2" *ngIf="isOwner" (click)="deleteGroupForever()">
         ❌ Delete Group Forever
       </button>
     </div>
   </header>
 
-  <!-- ✅ MESSAGES -->
+  <!-- ✅ MESSAGES (only scroll area) -->
   <div class="messages" #messagesBox>
-    <div *ngIf="messages.length === 0" class="emptyMsgs">
-      No messages yet...
-    </div>
+    <div *ngIf="messages.length === 0" class="emptyMsgs">No messages yet...</div>
 
     <div
       *ngFor="let m of messages"
@@ -45,7 +41,6 @@
       [class.me]="m.senderId === myUid"
       (click)="openMsgMenu($event, m)"
     >
-      <!-- sender -->
       <div class="sender" *ngIf="m.senderId !== myUid">
         {{ getSenderName(m.senderId) }}
       </div>
@@ -87,9 +82,7 @@
 
       </div>
 
-      <div class="meta">
-        {{ formatTime(m.createdAt) }}
-      </div>
+      <div class="meta">{{ formatTime(m.createdAt) }}</div>
     </div>
   </div>
 
@@ -116,44 +109,7 @@
     </div>
   </div>
 
-  <!-- ✅ COMPOSER -->
-  <div class="composer" (click)="$event.stopPropagation()">
-
-    <!-- ✅ attach -->
-    <button
-      class="attachBtn"
-      [class.disabled]="sendingFile"
-      (click)="toggleAttachMenu($event)"
-      type="button"
-    >
-      📎
-    </button>
-
-    <!-- ✅ attach menu -->
-    <div class="attachMenu" *ngIf="showAttachMenu" (click)="$event.stopPropagation()">
-      <button (click)="chooseAttachType('image')">🖼 Image</button>
-      <button (click)="chooseAttachType('document')">📄 Document</button>
-    </div>
-
-    <!-- hidden file input -->
-    <input #fileInput type="file" hidden (change)="pickFile($event)" />
-
-    <input
-      [(ngModel)]="text"
-      placeholder="Write a message..."
-      (keydown.enter)="send()"
-      [disabled]="sendingFile"
-    />
-
-    <button
-      (click)="send()"
-      [disabled]="sendingFile || (!text.trim() && !selectedFile)"
-    >
-      {{ sendingFile ? 'Uploading...' : 'Send' }}
-    </button>
-  </div>
-
-  <!-- ✅ preview -->
+  <!-- ✅ FILE PREVIEW -->
   <div class="filePreview" *ngIf="selectedFile">
     <div class="fileInfo">
       <div class="fileName">📎 {{ selectedFile.name }}</div>
@@ -163,5 +119,42 @@
   </div>
 
   <div class="uploadErr" *ngIf="fileError">{{ fileError }}</div>
+
+  <!-- ✅ COMPOSER (fixed bottom) -->
+  <div class="composer" (click)="$event.stopPropagation()">
+
+    <button
+      class="attachBtn"
+      [class.disabled]="sendingFile"
+      (click)="toggleAttachMenu($event)"
+      type="button"
+    >
+      📎
+    </button>
+
+    <div class="attachMenu" *ngIf="showAttachMenu" (click)="$event.stopPropagation()">
+      <button (click)="chooseAttachType('image')">🖼 Image</button>
+      <button (click)="chooseAttachType('document')">📄 Document</button>
+    </div>
+
+    <input #fileInput type="file" hidden (change)="pickFile($event)" />
+
+    <input
+      [(ngModel)]="text"
+      placeholder="Write a message..."
+      (keydown.enter)="send()"
+      [disabled]="sendingFile"
+      inputmode="text"
+      autocomplete="off"
+    />
+
+    <button
+      class="sendBtn"
+      (click)="send()"
+      [disabled]="sendingFile || (!text.trim() && !selectedFile)"
+    >
+      {{ sendingFile ? 'Uploading...' : 'Send' }}
+    </button>
+  </div>
 
 </div>

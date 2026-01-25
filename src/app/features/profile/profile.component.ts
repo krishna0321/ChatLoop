@@ -27,7 +27,7 @@ export class ProfileComponent {
   qrDataUrl = '';
   profileLink = '';
 
-  // ✅ avatar upload
+  // avatar upload
   uploading = false;
   avatarErr = '';
 
@@ -38,14 +38,19 @@ export class ProfileComponent {
       if (u) {
         this.reset(u);
 
-        // ✅ share link
-        this.profileLink = `chatloop://user/${u.uid}`;
+        // ✅ FIX: Use Netlify deployed link (Web link)
+        const baseUrl = window.location.origin; // auto: localhost OR netlify domain
+        this.profileLink = `${baseUrl}/u/${u.uid}`;
 
         // ✅ generate QR
-        this.qrDataUrl = await QRCode.toDataURL(this.profileLink, {
-          width: 220,
-          margin: 1,
-        });
+        try {
+          this.qrDataUrl = await QRCode.toDataURL(this.profileLink, {
+            width: 220,
+            margin: 1,
+          });
+        } catch {
+          this.qrDataUrl = '';
+        }
       }
     });
   }
@@ -54,49 +59,59 @@ export class ProfileComponent {
     this.editMode = !this.editMode;
     this.msg = '';
     this.err = '';
+    this.avatarErr = '';
   }
 
   reset(u: ProfileUser) {
-    this.form.name = u.name || '';
-    this.form.phone = u.phone || '';
+    this.form.name = u?.name || '';
+    this.form.phone = u?.phone || '';
   }
 
   async save() {
     this.msg = '';
     this.err = '';
 
+    const name = (this.form.name || '').trim();
+    const phone = (this.form.phone || '').trim();
+
+    if (name.length < 2) {
+      this.err = '❌ Name must be at least 2 characters';
+      setTimeout(() => (this.err = ''), 2500);
+      return;
+    }
+
     try {
-      await this.profile.updateMyProfile({
-        name: this.form.name,
-        phone: this.form.phone,
-      });
+      await this.profile.updateMyProfile({ name, phone });
 
       this.msg = '✅ Profile updated';
       this.editMode = false;
 
-      setTimeout(() => (this.msg = ''), 2500);
+      setTimeout(() => (this.msg = ''), 2000);
     } catch (e: any) {
+      console.error(e);
       this.err = e?.message || '❌ Update failed';
       setTimeout(() => (this.err = ''), 2500);
     }
   }
 
-  // ✅ PICK + UPLOAD AVATAR
+  // PICK + UPLOAD AVATAR
   async onPickAvatar(e: Event) {
     const input = e.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
 
     this.avatarErr = '';
+    this.msg = '';
+    this.err = '';
 
-    // ✅ only images
+    // only images
     if (!file.type.startsWith('image/')) {
       this.avatarErr = 'Please choose image file only';
       input.value = '';
       return;
     }
 
-    // ✅ size limit 2MB
+    // size limit 2MB
     const max = 2 * 1024 * 1024;
     if (file.size > max) {
       this.avatarErr = 'Image too large (Max 2MB)';
@@ -109,7 +124,7 @@ export class ProfileComponent {
 
       const url = await this.profile.updateAvatar(file);
 
-      // ✅ update UI instantly
+      // update UI instantly
       if (this.user) {
         this.user = { ...this.user, photoURL: url };
       }

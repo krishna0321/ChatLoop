@@ -11,7 +11,7 @@
     <div class="header">
       <div class="hLeft">
         <h2>👥 Users</h2>
-        <p class="sub">Manage Chatloop accounts (edit / delete)</p>
+        <p class="sub">Find people and start chatting instantly</p>
       </div>
 
       <div class="searchWrap">
@@ -39,9 +39,11 @@
         <div class="cardTop">
           <div class="cardTopLeft">
             <h3>All Users</h3>
-            <p class="miniSub">Tap a user to view details</p>
+            <p class="miniSub">Tap user for details or start chat</p>
           </div>
-          <div class="pill">{{ filtered.length }}</div>
+
+          <!-- ✅ COUNT REMOVED -->
+          <!-- <div class="pill">{{ filtered.length }}</div> -->
         </div>
 
         <div class="userList">
@@ -58,9 +60,9 @@
               </div>
             </div>
 
+            <!-- ✅ Only chat button -->
             <div class="actions">
-              <button class="btn ghost" (click)="openEdit(u)">✏ Edit</button>
-              <button class="btn danger" (click)="deleteUser(u)">🗑 Delete</button>
+              <button class="btn primary" (click)="startChat(u)">💬 Chat</button>
             </div>
           </div>
 
@@ -102,30 +104,9 @@
           </div>
         </div>
 
-        <button class="btn full ghost" (click)="closeDetails()">Close</button>
-      </div>
-
-      <!-- EDIT -->
-      <div class="card" *ngIf="editUser">
-        <div class="cardTop">
-          <h3>✏ Edit User</h3>
-          <button class="xBtn" (click)="closeEdit()">✖</button>
-        </div>
-
-        <div class="form">
-          <label>Name</label>
-          <input [(ngModel)]="editUser.name" placeholder="Enter name" />
-
-          <label>Email</label>
-          <input [(ngModel)]="editUser.email" placeholder="Enter email" />
-
-          <label>Phone</label>
-          <input [(ngModel)]="editUser.phone" placeholder="Enter phone" />
-        </div>
-
         <div class="rowBtns">
-          <button class="btn full primary" (click)="saveEdit()">✅ Save</button>
-          <button class="btn full ghost" (click)="closeEdit()">Cancel</button>
+          <button class="btn full primary" (click)="startChat(selectedUser)">💬 Start Chat</button>
+          <button class="btn full ghost" (click)="closeDetails()">Close</button>
         </div>
       </div>
 

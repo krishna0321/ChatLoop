@@ -1,0 +1,431 @@
+:host{
+  display:block;
+  height:100%;
+}
+
+/*     =======
+   ✅ About Page (Premium Glass UI)
+   file: about.component.css
+    ======= */
+
+.page{
+  height: 100%;
+  overflow: auto;
+  padding: 18px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ✅ Make scroll smooth */
+.page{ scroll-behavior: smooth; }
+
+/* =======================
+   ✅ HEADER
+======================= */
+.header{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.title h1{
+  margin:0;
+  font-size: 30px;
+  font-weight: 1100;
+  letter-spacing: 0.4px;
+}
+
+.sub{
+  margin: 6px 0 0;
+  font-size: 14px;
+  opacity: .82;
+  font-weight: 800;
+}
+
+/* ✅ Buttons */
+.actions{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn{
+  text-decoration:none;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 1000;
+  font-size: 13px;
+  cursor:pointer;
+  color: white;
+  background: linear-gradient(135deg, var(--theme), var(--theme-2));
+  box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+  transition: transform .15s ease, opacity .15s ease;
+}
+
+.btn:hover{
+  transform: translateY(-1px);
+  opacity: 0.96;
+}
+
+.btn.ghost{
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  color: var(--text);
+  box-shadow: none;
+}
+
+/* =======================
+   ✅ HERO (UPGRADED)
+======================= */
+.hero{
+  margin-top: 10px;
+  border-radius: 28px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background:
+    radial-gradient(900px 360px at 15% 0%, rgba(124,58,237,0.30), transparent 55%),
+    radial-gradient(900px 380px at 90% 20%, rgba(59,130,246,0.22), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  padding: 18px;
+  display:grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 14px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+  position: relative;
+  overflow:hidden;
+}
+
+.hero::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  background:
+    radial-gradient(300px 180px at 10% 0%, rgba(255,255,255,0.10), transparent 65%),
+    radial-gradient(240px 180px at 85% 20%, rgba(255,255,255,0.08), transparent 70%);
+  pointer-events:none;
+}
+
+/* Badge */
+.badge{
+  display:inline-flex;
+  gap: 8px;
+  align-items:center;
+  font-weight: 1000;
+  font-size: 12px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.22);
+  width: fit-content;
+  backdrop-filter: blur(10px);
+}
+
+/* Hero text */
+.hero h2{
+  margin: 12px 0 6px;
+  font-size: 24px;
+  font-weight: 1200;
+  letter-spacing: 0.2px;
+}
+
+.hero p{
+  margin: 0;
+  opacity: .86;
+  font-size: 14px;
+  line-height: 1.7;
+  font-weight: 800;
+}
+
+/* =======================
+   ✅ CREATOR CARD (MORE PREMIUM)
+======================= */
+.creatorCard{
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.25);
+  display:flex;
+  gap: 12px;
+  align-items:flex-start;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+  backdrop-filter: blur(10px);
+  transition: transform .15s ease;
+}
+
+.creatorCard:hover{
+  transform: translateY(-2px);
+}
+
+.creatorAvatar{
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  display:grid;
+  place-items:center;
+  font-size: 24px;
+  background: linear-gradient(135deg, var(--theme), var(--theme-2));
+  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+}
+
+.creatorTitle{
+  font-size: 12px;
+  opacity: .72;
+  font-weight: 900;
+}
+
+.creatorName{
+  margin-top: 2px;
+  font-size: 16px;
+  font-weight: 1200;
+  letter-spacing: 0.2px;
+}
+
+.creatorDesc{
+  margin-top: 6px;
+  font-size: 13px;
+  opacity: .86;
+  line-height: 1.7;
+  font-weight: 800;
+}
+
+/* =======================
+   ✅ RIGHT SIDE
+======================= */
+.logoCard{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.25);
+  box-shadow: 0 18px 55px rgba(0,0,0,0.25);
+  backdrop-filter: blur(10px);
+}
+
+.bubble{
+  width: 50px;
+  height: 50px;
+  display:grid;
+  place-items:center;
+  border-radius: 18px;
+  font-size: 22px;
+  background: linear-gradient(135deg, var(--theme), var(--theme-2));
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+}
+
+.name{
+  font-weight: 1200;
+  font-size: 16px;
+}
+
+.tag{
+  font-size: 12px;
+  opacity: .75;
+  font-weight: 900;
+}
+
+/* Goal */
+.goalCard{
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.22);
+  box-shadow: 0 18px 55px rgba(0,0,0,0.22);
+  backdrop-filter: blur(10px);
+}
+
+.goalTop{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  font-weight: 1200;
+  font-size: 13px;
+  margin-bottom: 8px;
+  opacity: .95;
+}
+
+.goalCard p{
+  margin: 0;
+  opacity: .9;
+  font-size: 13px;
+  line-height: 1.7;
+  font-weight: 800;
+}
+
+/* =======================
+   ✅ SECTION TITLE
+======================= */
+.section{
+  margin-top: 18px;
+}
+
+.secTitle{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  padding: 8px 2px 12px;
+  font-size: 15px;
+  font-weight: 1200;
+  opacity: .96;
+}
+
+.secIcon{
+  width: 38px;
+  height: 38px;
+  display:grid;
+  place-items:center;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.18);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+}
+
+/* =======================
+   ✅ TECH STACK (UPGRADED)
+======================= */
+.stack{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.stackItem{
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  padding: 14px;
+  box-shadow: 0 18px 55px rgba(0,0,0,0.22);
+  transition: transform .15s ease, border-color .15s ease;
+}
+
+.stackItem:hover{
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,0.18);
+}
+
+.stackLabel{
+  font-size: 12px;
+  opacity: .7;
+  font-weight: 900;
+}
+
+.stackValue{
+  margin-top: 7px;
+  font-size: 13px;
+  font-weight: 1100;
+  opacity: .95;
+}
+
+/* =======================
+   ✅ HIGHLIGHTS (BETTER)
+======================= */
+.grid{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.card{
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  padding: 14px;
+  box-shadow: 0 18px 55px rgba(0,0,0,0.22);
+  transition: transform .15s ease, border-color .15s ease;
+}
+
+.card:hover{
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,0.20);
+}
+
+.cardTop{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.icon{
+  width: 42px;
+  height: 42px;
+  display:grid;
+  place-items:center;
+  border-radius: 16px;
+  font-size: 18px;
+  background: rgba(0,0,0,0.20);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.25);
+}
+
+.card h3{
+  margin:0;
+  font-size: 15px;
+  font-weight: 1200;
+}
+
+.card p{
+  margin:0;
+  opacity: .86;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* =======================
+   ✅ FOOTER
+======================= */
+.footer{
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.10);
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.small{
+  font-size: 13px;
+  font-weight: 1100;
+  opacity: .92;
+}
+
+.muted{
+  font-size: 12px;
+  opacity: .62;
+  font-weight: 800;
+}
+
+.right{
+  display:flex;
+  gap: 14px;
+  flex-wrap:wrap;
+}
+
+.link{
+  text-decoration:none;
+  color: var(--text);
+  opacity: .76;
+  font-weight: 1000;
+  font-size: 13px;
+  transition: opacity .15s ease;
+}
+
+.link:hover{
+  opacity: 1;
+}
+
+/* =======================
+   ✅ RESPONSIVE
+======================= */
+@media (max-width: 900px){
+  .hero{ grid-template-columns: 1fr; }
+  .grid{ grid-template-columns: 1fr; }
+  .stack{ grid-template-columns: 1fr; }
+  .header{ align-items:flex-start; flex-direction: column; }
+}

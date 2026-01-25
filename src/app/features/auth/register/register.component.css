@@ -85,9 +85,9 @@
   to{ opacity:1; transform: translateY(0); }
 }
 
-/* =========================
+/*  //=========================
    ✅ LEFT Brand Panel
-========================= */
+ //========================= */
 .brand{
   padding: 86px;
   display: flex;
@@ -147,9 +147,9 @@
   border-color: color-mix(in srgb, var(--theme, #ff2d95) 22%, transparent);
 }
 
-/* =========================
+/*  //=========================
    ✅ RIGHT Form
-========================= */
+ //========================= */
 .formWrap{
   display:flex;
   justify-content:center;

@@ -1,1 +1,22 @@
-<p>app-layout works!</p>
+<div class="appShell">
+
+  <!-- 🌌 Background -->
+  <div class="bg"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="grain"></div>
+
+  <!-- ✅ LEFT / BOTTOM NAV -->
+  <app-leftbar
+    class="nav"
+    [class.hide-mobile]="isChatRoute"
+  ></app-leftbar>
+
+  <!-- ✅ MAIN CONTENT -->
+  <main class="main">
+    <div class="routeWrap">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+
+</div>

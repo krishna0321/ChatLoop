@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
 import { Subscription } from 'rxjs';
 
@@ -29,7 +29,11 @@ export class ChatListComponent implements OnInit, OnDestroy {
 
   private sub?: Subscription;
 
-  constructor(private auth: Auth, public rooms: RoomService) {}
+  constructor(
+    private auth: Auth,
+    public rooms: RoomService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     const user = this.auth.currentUser;
@@ -54,13 +58,9 @@ export class ChatListComponent implements OnInit, OnDestroy {
           unread: r.unread?.[myUid] || 0,
           ownerId: r.ownerId,
         }));
-
         this.loading = false;
       },
-      error: (err) => {
-        console.error(err);
-        this.loading = false;
-      },
+      error: () => (this.loading = false),
     });
   }
 
@@ -78,9 +78,12 @@ export class ChatListComponent implements OnInit, OnDestroy {
     return '💬';
   }
 
-  // ======================================================
+  // ✅ MOBILE SAFE NAVIGATION
+  openChat(c: ChatItem) {
+    this.router.navigate(['/app/chat', c.id]);
+  }
+
   // ✅ DELETE SINGLE CHAT FULL HISTORY
-  // ======================================================
   async deleteChatHistory(c: ChatItem) {
     const myUid = this.auth.currentUser?.uid;
     if (!myUid) return;
@@ -91,38 +94,31 @@ export class ChatListComponent implements OnInit, OnDestroy {
     if (!ok) return;
 
     try {
-      // ✅ If group/channel and NOT owner => leave only
       if ((c.type === 'group' || c.type === 'channel') && c.ownerId !== myUid) {
         await this.rooms.leaveRoom(c.id, myUid);
         alert('✅ You left this group/channel');
         return;
       }
 
-      // ✅ DM OR owner => delete fully (messages + room)
       await this.rooms.deleteRoomWithMessages(c.id);
       alert('✅ Chat deleted permanently!');
-    } catch (e) {
-      console.error(e);
+    } catch {
       alert('❌ Failed to delete chat');
     }
   }
 
-  // ======================================================
-  // ✅ DELETE ALL CHATS FULL HISTORY (Account)
-  // ======================================================
+  // ✅ DELETE ALL
   async deleteAllChatsHistory() {
     const ok = confirm(
-      `Delete ALL chats history?\n\nThis will permanently delete all your DMs.\nGroup chats will be deleted only if you are owner, otherwise you will leave them.`
+      `Delete ALL chats history?\n\nThis will permanently delete all your DMs.\nGroup chats will be deleted only if you are owner.`
     );
     if (!ok) return;
 
     try {
       await this.rooms.deleteAllMyChats();
       alert('✅ All chats deleted!');
-    } catch (e) {
-      console.error(e);
+    } catch {
       alert('❌ Failed to delete all chats');
     }
   }
-  
 }

@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { Auth, onAuthStateChanged } from '@angular/fire/auth';
-import { signOut, deleteUser } from '@angular/fire/auth';
-
+import { Auth, onAuthStateChanged, signOut, deleteUser } from '@angular/fire/auth';
 import { Subscription } from 'rxjs';
+
 import { SettingsService, UserSettings } from '../../core/services/settings.service';
+import { ThemeService } from '../../core/services/theme.service';
 
 type TabKey = 'profile' | 'appearance' | 'notifications' | 'privacy' | 'account';
 
@@ -39,9 +39,13 @@ export class SettingsComponent implements OnInit, OnDestroy {
     name: '',
     bio: '',
     phone: '',
+
     darkMode: true,
+    themeColor: '#3b82f6', // ✅ custom main color
+
     notifyMessages: true,
     notifySound: true,
+
     showOnlineStatus: true,
     allowFriendRequests: true,
   };
@@ -51,10 +55,11 @@ export class SettingsComponent implements OnInit, OnDestroy {
   constructor(
     private auth: Auth,
     private router: Router,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    private theme: ThemeService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     onAuthStateChanged(this.auth, async (user) => {
       if (!user) {
         this.router.navigate(['/login']);
@@ -63,21 +68,30 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
       this.uid = user.uid;
 
+      // ✅ create settings doc if missing
       try {
         await this.settingsService.createDefaultIfMissing(user.uid, user.email || '');
       } catch (err) {
         console.error('❌ Default settings create error:', err);
       }
 
+      // ✅ subscribe settings
       this.sub = this.settingsService.getSettings(user.uid).subscribe({
         next: (data) => {
-          this.settings = { ...this.settings, ...data, uid: user.uid };
+          this.settings = {
+            ...this.settings,
+            ...data,
+            uid: user.uid,
+            themeColor: data?.themeColor || this.theme.getSavedColor(),
+          };
 
           this.originalSettings = structuredClone(this.settings);
           this.hasChanges = false;
-
           this.loading = false;
+
+          // ✅ apply theme instantly
           this.applyTheme();
+          this.applyColor();
         },
         error: (err) => {
           console.error('❌ Firestore settings read failed:', err);
@@ -107,7 +121,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   getTabSubtitle() {
     switch (this.activeTab) {
       case 'profile': return 'Update your name, bio and phone';
-      case 'appearance': return 'Dark mode and UI appearance';
+      case 'appearance': return 'Dark/Light mode + Custom Color';
       case 'notifications': return 'Sounds and message alerts';
       case 'privacy': return 'Online status & requests';
       case 'account': return 'Logout or delete permanently';
@@ -129,17 +143,14 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.hasChanges = JSON.stringify(cur) !== JSON.stringify(orig);
   }
 
-  // ✅ Dark/Light theme toggle
+  // ✅ Theme (dark/light)
   applyTheme() {
-    const body = document.body;
+    this.theme.setMode(this.settings.darkMode ? 'dark' : 'light');
+  }
 
-    if (this.settings.darkMode) {
-      body.classList.remove('light-mode');
-      body.classList.add('dark-mode');
-    } else {
-      body.classList.remove('dark-mode');
-      body.classList.add('light-mode');
-    }
+  // ✅ Custom theme color
+  applyColor() {
+    this.theme.setThemeColor(this.settings.themeColor || '#3b82f6');
   }
 
   showToast(msg: string, type: 'ok' | 'err' = 'ok') {
@@ -163,6 +174,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
       this.hasChanges = false;
 
       this.applyTheme();
+      this.applyColor();
+
       this.showToast('✅ Settings saved!', 'ok');
     } catch (err) {
       console.error('❌ save error:', err);
@@ -194,8 +207,5 @@ export class SettingsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ✅ optional: click outside handler
-  closeAll() {
-    // placeholder - if you later add dropdowns etc.
-  }
+  closeAll() {}
 }

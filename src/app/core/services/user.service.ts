@@ -115,12 +115,13 @@ export class UserService {
     });
   }
 
-  // ======================================================
+     
   // ✅✅ PHONE UNIQUE SYSTEM (NEW)
   // phone_index/{phone} -> { uid, createdAt }
-  // ======================================================
+     
 
   // ✅ check phone already taken
+  
   async isPhoneTaken(phone: string): Promise<boolean> {
     const clean = this.normalizePhone(phone);
     if (!clean) return false;
@@ -153,3 +154,7 @@ export class UserService {
     });
   }
 }
+function isPhoneTaken(phone: any, string: any) {
+  throw new Error('Function not implemented.');
+}
+

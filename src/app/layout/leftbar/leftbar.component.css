@@ -1,1 +1,430 @@
- 
+ /* =========================================================
+   ✅ Chatloop Leftbar (Premium Telegram Style)
+   Works in Desktop Sidebar + Mobile Bottom Bar
+========================================================= */
+
+:host{
+  display:block;
+  height:100%;
+  min-height:0;
+
+  /* fallback if global not present */
+  --theme: var(--theme, #7c3aed);
+  --theme-2: var(--theme-2, #3b82f6);
+
+  --bg: var(--bg, #050816);
+  --text: var(--text, rgba(255,255,255,0.92));
+  --border: var(--border, rgba(255,255,255,0.10));
+
+  --t: .18s ease;
+}
+
+*{ box-sizing:border-box; }
+
+/* =========================
+   NAV WRAPPER
+========================= */
+.nav{
+  width:78px;
+  height:100%;
+  min-height:0;
+
+  position:sticky;
+  top:0;
+  z-index:1000;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+
+  padding: 10px 10px 14px;
+
+  background: rgba(2,6,23,0.72);
+  border-right: 1px solid var(--border);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  overflow:hidden;
+  isolation:isolate;
+}
+
+/* GLOW */
+.navGlow{
+  position:absolute;
+  inset:-30%;
+  pointer-events:none;
+  z-index:0;
+
+  background:
+    radial-gradient(circle at 50% 12%, rgba(124,58,237,0.36), transparent 55%),
+    radial-gradient(circle at 50% 85%, rgba(59,130,246,0.26), transparent 60%),
+    radial-gradient(circle at 50% 50%, rgba(34,211,238,0.12), transparent 60%);
+  filter: blur(60px);
+  opacity: .95;
+  animation: glowMove 10s ease-in-out infinite;
+}
+
+@keyframes glowMove{
+  0%,100%{ transform: translate(0,0); }
+  50%{ transform: translate(18px,-14px); }
+}
+
+/* =========================
+   BRAND
+========================= */
+.brand{
+  position:relative;
+  z-index:2;
+  margin-bottom: 14px;
+}
+
+.logo{
+  width:54px;
+  height:54px;
+  border-radius:22px;
+
+  display:grid;
+  place-items:center;
+
+  background: linear-gradient(135deg, var(--theme), var(--theme-2));
+  border: 1px solid rgba(255,255,255,0.14);
+
+  box-shadow:
+    0 18px 55px rgba(124,58,237,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.10);
+
+  position:relative;
+  overflow:hidden;
+
+  animation: pop .45s ease;
+}
+
+.logo::after{
+  content:"";
+  position:absolute;
+  inset:-50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.30), transparent 55%);
+  opacity:.16;
+  transform: translateX(-30%);
+  animation: shine 2.8s ease-in-out infinite;
+}
+
+@keyframes shine{
+  0%,100%{ transform: translateX(-30%); }
+  50%{ transform: translateX(20%); }
+}
+
+.bub{ font-size:22px; }
+
+@keyframes pop{
+  from{ transform:scale(.92); opacity:.6; }
+  to{ transform:scale(1); opacity:1; }
+}
+
+/* =========================
+   LINKS
+========================= */
+.links{
+  position:relative;
+  z-index:2;
+
+  display:flex;
+  flex-direction:column;
+  gap: 9px;
+
+  width:100%;
+  align-items:center;
+
+  padding: 6px 0;
+
+  flex:1;
+  min-height:0;
+}
+
+.item{
+  width:54px;
+  height:54px;
+  border-radius:20px;
+
+  display:grid;
+  place-items:center;
+
+  text-decoration:none;
+  color: var(--text);
+  font-size:22px;
+
+  position:relative;
+  border:1px solid transparent;
+  background: rgba(255,255,255,0.04);
+
+  transition: var(--t);
+  cursor:pointer;
+  overflow:hidden;
+
+  transform: translateZ(0);
+  user-select:none;
+}
+
+/* hover shine */
+.item::after{
+  content:"";
+  position:absolute;
+  inset:-40%;
+  background: linear-gradient(
+    120deg,
+    transparent 20%,
+    rgba(255,255,255,0.16),
+    transparent 70%
+  );
+  opacity:0;
+  transform: translateX(-40%);
+  transition: .22s ease;
+}
+
+.item:hover{
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.10);
+  box-shadow: 0 18px 55px rgba(0,0,0,0.28);
+}
+
+.item:hover::after{
+  opacity:1;
+  transform: translateX(40%);
+}
+
+.item:active{
+  transform: translateY(0px) scale(.97);
+}
+
+/* ✅ keyboard accessibility */
+.item:focus-visible,
+.logout:focus-visible{
+  outline: 3px solid rgba(124,58,237,0.35);
+  outline-offset: 2px;
+}
+
+/* =========================
+   ACTIVE STATE
+========================= */
+.item.active{
+  color:#fff;
+  background: linear-gradient(
+    135deg,
+    rgba(124,58,237,0.22),
+    rgba(59,130,246,0.14)
+  );
+  border-color: rgba(124,58,237,0.40);
+
+  box-shadow:
+    0 18px 55px rgba(124,58,237,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.10);
+}
+
+/* active indicator */
+.item.active::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top: 14px;
+  bottom: 14px;
+  width: 4px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--theme), var(--theme-2));
+  box-shadow: 0 0 18px rgba(124,58,237,0.40);
+}
+
+/* =========================
+   CREATE FAB
+========================= */
+.item.create{
+  margin-top: 10px;
+  color:white;
+  font-weight:900;
+
+  background: linear-gradient(135deg, var(--theme), var(--theme-2));
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow:
+    0 20px 65px rgba(124,58,237,0.30),
+    0 10px 26px rgba(0,0,0,0.45);
+}
+
+.item.create .pulse{
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  background: radial-gradient(circle, rgba(255,255,255,0.35), transparent 55%);
+  opacity:.12;
+  animation: pulse 1.8s ease-in-out infinite;
+  pointer-events:none;
+}
+
+@keyframes pulse{
+  0%,100%{ transform: scale(1); opacity:.10; }
+  50%{ transform: scale(1.15); opacity:.18; }
+}
+
+.item.create:hover{
+  transform: translateY(-3px) scale(1.03);
+  filter: brightness(1.06);
+}
+
+/* =========================
+   FOOTER
+========================= */
+.footer{
+  position:relative;
+  z-index:2;
+  width:100%;
+  display:flex;
+  justify-content:center;
+  padding-top: 10px;
+}
+
+.logout{
+  width:54px;
+  height:54px;
+  border-radius:20px;
+  display:grid;
+  place-items:center;
+
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.10);
+  color:white;
+  font-size:22px;
+
+  cursor:pointer;
+  transition: var(--t);
+  position:relative;
+  overflow:hidden;
+}
+
+.logout:hover{
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.09);
+  border-color: rgba(255,120,120,0.22);
+  box-shadow: 0 18px 55px rgba(0,0,0,0.28);
+}
+
+.logout:active{ transform: scale(.97); }
+
+.logout:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+  transform:none;
+}
+
+/* =========================
+   Tooltip (Desktop)
+========================= */
+@media (min-width: 901px){
+  .item[data-tip]::before,
+  .logout[data-tip]::before{
+    content: attr(data-tip);
+    position:absolute;
+    left: 76px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    padding: 8px 10px;
+    border-radius: 14px;
+
+    font-size:12px;
+    font-weight: 1000;
+
+    background: rgba(2,6,23,0.94);
+    border:1px solid rgba(255,255,255,0.12);
+    color:white;
+
+    opacity:0;
+    pointer-events:none;
+    white-space:nowrap;
+
+    box-shadow: 0 16px 60px rgba(0,0,0,0.55);
+    transition: .16s ease;
+  }
+
+  .item:hover::before,
+  .logout:hover::before{
+    opacity:1;
+  }
+}
+
+/* =========================
+   ✅ MOBILE BOTTOM NAV
+========================= */
+@media (max-width: 900px){
+  .nav{
+    width:100%;
+    height:74px;
+
+    flex-direction:row;
+    justify-content:space-between;
+    align-items:center;
+
+    position:fixed;
+    bottom:0;
+    left:0;
+    top:auto;
+
+    padding: 10px 12px;
+
+    border-right:none;
+    border-top: 1px solid var(--border);
+
+    z-index:2000;
+  }
+
+  .brand{ display:none; }
+
+  .links{
+    width:100%;
+    flex-direction:row;
+    justify-content:space-around;
+    gap: 8px;
+    padding: 0;
+  }
+
+  .footer{ display:none; }
+
+  .item{
+    width:46px;
+    height:46px;
+    border-radius:16px;
+  }
+
+  /* active indicator bottom */
+  .item.active::before{
+    left: 50%;
+    top: auto;
+    bottom: 6px;
+    transform: translateX(-50%);
+    height: 4px;
+    width: 18px;
+    border-radius: 999px;
+  }
+
+  /* create FAB */
+  .item.create{
+    width:56px;
+    height:56px;
+    border-radius:20px;
+    transform: translateY(-16px);
+    box-shadow:
+      0 24px 75px rgba(124,58,237,0.30),
+      0 10px 30px rgba(0,0,0,0.45);
+  }
+
+  .item.create:hover{
+    transform: translateY(-18px) scale(1.04);
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .navGlow{ animation:none !important; }
+  .logo::after{ animation:none !important; }
+  .pulse{ animation:none !important; }
+  .item, .logout{ transition:none !important; }
+}

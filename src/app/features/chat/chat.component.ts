@@ -1,22 +1,11 @@
-import {
-  AfterViewChecked,
-  Component,
-  ElementRef,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  SimpleChanges,
-  ViewChild,
-} from '@angular/core';
+import { AfterViewChecked,Component,ElementRef,HostListener,Input,OnChanges,OnDestroy,OnInit,SimpleChanges,ViewChild,Output, EventEmitter, } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { Auth, onAuthStateChanged } from '@angular/fire/auth';
 import { Firestore, doc, docData } from '@angular/fire/firestore';
-
 import QRCode from 'qrcode';
-
 import { ChatMessage, ChatService } from '../../core/services/chat.service';
 import { AppUser, UserService } from '../../core/services/user.service';
 import { ContactService } from '../../core/services/contact.service';
@@ -35,6 +24,12 @@ export class ChatComponent
   implements OnInit, OnChanges, OnDestroy, AfterViewChecked
 {
   @Input() user!: AppUser;
+  @Output() back = new EventEmitter<void>(); // ✅ mobile back
+
+  // ✅ MOBILE BACK (used only on small screens)
+  goBack() {
+  this.back.emit();
+}
 
   myUid = '';
   chatId = '';
@@ -75,10 +70,13 @@ export class ChatComponent
   sendingFile = false;
   fileError = '';
 
-  // ✅ ATTACH MENU FEATURE
+  // attach menu
   showAttachMenu = false;
   attachType: AttachType | null = null;
   selectedFile: File | null = null;
+
+  // ✅ mobile keyboard helper
+  keyboardOpen = false;
 
   @ViewChild('messagesBox') messagesBox!: ElementRef<HTMLDivElement>;
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -101,6 +99,21 @@ export class ChatComponent
     private userService: UserService,
     private contactService: ContactService
   ) {}
+
+  // ✅ keyboard open/close
+  @HostListener('window:focusin', ['$event'])
+  onFocusIn(e: any) {
+    const tag = (e?.target?.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea') {
+      this.keyboardOpen = true;
+      setTimeout(() => this.scrollBottom(), 120);
+    }
+  }
+
+  @HostListener('window:focusout')
+  onFocusOut() {
+    this.keyboardOpen = false;
+  }
 
   // =====================
   // INIT
@@ -134,7 +147,8 @@ export class ChatComponent
   ngAfterViewChecked(): void {
     if (this.messages.length !== this.lastCount) {
       this.lastCount = this.messages.length;
-      setTimeout(() => this.scrollBottom(), 50);
+      setTimeout(() => this.scrollBottom(true), 40);
+
     }
   }
 
@@ -150,10 +164,10 @@ export class ChatComponent
     try {
       this.chatId = this.chatService.getChatId(this.myUid, this.user.uid);
 
-      // ✅ always ensure chat exists
+      // ensure chat exists
       await this.chatService.ensureChat(this.chatId, [this.myUid, this.user.uid]);
 
-      // ✅ chat meta listener (mute/pin)
+      // chat meta listener (mute/pin)
       this.chatDocSub?.unsubscribe?.();
       this.chatDocSub = docData(doc(this.firestore, `chats/${this.chatId}`)).subscribe(
         (d: any) => {
@@ -162,10 +176,10 @@ export class ChatComponent
         }
       );
 
-      // ✅ mark read
+      // mark read
       await this.chatService.markAsRead(this.chatId, this.myUid);
 
-      // ✅ realtime messages
+      // realtime messages
       this.msgUnsub?.();
       this.msgUnsub = this.chatService.listenMessages(this.chatId, (msgs) => {
         this.messages = msgs || [];
@@ -179,11 +193,20 @@ export class ChatComponent
   // =====================
   // UI HELPERS
   // =====================
-  private scrollBottom() {
-    if (!this.messagesBox) return;
-    const el = this.messagesBox.nativeElement;
-    el.scrollTop = el.scrollHeight;
-  }
+  private scrollBottom(smooth = false) {
+  try {
+    const el = this.messagesBox?.nativeElement;
+    if (!el) return;
+
+    requestAnimationFrame(() => {
+      el.scrollTo({
+        top: el.scrollHeight,
+        behavior: smooth ? 'smooth' : 'auto',
+      });
+    });
+  } catch {}
+}
+
 
   closeAllMenus() {
     this.menuMessageId = null;
@@ -237,6 +260,7 @@ export class ChatComponent
   clearSelectedFile() {
     this.selectedFile = null;
     this.attachType = null;
+    this.fileError = '';
 
     const input = this.fileInput?.nativeElement;
     if (input) input.value = '';
@@ -258,9 +282,25 @@ export class ChatComponent
       return;
     }
 
-    const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    this.menuX = r.right - 210;
-    this.menuY = r.bottom + 6;
+    const pad = 10;
+    const menuW = 200;
+    const menuH = 132;
+
+    let x = e.clientX;
+    let y = e.clientY;
+
+    x = Math.max(pad, Math.min(x, window.innerWidth - menuW - pad));
+    y = Math.max(pad, Math.min(y, window.innerHeight - menuH - pad));
+
+    // ✅ mobile: center-bottom
+    if (window.innerWidth <= 900) {
+      x = Math.max(pad, (window.innerWidth - menuW) / 2);
+      y = window.innerHeight - menuH - 110;
+      y = Math.max(pad, y);
+    }
+
+    this.menuX = x;
+    this.menuY = y;
 
     this.menuMessageId = m.id;
     this.selectedMessage = m;
@@ -282,19 +322,18 @@ export class ChatComponent
 
         await this.chatService.ensureChat(this.chatId, [this.myUid, this.user.uid]);
 
-        // ✅ IMPORTANT: your ChatService should support sending images/files
-        // type: image => 'image', doc => 'file'
         await this.chatService.sendFileMessage(
           this.chatId,
           this.selectedFile,
           this.myUid,
           this.user.uid,
           this.attachType === 'image' ? 'image' : 'file',
-          (this.text || '').trim() // caption
+          (this.text || '').trim()
         );
 
         this.text = '';
         this.clearSelectedFile();
+        setTimeout(() => this.scrollBottom(), 70);
       } catch (err: any) {
         console.error(err);
         this.fileError = err?.message || 'Upload failed';
@@ -313,6 +352,7 @@ export class ChatComponent
       await this.chatService.ensureChat(this.chatId, [this.myUid, this.user.uid]);
       await this.chatService.sendMessage(this.chatId, v, this.myUid, this.user.uid);
       this.text = '';
+      setTimeout(() => this.scrollBottom(), 30);
     } catch (err) {
       console.error('🔥 send() failed:', err);
     }
@@ -326,6 +366,7 @@ export class ChatComponent
     this.editingId = this.selectedMessage.id;
     this.editingText = this.selectedMessage.text;
     this.menuMessageId = null;
+    setTimeout(() => this.scrollBottom(), 80);
   }
 
   async clickDelete() {
@@ -381,6 +422,24 @@ export class ChatComponent
     this.showHeaderMenu = false;
   }
 
+  // TIME FORMATTER ✅
+  // =====================
+  formatTime(ts: any): string {
+    try {
+      if (!ts) return '';
+      const d = ts?.toDate ? ts.toDate() : new Date(ts);
+      let h = d.getHours();
+      const m = d.getMinutes();
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12;
+      h = h ? h : 12;
+      const mm = m < 10 ? '0' + m : m;
+      return `${h}:${mm} ${ampm}`;
+    } catch {
+      return '';
+    }
+  }
+
   // =====================
   // PROFILE DRAWER
   // =====================
@@ -434,23 +493,21 @@ export class ChatComponent
   }
 
   // =====================
-  // FILE PICK (NO AUTO UPLOAD)
+  // FILE PICK
   // =====================
   pickFile(e: Event) {
     const input = e.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
 
-    // ✅ validate image
     if (this.attachType === 'image') {
       if (!file.type.startsWith('image/')) {
-        alert('❌ Only image files allowed!');
+        this.fileError = '❌ Only image files allowed!';
         input.value = '';
         return;
       }
     }
 
-    // ✅ validate document
     if (this.attachType === 'document') {
       const allowedExt = [
         'pdf',
@@ -466,14 +523,16 @@ export class ChatComponent
       ];
       const ext = file.name.split('.').pop()?.toLowerCase() || '';
       if (!allowedExt.includes(ext)) {
-        alert('❌ Only document files allowed!');
+        this.fileError = '❌ Only document files allowed!';
         input.value = '';
         return;
       }
     }
 
-    // ✅ set preview file (upload happens when press send)
     this.selectedFile = file;
+
+    // ✅ scroll a bit so preview visible
+    setTimeout(() => this.scrollBottom(), 80);
   }
 
   // =====================
@@ -500,7 +559,6 @@ export class ChatComponent
     });
   }
 
-  // dummy actions
   callUser() {
     alert('📞 Coming soon');
   }
@@ -518,4 +576,5 @@ export class ChatComponent
     this.meSub?.unsubscribe?.();
     this.contactUnsub?.();
   }
+  
 }

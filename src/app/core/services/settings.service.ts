@@ -4,6 +4,8 @@ import {
   doc,
   docData,
   setDoc,
+  updateDoc,
+  getDoc,
   serverTimestamp,
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
@@ -11,46 +13,48 @@ import { Observable } from 'rxjs';
 export interface UserSettings {
   uid: string;
 
-  // Profile
+  // profile
   name: string;
   bio: string;
   phone: string;
 
-  // Appearance
+  // appearance
   darkMode: boolean;
+  themeColor: string; // ✅ NEW
 
-  // Notifications
+  // notifications
   notifyMessages: boolean;
   notifySound: boolean;
 
-  // Privacy
+  // privacy
   showOnlineStatus: boolean;
   allowFriendRequests: boolean;
 
+  // meta
   createdAt?: any;
   updatedAt?: any;
 }
 
 @Injectable({ providedIn: 'root' })
 export class SettingsService {
+  private readonly col = 'settings';
+
   constructor(private firestore: Firestore) {}
 
-  getSettings(uid: string): Observable<UserSettings> {
-    const ref = doc(this.firestore, `user_settings/${uid}`);
-    return docData(ref) as Observable<UserSettings>;
+  private ref(uid: string) {
+    return doc(this.firestore, `${this.col}/${uid}`);
   }
 
-  async createDefaultIfMissing(uid: string, email?: string | null) {
-    const ref = doc(this.firestore, `user_settings/${uid}`);
-
-    const defaultSettings: UserSettings = {
+  private defaultSettings(uid: string, email: string): UserSettings {
+    return {
       uid,
 
-      name: email ? email.split('@')[0] : 'User',
+      name: email?.split('@')?.[0] || 'User',
       bio: '',
       phone: '',
 
       darkMode: true,
+      themeColor: '#3b82f6', // ✅ NEW
 
       notifyMessages: true,
       notifySound: true,
@@ -61,22 +65,41 @@ export class SettingsService {
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
-
-    // ✅ merge true means: if document exists, don't delete old fields
-    await setDoc(ref, defaultSettings, { merge: true });
   }
 
-  async saveSettings(uid: string, payload: Partial<UserSettings>) {
-    const ref = doc(this.firestore, `user_settings/${uid}`);
+  async createDefaultIfMissing(uid: string, email: string) {
+    const ref = this.ref(uid);
+    const snap = await getDoc(ref);
+    if (snap.exists()) return;
 
-    await setDoc(
-      ref,
-      {
-        ...payload,
-        uid,
-        updatedAt: serverTimestamp(),
-      },
-      { merge: true }
-    );
+    const data = this.defaultSettings(uid, email);
+    await setDoc(ref, data, { merge: true });
+  }
+
+  getSettings(uid: string): Observable<Partial<UserSettings>> {
+    return docData(this.ref(uid)) as Observable<Partial<UserSettings>>;
+  }
+
+  async saveSettings(uid: string, settings: UserSettings) {
+    const ref = this.ref(uid);
+
+    const payload: Partial<UserSettings> = {
+      name: (settings.name || '').trim(),
+      bio: (settings.bio || '').trim(),
+      phone: (settings.phone || '').trim(),
+
+      darkMode: !!settings.darkMode,
+      themeColor: settings.themeColor || '#3b82f6', // ✅ NEW
+
+      notifyMessages: !!settings.notifyMessages,
+      notifySound: !!settings.notifySound,
+
+      showOnlineStatus: !!settings.showOnlineStatus,
+      allowFriendRequests: !!settings.allowFriendRequests,
+
+      updatedAt: serverTimestamp(),
+    };
+
+    await updateDoc(ref, payload);
   }
 }

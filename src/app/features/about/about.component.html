@@ -1,0 +1,112 @@
+<div class="page">
+
+  <!-- ✅ HEADER -->
+  <div class="header">
+    <div class="title">
+      <h1>About Chatloop</h1>
+      <p class="sub">
+        A premium Telegram-like chat application built using
+        <b>Angular 17</b> + <b>Firebase</b>.
+      </p>
+    </div>
+
+    <div class="actions">
+      <a routerLink="/app/faq" class="btn ghost">FAQ</a>
+      <a routerLink="/app/chats" class="btn">Back to Chats</a>
+    </div>
+  </div>
+
+  <!-- ✅ HERO -->
+  <div class="hero">
+    <div class="heroLeft">
+      <div class="badge">🚀 {{ projectType }}</div>
+
+      <h2>{{ appName }} – Fast. Clean. Secure.</h2>
+
+      <p class="heroText">
+        {{ appName }} is designed as a modern real-time chat app where users can communicate
+        instantly with a smooth UI and secure authentication system.
+      </p>
+
+      <!-- ✅ Creator Card -->
+      <div class="creatorCard">
+        <div class="creatorAvatar">👑</div>
+        <div class="creatorInfo">
+          <div class="creatorTitle">Created By</div>
+          <div class="creatorName">{{ creatorName }}</div>
+          <div class="creatorDesc">
+            This application was made as a <b>{{ projectType }}</b> to learn and demonstrate
+            full-stack real-time chat development using Angular + Firebase.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="heroRight">
+      <div class="logoCard">
+        <span class="bubble">💬</span>
+        <div class="logoText">
+          <div class="name">Chatloop</div>
+          <div class="tag">Realtime Chat App</div>
+        </div>
+      </div>
+
+      <div class="goalCard">
+        <div class="goalTop">🎯 Project Goal</div>
+        <p>
+          Build a Telegram-style chat application with rooms, realtime messaging,
+          user profiles, and modern UI.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ TECH STACK -->
+  <div class="section">
+    <div class="secTitle">
+      <span class="secIcon">🛠️</span>
+      <span>Tech Stack</span>
+    </div>
+
+    <div class="stack">
+      <div class="stackItem" *ngFor="let t of techStack">
+        <div class="stackLabel">{{ t.label }}</div>
+        <div class="stackValue">{{ t.value }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ HIGHLIGHTS -->
+  <div class="section">
+    <div class="secTitle">
+      <span class="secIcon">✨</span>
+      <span>Key Features</span>
+    </div>
+
+    <div class="grid">
+      <div class="card" *ngFor="let h of highlights">
+        <div class="cardTop">
+          <div class="icon">{{ h.icon }}</div>
+          <h3>{{ h.title }}</h3>
+        </div>
+        <p>{{ h.desc }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ FOOTER -->
+  <div class="footer">
+    <div class="left">
+      <div class="small">© {{ year }} Chatloop</div>
+      <div class="muted">
+        Built by <b>{{ creatorName }}</b> • {{ projectType }}
+      </div>
+    </div>
+
+    <div class="right">
+      <a routerLink="/app/contact" class="link">Contact</a>
+      <a routerLink="/app/settings" class="link">Settings</a>
+      <a routerLink="/app/profile" class="link">Profile</a>
+    </div>
+  </div>
+</div>
