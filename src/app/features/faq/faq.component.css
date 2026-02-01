@@ -305,3 +305,85 @@ h1{
   .top{ flex-direction: column; align-items:flex-start; }
   .a{ padding-left: 14px; }
 }
+/* =====================================
+   🍃 FAQ / HELP PAGE – MINT GLASS BOOST
+   (COLOR ONLY – NO STRUCTURE CHANGED)
+===================================== */
+
+.page{
+  background:#ecfffa;
+  color:#0f172a;
+}
+
+/* header fade fix */
+.top{
+  background: linear-gradient(180deg,#ecfffa,rgba(236,255,250,0));
+}
+
+/* soft glow */
+:root{
+  --theme:#34d399;
+  --theme-2:#67e8f9;
+  --border: rgba(15,23,42,.12);
+  --card: rgba(255,255,255,.82);
+  --shadow: 0 18px 55px rgba(52,211,153,.25);
+}
+
+/* cards + list */
+.qa,
+.empty,
+.searchBox,
+.chip{
+  background: rgba(255,255,255,.85);
+  backdrop-filter: blur(20px);
+  box-shadow:
+    0 18px 50px rgba(52,211,153,.25),
+    inset 0 1px 0 rgba(255,255,255,.7);
+}
+
+/* search */
+.search{
+  color:#0f172a;
+}
+
+/* chips active */
+.chip.active{
+  background: linear-gradient(135deg,#34d399,#67e8f9);
+  color:white;
+  border-color: transparent;
+}
+
+/* tag pills softer */
+.tag{
+  background:#ffffff;
+  border-color: rgba(15,23,42,.12);
+}
+
+/* icons contrast */
+.qIcon{
+  background:#ffffff;
+  border-color: rgba(15,23,42,.12);
+}
+
+/* answer text */
+.a{
+  color:#0f172a;
+}
+
+/* ghost buttons */
+.btn.ghost,
+.tbtn.ghost{
+  background:#ffffff;
+  border-color: rgba(15,23,42,.12);
+  color:#0f172a;
+}
+
+/* footer links */
+.link{
+  color:#0f172a;
+}
+
+/* scrollbar soft */
+.page::-webkit-scrollbar-thumb{
+  background: rgba(15,23,42,.18);
+}

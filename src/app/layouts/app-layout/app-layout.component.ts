@@ -19,7 +19,10 @@ export class AppLayoutComponent {
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe(() => {
-        this.isChatRoute = this.router.url.startsWith('/chat');
+        const url = this.router.url;
+
+        // ✅ FIX — correct route check
+        this.isChatRoute = url.startsWith('/app/chat/');
       });
   }
 }

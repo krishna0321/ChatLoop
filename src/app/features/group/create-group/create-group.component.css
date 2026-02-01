@@ -545,3 +545,104 @@
   .orb{ animation:none !important; }
   .fadeIn{ animation:none !important; }
 }
+/* =====================================
+   🍃 CREATE GROUP – MINT GLASS THEME
+   (layout untouched)
+===================================== */
+
+.page{
+  background:#ecfffa;
+  color:#0f172a;
+}
+
+/* background glow fresh */
+.bg{
+  background:
+    radial-gradient(1200px 800px at 15% 10%, rgba(52,211,153,.45), transparent 60%),
+    radial-gradient(1000px 700px at 85% 85%, rgba(103,232,249,.35), transparent 65%);
+  filter: blur(120px);
+}
+
+/* glass surfaces */
+.topbar,
+.card,
+.selectedBox,
+.user,
+.empty{
+  background: rgba(255,255,255,.78);
+  border-color: rgba(15,23,42,.10);
+  backdrop-filter: blur(22px);
+
+  box-shadow:
+    0 18px 55px rgba(52,211,153,.25),
+    inset 0 1px 0 rgba(255,255,255,.65);
+}
+
+/* text clarity */
+.title,
+.name{
+  color:#0f172a;
+}
+.sub,
+.meta .sub,
+.secTitle{
+  color:#475569;
+}
+
+/* type buttons */
+.typeBtn{
+  background:#ffffff;
+  color:#0f172a;
+  border-color: rgba(15,23,42,.12);
+}
+
+.typeBtn.active{
+  background: linear-gradient(135deg,#34d399,#67e8f9);
+  color:white;
+}
+
+/* inputs */
+.form input,
+.form textarea,
+.searchRow input{
+  background:#ffffff;
+  color:#0f172a;
+  border-color: rgba(15,23,42,.12);
+}
+
+.form input:focus,
+.form textarea:focus,
+.searchRow input:focus{
+  border-color:#34d399;
+  box-shadow: 0 0 0 4px rgba(52,211,153,.25);
+}
+
+/* selected user */
+.user.sel{
+  background: linear-gradient(135deg,#34d399,#67e8f9);
+  color:white;
+}
+
+/* chips */
+.chip{
+  background:#ffffff;
+  border-color: rgba(15,23,42,.12);
+}
+
+/* create button */
+.primary{
+  background: linear-gradient(135deg,#34d399,#67e8f9);
+  box-shadow: 0 20px 55px rgba(52,211,153,.45);
+}
+
+/* back button */
+.backBtn{
+  background:#ffffff;
+  color:#0f172a;
+  border-color: rgba(15,23,42,.12);
+}
+
+.backBtn:hover{
+  background: rgba(52,211,153,.18);
+  border-color:#34d399;
+}

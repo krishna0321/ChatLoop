@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Auth, signOut } from '@angular/fire/auth';
+import { Auth, authState, signOut } from '@angular/fire/auth';
 import {
   Firestore,
   doc,
@@ -14,6 +14,7 @@ import {
   getDownloadURL,
 } from '@angular/fire/storage';
 import { Observable, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 export interface ProfileUser {
   uid: string;
@@ -40,37 +41,39 @@ export class ProfileService {
     private storage: Storage
   ) {}
 
-  // ✅ get logged in user profile
+  // 🔥 REALTIME profile (NO REFRESH EVER)
   getMyProfile(): Observable<ProfileUser | null> {
-    const uid = this.auth.currentUser?.uid;
-    if (!uid) return of(null);
+    return authState(this.auth).pipe(
+      switchMap(user => {
+        if (!user) return of(null);
 
-    const refDoc = doc(this.firestore, `users/${uid}`);
-    return docData(refDoc, { idField: 'uid' }) as Observable<ProfileUser>;
+        const refDoc = doc(this.firestore, `users/${user.uid}`);
+        return docData(refDoc, { idField: 'uid' }) as Observable<ProfileUser>;
+      })
+    );
   }
 
-  // ✅ update profile
   async updateMyProfile(data: Partial<ProfileUser>) {
     const uid = this.auth.currentUser?.uid;
     if (!uid) throw new Error('Not logged in');
 
     const refDoc = doc(this.firestore, `users/${uid}`);
+
     return updateDoc(refDoc, {
       ...data,
       updatedAt: serverTimestamp(),
     });
   }
 
-  // ✅ upload avatar
   async updateAvatar(file: File) {
     const uid = this.auth.currentUser?.uid;
     if (!uid) throw new Error('Not logged in');
-    if (!file) throw new Error('No file');
 
-    const safeName = file.name.replace(/[^\w.\-]+/g, '_');
-    const path = `avatars/${uid}/${Date.now()}_${safeName}`;
+    const clean = file.name.replace(/[^\w.\-]+/g, '_');
+    const path = `avatars/${uid}/${Date.now()}_${clean}`;
 
     const fileRef = ref(this.storage, path);
+
     await uploadBytes(fileRef, file);
 
     const url = await getDownloadURL(fileRef);
@@ -84,7 +87,6 @@ export class ProfileService {
     return url;
   }
 
-  // ✅ logout
   async logout() {
     await signOut(this.auth);
   }

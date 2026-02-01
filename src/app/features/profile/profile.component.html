@@ -21,35 +21,51 @@
   <div class="toast ok" *ngIf="msg">{{ msg }}</div>
   <div class="toast err" *ngIf="err">{{ err }}</div>
 
-  <!-- ✅ HERO -->
+  <!-- ================= HERO ================= -->
   <section class="hero fadeUp">
 
     <div class="heroLeft">
-      <!-- Avatar -->
+
+      <!-- 📸 Avatar -->
       <div class="avatarArea">
+
         <div class="avatarImg" [class.loading]="uploading">
-          <img *ngIf="u.photoURL" [src]="u.photoURL" class="img" alt="avatar" />
-          <div *ngIf="!u.photoURL" class="txt">{{ (u.name || 'U')[0] }}</div>
+
+          <img
+            *ngIf="previewAvatar || u.photoURL"
+            [src]="previewAvatar || u.photoURL"
+            class="img"
+            alt="avatar"
+          />
+
+          <div *ngIf="!previewAvatar && !u.photoURL" class="txt">
+            {{ (u.name || 'U')[0] }}
+          </div>
+
         </div>
 
-        <label class="camBtn" title="Upload photo">
+        <label class="camBtn">
           📷
           <input
             type="file"
             hidden
             accept="image/*"
+            [disabled]="uploading"
             (change)="onPickAvatar($event)"
           />
+
         </label>
 
         <div class="avatarHint">
           {{ uploading ? 'Uploading photo...' : 'Upload profile photo (Max 2MB)' }}
         </div>
 
-        <div class="avatarErr" *ngIf="avatarErr">{{ avatarErr }}</div>
+        <div class="avatarErr" *ngIf="avatarErr">
+          {{ avatarErr }}
+        </div>
       </div>
 
-      <!-- Name / badges -->
+      <!-- 🧑 Meta -->
       <div class="heroMeta">
         <div class="pName">{{ u.name || 'User' }}</div>
         <div class="pEmail">{{ u.email }}</div>
@@ -59,8 +75,8 @@
             <span class="dot"></span> Active
           </span>
 
-          <span class="pill mono" title="User ID">
-            {{ (u.uid || '').slice(0, 10) }}...
+          <span class="pill mono">
+            {{ u.uid?.slice(0, 10) }}...
           </span>
         </div>
 
@@ -69,30 +85,34 @@
           <button class="btn ghost" (click)="copyText(profileLink)">🔗 Copy Share Link</button>
         </div>
       </div>
+
     </div>
 
-    <!-- QR -->
+    <!-- 📷 QR -->
     <div class="heroRight">
       <div class="qrBox">
+
         <div class="qrTop">
           <div class="qrTitle">📷 My QR</div>
           <div class="qrSub">Scan to open my profile</div>
         </div>
 
-        <img class="qr" [src]="qrDataUrl" alt="QR Code" />
+        <img class="qr" [src]="qrDataUrl" alt="QR code" />
 
         <div class="qrLink">
           <span class="mono">{{ profileLink }}</span>
           <button class="mini" (click)="copyText(profileLink)">Copy</button>
         </div>
+
       </div>
     </div>
+
   </section>
 
-  <!-- ✅ GRID -->
+  <!-- ================= GRID ================= -->
   <section class="grid fadeUp">
 
-    <!-- Details -->
+    <!-- ℹ Account Info -->
     <div class="card">
       <div class="cardTitle">📌 Account Info</div>
 
@@ -112,11 +132,12 @@
       </div>
     </div>
 
-    <!-- Edit -->
+    <!-- ✏ Edit -->
     <div class="card" *ngIf="editMode">
       <div class="cardTitle">✏️ Edit Profile</div>
 
       <div class="form">
+
         <div class="field">
           <label>Name</label>
           <input [(ngModel)]="form.name" placeholder="Enter name" />
@@ -129,12 +150,13 @@
 
         <div class="actions">
           <button class="btn primary" (click)="save()">✅ Save</button>
-          <button class="btn ghost" (click)="reset(u)">↩ Reset</button>
+          <button class="btn ghost" (click)="toggleEdit()">↩ Cancel</button>
         </div>
+
       </div>
     </div>
 
-    <!-- Quick Actions -->
+    <!-- ⚡ Quick Actions -->
     <div class="card">
       <div class="cardTitle">⚡ Quick Actions</div>
 
@@ -152,7 +174,9 @@
 
       <button class="actionRow" (click)="toggleEdit()">
         <span class="ic">✏️</span>
-        <span class="tx">{{ editMode ? 'Close Edit Mode' : 'Edit Profile' }}</span>
+        <span class="tx">
+          {{ editMode ? 'Close Edit Mode' : 'Edit Profile' }}
+        </span>
         <span class="go">›</span>
       </button>
     </div>

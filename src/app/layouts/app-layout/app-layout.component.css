@@ -1,5 +1,5 @@
 /* =========================================================
-   ✅ Chatloop AppLayout – MOBILE PERFECT EDITION
+   🍃 Chatloop AppLayout – PREMIUM MINT UI
 ========================================================= */
 
 :host{
@@ -7,42 +7,47 @@
   width:100%;
   height:100dvh;
   min-height:0;
+
+  /* 🌿 Mint color system */
+  --mint:#34d399;
+  --mint-soft:#a7f3d0;
+  --aqua:#67e8f9;
+  --sky:#93c5fd;
+  --leaf:#4ade80;
+
+  --bg:#f4fffb;
+  --surface:#ffffff;
+  --text:#0f172a;
+  --border:rgba(0,0,0,0.06);
 }
 
-@supports not (height: 100dvh){
+@supports not (height:100dvh){
   :host{ height:100vh; }
-}
-
-:host{
-  --theme:#7c3aed;
-  --theme-2:#3b82f6;
-
-  --bg:#050816;
-  --text:rgba(255,255,255,0.92);
-  --border:rgba(255,255,255,0.10);
 }
 
 *{ box-sizing:border-box; }
 
-/* ✅ Root container */
+/* =========================================================
+   📦 ROOT
+========================================================= */
+
 .appShell{
   position:relative;
   width:100%;
   height:100%;
-  min-height:0;
 
   display:flex;
-  align-items:stretch;
-
   overflow:hidden;
+
   background: var(--bg);
   color: var(--text);
   isolation:isolate;
 }
 
 /* =========================================================
-   🌌 BACKGROUND EFFECTS
+   🌤 PREMIUM MINT BACKGROUND GLOW
 ========================================================= */
+
 .bg,
 .orb,
 .grain{ pointer-events:none; }
@@ -53,115 +58,128 @@
   z-index:0;
 
   background:
-    radial-gradient(1000px 720px at 18% 10%, rgba(124,58,237,0.20), transparent 55%),
-    radial-gradient(950px 700px at 86% 28%, rgba(59,130,246,0.18), transparent 62%),
-    radial-gradient(800px 600px at 50% 100%, rgba(34,211,238,0.10), transparent 60%);
-  filter: blur(92px);
-  opacity:.95;
+    radial-gradient(900px 600px at 10% 10%, rgba(52,211,153,.30), transparent 60%),
+    radial-gradient(850px 600px at 90% 20%, rgba(103,232,249,.28), transparent 65%),
+    radial-gradient(700px 500px at 20% 90%, rgba(167,243,208,.35), transparent 60%),
+    radial-gradient(900px 700px at 80% 80%, rgba(147,197,253,.25), transparent 65%);
+
+  filter: blur(95px);
 }
+
+/* =========================================================
+   💫 FLOATING SOFT ORBS
+========================================================= */
 
 .orb{
   position:absolute;
-  width:560px;
-  height:560px;
+  width:520px;
+  height:520px;
   border-radius:999px;
 
-  filter: blur(175px);
-  opacity:.20;
-  z-index:0;
+  filter: blur(170px);
+  opacity:.35;
 
-  animation: orbFloat 11s ease-in-out infinite;
+  animation: orbFloat 14s ease-in-out infinite;
 }
 
 .orb1{
-  top:-280px;
-  left:-280px;
-  background: var(--theme);
+  top:-260px;
+  left:-260px;
+  background: var(--mint);
 }
 
 .orb2{
-  bottom:-300px;
-  right:-300px;
-  background: var(--theme-2);
-  animation-delay: 2.8s;
+  bottom:-280px;
+  right:-280px;
+  background: var(--aqua);
+  animation-delay:4s;
 }
 
 @keyframes orbFloat{
   0%,100%{ transform: translate(0,0); }
-  50%{ transform: translate(45px,-26px); }
+  50%{ transform: translate(55px,-35px); }
 }
+
+/* =========================================================
+   🌾 SUPER LIGHT TEXTURE
+========================================================= */
 
 .grain{
   position:absolute;
   inset:0;
-  z-index:1;
-  opacity:.06;
-  mix-blend-mode: overlay;
+  opacity:.02;
+  mix-blend-mode: soft-light;
 
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
-  background-size: 180px 180px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='2'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E");
 }
 
 /* =========================================================
-   ✅ NAV + MAIN
+   📑 LAYOUT
 ========================================================= */
+
 .nav{
   position:relative;
   z-index:3;
 }
 
 .main{
-  position:relative;
-  z-index:2;
-
   flex:1;
   min-width:0;
   min-height:0;
-
   display:flex;
   flex-direction:column;
+  z-index:2;
 }
 
-/* ✅ only this scrolls */
+/* =========================================================
+   📜 SCROLL
+========================================================= */
+
 .routeWrap{
   flex:1;
-  min-width:0;
-  min-height:0;
-
   overflow:auto;
   scroll-behavior:smooth;
   -webkit-overflow-scrolling:touch;
-
-  overscroll-behavior: contain;
-
-  /* ✅ avoid "scroll chain" to body */
-  touch-action: pan-y;
 }
 
-/* Scrollbar */
-.routeWrap::-webkit-scrollbar{ width:10px; }
+.routeWrap::-webkit-scrollbar{ width:8px; }
+
 .routeWrap::-webkit-scrollbar-thumb{
-  background: rgba(255,255,255,0.12);
+  background: rgba(0,0,0,.18);
   border-radius:999px;
 }
-.routeWrap::-webkit-scrollbar-track{ background:transparent; }
 
 /* =========================================================
-   ✅ MOBILE FIX
+   📱 MOBILE SAFE
 ========================================================= */
-@media (max-width:900px){
 
-  /* ✅ make sure content not hidden behind bottom nav */
+@media (max-width:900px){
   .routeWrap{
     padding-bottom: 92px;
-  }
-
-  /* ✅ iPhone safe area support */
-  .routeWrap{
     padding-bottom: calc(92px + env(safe-area-inset-bottom));
   }
 }
 
 @media (prefers-reduced-motion: reduce){
-  .orb{ animation:none !important; }
+  .orb{ animation:none; }
 }
+.appShell{
+  display:flex;
+  width:100%;
+  height:100%;
+  min-height:0;
+}
+
+.main{
+  flex:1;
+  min-width:0;
+  min-height:0;
+  display:flex;
+}
+
+.routeWrap{
+  flex:1;
+  min-height:0;
+  overflow:auto;
+}
+

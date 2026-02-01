@@ -11,7 +11,7 @@
     ======= */
 :root{
   /* ✅ custom theme color */
-  --theme: #3b82f6;
+  --theme: #10b981; /* MINT GREEN */
 
   /* derived */
   --accent: color-mix(in srgb, var(--theme) 70%, white);
@@ -237,4 +237,33 @@ img, video, canvas, svg{
   outline: none;
   box-shadow: var(--ring);
   border-radius: 12px;
+}
+/* =====================================
+   🎨 Chatloop Theme Presets
+   (Change class on <body>)
+===================================== */
+
+/* 💚 Mint (default / recommended) */
+body.theme-mint{
+  --theme: #10b981;
+}
+
+/* ❤️ Soft Red */
+body.theme-red{
+  --theme: #ef4444;
+}
+
+/* 💛 Soft Yellow */
+body.theme-yellow{
+  --theme: #facc15;
+}
+
+/* 💙 Blue (classic) */
+body.theme-blue{
+  --theme: #3b82f6;
+}
+
+/* 💜 Purple */
+body.theme-purple{
+  --theme: #8b5cf6;
 }

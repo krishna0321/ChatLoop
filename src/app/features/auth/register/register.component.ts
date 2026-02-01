@@ -25,6 +25,9 @@ export class RegisterComponent {
   showPass = false;
   showConfirm = false;
 
+  // ✅ NEW
+  termsAccepted = false;
+
   constructor(
     private auth: AuthService,
     private userService: UserService,
@@ -39,7 +42,7 @@ export class RegisterComponent {
   }
 
   // ========================
-  // ✅ PASSWORD RULES (FOR HTML)
+  // ✅ PASSWORD RULES
   // ========================
   get hasMinLength(): boolean {
     return (this.password || '').length >= 6;
@@ -58,7 +61,7 @@ export class RegisterComponent {
   }
 
   // ========================
-  // ✅ STRENGTH BAR
+  // ✅ PASSWORD STRENGTH
   // ========================
   get strength(): number {
     let s = 0;
@@ -66,33 +69,55 @@ export class RegisterComponent {
     if (this.hasNumber) s++;
     if (this.hasUppercase) s++;
     if (this.hasLowercase) s++;
-    return s; // 0..4
+    return s;
   }
 
   get strengthLabel(): string {
     switch (this.strength) {
-      case 1:
-        return 'Weak';
-      case 2:
-        return 'Fair';
-      case 3:
-        return 'Good';
-      case 4:
-        return 'Strong';
-      default:
-        return '';
+      case 1: return 'Weak';
+      case 2: return 'Fair';
+      case 3: return 'Good';
+      case 4: return 'Strong';
+      default: return '';
     }
   }
 
   // ========================
-  // ✅ VALIDATION
+  // ✅ EXTRA VALIDATION
+  // ========================
+
+  // Email format check
+  get emailValid(): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email);
+  }
+
+  // Phone must be 10 digits
+  get phoneValid(): boolean {
+    return this.cleanPhone(this.phone).length === 10;
+  }
+
+  // Passwords match
+  get passwordsMatch(): boolean {
+  return (
+    !!this.password &&
+    !!this.confirmPassword &&
+    this.password === this.confirmPassword
+  );
+}
+
+  // ========================
+  // ✅ FINAL FORM VALID
   // ========================
   get formValid(): boolean {
     return (
-      !!this.email.trim() &&
-      this.cleanPhone(this.phone).length === 10 &&
+      this.emailValid &&
+      this.phoneValid &&
       this.hasMinLength &&
-      this.password === this.confirmPassword
+      this.hasNumber &&
+      this.hasUppercase &&
+      this.hasLowercase &&
+      this.passwordsMatch &&
+      this.termsAccepted
     );
   }
 
@@ -100,6 +125,9 @@ export class RegisterComponent {
   // ✅ REGISTER
   // ========================
   async register() {
+    // 🚫 prevent double click
+    if (this.loading) return;
+
     if (!this.formValid) {
       this.error = 'Please fill all fields correctly';
       return;
@@ -113,23 +141,23 @@ export class RegisterComponent {
       const phoneDigits10 = this.cleanPhone(this.phone);
       const pass = this.password.trim();
 
-      // ✅ 1) check phone unique
+      // ✅ 1) Check phone unique
       const taken = await this.userService.isPhoneTaken(phoneDigits10);
       if (taken) {
         this.error = '❌ Phone number already registered';
         return;
       }
 
-      // ✅ 2) Create Firebase Auth user
+      // ✅ 2) Firebase Auth create
       const cred = await this.auth.register(email, pass, phoneDigits10);
       const uid = cred?.user?.uid;
 
       if (!uid) throw new Error('Register failed');
 
-      // ✅ 3) Reserve phone index (blocks duplicates)
+      // ✅ 3) Reserve phone
       await this.userService.reservePhone(uid, phoneDigits10);
 
-      // ✅ 4) Create user profile
+      // ✅ 4) Create profile
       await this.userService.createUser({
         uid,
         name: email.split('@')[0],
@@ -139,8 +167,9 @@ export class RegisterComponent {
         blocked: [],
       });
 
-      // ✅ done
+      // ✅ SUCCESS
       this.router.navigate(['/app']);
+
     } catch (e: any) {
       this.error = this.auth.getErrorMessage(e);
     } finally {

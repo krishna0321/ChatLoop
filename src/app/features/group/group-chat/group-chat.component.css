@@ -287,3 +287,86 @@
   opacity:.55;
   cursor:not-allowed;
 }
+/* ===============================
+   🍃 CHAT SCREEN – MINT SOFT THEME
+   (structure untouched)
+=============================== */
+
+.wrap{
+  background:#ecfffa;
+  color:#0f172a;
+}
+
+/* background glow softer */
+.bg{
+  background:
+    radial-gradient(1200px 800px at 15% 10%, rgba(52,211,153,.45), transparent 60%),
+    radial-gradient(1000px 700px at 85% 85%, rgba(103,232,249,.35), transparent 65%);
+  filter: blur(120px);
+}
+
+/* header glass */
+.header,
+.loading,
+.composer{
+  background: rgba(255,255,255,.78);
+  border-color: rgba(15,23,42,.10);
+  backdrop-filter: blur(22px);
+
+  box-shadow:
+    0 18px 55px rgba(52,211,153,.28),
+    inset 0 1px 0 rgba(255,255,255,.65);
+}
+
+/* avatar brighter */
+.avatar,
+.miniAv{
+  background: linear-gradient(135deg,#34d399,#67e8f9);
+  box-shadow: 0 14px 40px rgba(52,211,153,.45);
+}
+
+/* header text clarity */
+.name{ color:#0f172a; }
+.sub{ color:#475569; }
+
+/* bubbles */
+.bubble{
+  background: rgba(255,255,255,.85);
+  border-color: rgba(15,23,42,.12);
+  color:#0f172a;
+}
+
+.bubble.me{
+  background: linear-gradient(135deg,#34d399,#67e8f9);
+  color:white;
+}
+
+/* composer input */
+.composer input{
+  background:#ffffff;
+  border-color: rgba(15,23,42,.12);
+  color:#0f172a;
+}
+
+.composer input:focus{
+  border-color:#34d399;
+  box-shadow: 0 0 0 4px rgba(52,211,153,.25);
+}
+
+/* send button premium */
+.composer button{
+  background: linear-gradient(135deg,#34d399,#67e8f9);
+  box-shadow: 0 18px 45px rgba(52,211,153,.45);
+}
+
+/* icons lighter */
+.iconBtn{
+  background:#ffffff;
+  color:#0f172a;
+  border-color: rgba(15,23,42,.12);
+}
+
+.iconBtn:hover{
+  background: rgba(52,211,153,.18);
+  border-color:#34d399;
+}

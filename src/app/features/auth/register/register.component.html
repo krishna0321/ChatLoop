@@ -1,4 +1,4 @@
-<div class="page">
+<div class="page auth-page">
   <!-- Background -->
   <div class="bg"></div>
   <div class="orb orb1"></div>
@@ -8,9 +8,7 @@
   <section class="brand">
     <div class="badge">✨</div>
     <h1>Start chatting smarter</h1>
-    <p>
-      Secure. Fast. Built for real conversations — not noise.
-    </p>
+    <p>Secure. Fast. Built for real conversations — not noise.</p>
 
     <div class="features">
       <div>⚡ Instant messaging</div>
@@ -21,7 +19,8 @@
 
   <!-- RIGHT -->
   <section class="formWrap">
-    <div class="card fadeIn">
+    <div class="card">
+
       <h2>Create account</h2>
       <p class="sub">Join thousands chatting smarter</p>
 
@@ -35,7 +34,7 @@
 
       <div class="divider"><span>or</span></div>
 
-      <!-- Phone -->
+      <!-- PHONE -->
       <div class="field phone">
         <select class="code">
           <option>+91</option>
@@ -43,20 +42,27 @@
           <option>+44</option>
         </select>
 
-        <input [(ngModel)]="phone" placeholder=" " type="text" />
+        <input [(ngModel)]="phone" name="phone" #p="ngModel" required placeholder=" " />
         <label>Phone number</label>
       </div>
+      <small class="fieldError" *ngIf="p.touched && !phoneValid">
+        Enter valid 10-digit phone
+      </small>
 
-      <!-- Email -->
+      <!-- EMAIL -->
       <div class="field">
-        <input [(ngModel)]="email" placeholder=" " type="email" />
+        <input [(ngModel)]="email" name="email" #e="ngModel" required email placeholder=" " />
         <label>Email address</label>
       </div>
+      <small class="fieldError" *ngIf="e.touched && !emailValid">
+        Enter valid email address
+      </small>
 
-      <!-- Password -->
+      <!-- PASSWORD -->
       <div class="field">
         <input
           [(ngModel)]="password"
+          name="password"
           placeholder=" "
           [type]="showPass ? 'text' : 'password'"
         />
@@ -77,15 +83,21 @@
       <!-- Strength -->
       <div class="strength">
         <div class="bar">
-          <span [style.width.%]="strength * 25"></span>
+          <span
+            [style.width.%]="strength * 25"
+            [class.weak]="strength === 1"
+            [class.mid]="strength === 2 || strength === 3"
+            [class.strong]="strength === 4">
+          </span>
         </div>
         <small>{{ strengthLabel }}</small>
       </div>
 
-      <!-- Confirm -->
+      <!-- CONFIRM PASSWORD -->
       <div class="field">
         <input
           [(ngModel)]="confirmPassword"
+          name="confirmPassword"
           placeholder=" "
           [type]="showConfirm ? 'text' : 'password'"
         />
@@ -94,14 +106,20 @@
           {{ showConfirm ? '🙈' : '👁️' }}
         </button>
       </div>
+      <small class="fieldError" *ngIf="confirmPassword && !passwordsMatch">
+        Passwords do not match
+      </small>
 
-      <!-- Terms -->
+      <!-- TERMS -->
       <label class="terms">
-        <input type="checkbox" />
+        <input type="checkbox" [(ngModel)]="termsAccepted" />
         I agree to the <b>Terms</b> & <b>Privacy Policy</b>
       </label>
+      <small class="fieldError" *ngIf="!termsAccepted">
+        You must accept the terms
+      </small>
 
-      <!-- Submit -->
+      <!-- SUBMIT -->
       <button
         class="submit"
         [disabled]="!formValid || loading"
@@ -111,10 +129,13 @@
         <span *ngIf="loading" class="loader"></span>
       </button>
 
+      <p class="trust">🔒 We never share your data</p>
+
       <p class="login">
         Already have an account?
         <a routerLink="/login">Sign in</a>
       </p>
+
     </div>
   </section>
 </div>

@@ -303,3 +303,73 @@
   .card{ transition:none !important; }
   .card::after{ display:none !important; }
 }
+/* =====================================
+   🍃 DASHBOARD – MINT GLASS COLOR UPGRADE
+   (NO STRUCTURE CHANGED)
+===================================== */
+
+.dash{
+  background:#ecfffa;
+  color:#0f172a;
+}
+
+/* glow background */
+.bg{
+  background:
+    radial-gradient(900px at 20% 10%, rgba(52,211,153,.45), transparent 60%),
+    radial-gradient(900px at 80% 30%, rgba(103,232,249,.35), transparent 60%),
+    radial-gradient(800px at 45% 95%, rgba(52,211,153,.28), transparent 60%);
+  filter: blur(110px);
+}
+
+/* card glass */
+.card{
+  background: rgba(255,255,255,.82);
+  border-color: rgba(15,23,42,.12);
+  backdrop-filter: blur(22px);
+  box-shadow:
+    0 18px 55px rgba(52,211,153,.28),
+    inset 0 1px 0 rgba(255,255,255,.75);
+}
+
+/* hover glow */
+.card:hover{
+  border-color: rgba(52,211,153,.45);
+  box-shadow:
+    0 28px 90px rgba(52,211,153,.45),
+    inset 0 1px 0 rgba(255,255,255,.75);
+}
+
+/* header */
+.head h2{
+  color:#0f172a;
+}
+
+/* muted text fix */
+.head p,
+.sub,
+.hint{
+  color:#334155;
+}
+
+/* badge */
+.badge{
+  background:#ffffff;
+  border-color: rgba(15,23,42,.12);
+  color:#0f172a;
+}
+
+/* icons glow */
+.icon{
+  box-shadow: 0 18px 45px rgba(52,211,153,.45);
+}
+
+/* footer hint glass */
+.hint{
+  background: rgba(255,255,255,.85);
+}
+
+/* scroll contrast */
+.dash::-webkit-scrollbar-thumb{
+  background: rgba(15,23,42,.18);
+}

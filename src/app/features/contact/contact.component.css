@@ -526,3 +526,101 @@
     border-radius: 20px;
   }
 }
+/* =====================================
+   🍃 CONTACTS – MINT GLASS COLOR UPGRADE
+   (NO STRUCTURE CHANGED)
+===================================== */
+
+.contacts-panel{
+  background:
+    radial-gradient(1100px at 18% 10%, rgba(52,211,153,.45), transparent 60%),
+    radial-gradient(900px at 85% 85%, rgba(103,232,249,.35), transparent 62%),
+    #ecfffa;
+  color:#0f172a;
+}
+
+/* header glass */
+.header{
+  background: rgba(255,255,255,.82);
+  border-color: rgba(15,23,42,.12);
+  box-shadow: 0 18px 55px rgba(52,211,153,.30);
+}
+
+/* text clarity */
+.subtitle,
+.info .sub,
+.empty-sub,
+.mSub{
+  color:#334155;
+}
+
+/* search glass */
+.search-wrap{
+  background: rgba(255,255,255,.85);
+  border-color: rgba(15,23,42,.12);
+}
+
+.search{
+  background: rgba(15,23,42,.04);
+  color:#0f172a;
+}
+
+/* list item glass */
+.item{
+  background: rgba(255,255,255,.86);
+  border-color: rgba(15,23,42,.12);
+  box-shadow:
+    0 18px 55px rgba(52,211,153,.25),
+    inset 0 1px 0 rgba(255,255,255,.7);
+}
+
+.item:hover{
+  border-color: rgba(52,211,153,.45);
+}
+
+/* avatar glow */
+.avatar{
+  box-shadow: 0 18px 45px rgba(52,211,153,.45);
+}
+
+/* tags */
+.tag{
+  background:#ffffff;
+  border-color: rgba(15,23,42,.12);
+  color:#0f172a;
+}
+
+/* buttons */
+.btn.ghost,
+.chat-btn,
+.icon-btn{
+  background:#ffffff;
+  border-color: rgba(15,23,42,.12);
+  color:#0f172a;
+}
+
+/* modal glass */
+.box{
+  background: rgba(255,255,255,.94);
+  border-color: rgba(15,23,42,.12);
+  color:#0f172a;
+  box-shadow: 0 28px 80px rgba(52,211,153,.45);
+}
+
+/* inputs */
+.input{
+  background: rgba(15,23,42,.04);
+  border-color: rgba(15,23,42,.12);
+  color:#0f172a;
+}
+
+/* empty state */
+.empty{
+  background: rgba(255,255,255,.85);
+  border-color: rgba(15,23,42,.12);
+}
+
+/* scrollbar */
+.list::-webkit-scrollbar-thumb{
+  background: rgba(15,23,42,.18);
+}

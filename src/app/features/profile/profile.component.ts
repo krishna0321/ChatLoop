@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import QRCode from 'qrcode';
@@ -11,7 +11,8 @@ import { ProfileService, ProfileUser } from '../../core/services/profile.service
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css'],
 })
-export class ProfileComponent {
+export class ProfileComponent implements OnInit {
+
   user: ProfileUser | null = null;
 
   editMode = false;
@@ -27,30 +28,32 @@ export class ProfileComponent {
   qrDataUrl = '';
   profileLink = '';
 
-  // avatar upload
   uploading = false;
   avatarErr = '';
 
-  constructor(private profile: ProfileService) {
+  previewAvatar: string | null = null;
+
+  constructor(private profile: ProfileService) {}
+
+  // 🔥 LIVE PROFILE (Telegram style)
+  ngOnInit() {
     this.profile.getMyProfile().subscribe(async (u) => {
       this.user = u;
+      if (!u) return;
 
-      if (u) {
-        this.reset(u);
+      this.form.name = u.name || '';
+      this.form.phone = u.phone || '';
 
-        // ✅ FIX: Use Netlify deployed link (Web link)
-        const baseUrl = window.location.origin; // auto: localhost OR netlify domain
-        this.profileLink = `${baseUrl}/u/${u.uid}`;
+      const base = window.location.origin;
+      this.profileLink = `${base}/u/${u.uid}`;
 
-        // ✅ generate QR
-        try {
-          this.qrDataUrl = await QRCode.toDataURL(this.profileLink, {
-            width: 220,
-            margin: 1,
-          });
-        } catch {
-          this.qrDataUrl = '';
-        }
+      try {
+        this.qrDataUrl = await QRCode.toDataURL(this.profileLink, {
+          width: 220,
+          margin: 1,
+        });
+      } catch {
+        this.qrDataUrl = '';
       }
     });
   }
@@ -62,81 +65,75 @@ export class ProfileComponent {
     this.avatarErr = '';
   }
 
-  reset(u: ProfileUser) {
-    this.form.name = u?.name || '';
-    this.form.phone = u?.phone || '';
-  }
-
   async save() {
     this.msg = '';
     this.err = '';
 
-    const name = (this.form.name || '').trim();
-    const phone = (this.form.phone || '').trim();
-
-    if (name.length < 2) {
-      this.err = '❌ Name must be at least 2 characters';
-      setTimeout(() => (this.err = ''), 2500);
+    if (this.form.name.trim().length < 2) {
+      this.err = '❌ Name too short';
       return;
     }
 
     try {
-      await this.profile.updateMyProfile({ name, phone });
+      await this.profile.updateMyProfile({
+        name: this.form.name.trim(),
+        phone: this.form.phone.trim(),
+      });
 
       this.msg = '✅ Profile updated';
       this.editMode = false;
 
-      setTimeout(() => (this.msg = ''), 2000);
+      setTimeout(() => this.msg = '', 2000);
+
     } catch (e: any) {
-      console.error(e);
-      this.err = e?.message || '❌ Update failed';
-      setTimeout(() => (this.err = ''), 2500);
+      this.err = e?.message || 'Update failed';
     }
   }
 
-  // PICK + UPLOAD AVATAR
+  // 📸 INSTANT avatar update
   async onPickAvatar(e: Event) {
-    const input = e.target as HTMLInputElement;
-    const file = input.files?.[0];
+
+    if (this.uploading) return;
+
+    const file = (e.target as HTMLInputElement).files?.[0];
     if (!file) return;
 
     this.avatarErr = '';
     this.msg = '';
     this.err = '';
 
-    // only images
     if (!file.type.startsWith('image/')) {
-      this.avatarErr = 'Please choose image file only';
-      input.value = '';
+      this.avatarErr = 'Image only';
       return;
     }
 
-    // size limit 2MB
-    const max = 2 * 1024 * 1024;
-    if (file.size > max) {
-      this.avatarErr = 'Image too large (Max 2MB)';
-      input.value = '';
+    if (file.size > 2 * 1024 * 1024) {
+      this.avatarErr = 'Max 2MB';
       return;
     }
+
+    // ⚡ instant preview
+    this.previewAvatar = URL.createObjectURL(file);
 
     try {
       this.uploading = true;
 
-      const url = await this.profile.updateAvatar(file);
-
-      // update UI instantly
-      if (this.user) {
-        this.user = { ...this.user, photoURL: url };
-      }
+      await this.profile.updateAvatar(file);
 
       this.msg = '✅ Photo updated';
-      setTimeout(() => (this.msg = ''), 2000);
+
+      setTimeout(() => this.msg = '', 2000);
+
+      setTimeout(() => {
+        URL.revokeObjectURL(this.previewAvatar!);
+        this.previewAvatar = null;
+      }, 800);
+
     } catch (err: any) {
-      console.error(err);
       this.avatarErr = err?.message || 'Upload failed';
+
     } finally {
       this.uploading = false;
-      input.value = '';
     }
   }
 
@@ -144,10 +141,9 @@ export class ProfileComponent {
     try {
       await navigator.clipboard.writeText(text || '');
       this.msg = '✅ Copied';
-      setTimeout(() => (this.msg = ''), 1500);
+      setTimeout(() => this.msg = '', 1500);
     } catch {
       this.err = '❌ Copy failed';
-      setTimeout(() => (this.err = ''), 1500);
     }
   }
 }

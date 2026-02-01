@@ -1,52 +1,44 @@
 import { Injectable } from '@angular/core';
 
 export type ThemeMode = 'dark' | 'light';
-
 @Injectable({ providedIn: 'root' })
-export class ThemeService {
+export class ThemeService 
+{
 
-  private COLOR_KEY = 'chatloop_theme_color';
   private MODE_KEY  = 'chatloop_theme_mode';
+  private COLOR_KEY = 'chatloop_theme_color';
 
-// INIT (CALL ON APP START)
+  initTheme() 
+  {
+    const mode  = (localStorage.getItem(this.MODE_KEY) as any) || 'dark';
+    const color = localStorage.getItem(this.COLOR_KEY) || '#6366f1';
 
- initTheme() {
-  const savedMode  = localStorage.getItem('chatloop_theme_mode') || 'dark';
-  const savedColor = localStorage.getItem('chatloop_theme_color') || '#3b82f6';
-
-  this.setMode(savedMode as any, false);
-  this.setThemeColor(savedColor, false);
-}
-
-   
-  // MODE (dark / light)
-  setMode(mode: ThemeMode, persist = true) {
-    const body = document.body;
-
-    body.classList.remove('dark-mode', 'light-mode');
-    body.classList.add(mode === 'dark' ? 'dark-mode' : 'light-mode');
-
-    if (persist) {
-      localStorage.setItem(this.MODE_KEY, mode);
-    }
+    this.setMode(mode, false);
+    this.setThemeColor(color, false);
   }
 
-   
-  // COLOR (main theme color)
-  setThemeColor(color: string, persist = true) {
+  setMode(mode: 'dark' | 'light', persist = true)
+   {
+    document.body.classList.toggle('dark-mode', mode === 'dark');
+    document.body.classList.toggle('light-mode', mode === 'light');
+
+    if (persist) localStorage.setItem(this.MODE_KEY, mode);
+  }
+
+  setThemeColor(color: string, persist = true) 
+  {
     document.documentElement.style.setProperty('--theme', color);
 
-    if (persist) {
-      localStorage.setItem(this.COLOR_KEY, color);
-    }
+    if (persist) localStorage.setItem(this.COLOR_KEY, color);
   }
 
-  // HELPERS
-  getSavedColor(): string {
-    return localStorage.getItem(this.COLOR_KEY) || '#3b82f6';
+  getSavedColor() 
+  {
+    return localStorage.getItem(this.COLOR_KEY) || '#6366f1';
   }
 
-  getSavedMode(): ThemeMode {
-    return (localStorage.getItem(this.MODE_KEY) as ThemeMode) || 'dark';
+  getSavedMode() 
+  {
+    return (localStorage.getItem(this.MODE_KEY) as any) || 'dark';
   }
 }

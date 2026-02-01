@@ -1,23 +1,25 @@
 :host{
-  display:block;
-  height:100%;
+  display:flex;
+  flex-direction: column;
+  min-height:0;
 }
 
-/*     =======
-   ✅ About Page (Premium Glass UI)
-   file: about.component.css
-    ======= */
 
-.page{
-  height: 100%;
-  overflow: auto;
+
+/* About page scroll container */
+.page {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 18px;
   background: var(--bg);
   color: var(--text);
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: auto;
+  contain: layout paint;
 }
-
-/* ✅ Make scroll smooth */
-.page{ scroll-behavior: smooth; }
 
 /* =======================
    ✅ HEADER
@@ -54,13 +56,13 @@
 .btn{
   text-decoration:none;
   border: none;
-  border-radius: 999px;
+  border-radius:14px;
   padding: 10px 16px;
   font-weight: 1000;
   font-size: 13px;
   cursor:pointer;
   color: white;
-  background: linear-gradient(135deg, var(--theme), var(--theme-2));
+  background: linear-gradient(135deg,var(--primary),var(--primary-2));
   box-shadow: 0 10px 24px rgba(0,0,0,0.35);
   transition: transform .15s ease, opacity .15s ease;
 }
@@ -71,7 +73,7 @@
 }
 
 .btn.ghost{
-  background: rgba(255,255,255,0.05);
+  background:#f1f5f9;
   border: 1px solid var(--border);
   color: var(--text);
   box-shadow: none;
@@ -83,28 +85,14 @@
 .hero{
   margin-top: 10px;
   border-radius: 28px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background:
-    radial-gradient(900px 360px at 15% 0%, rgba(124,58,237,0.30), transparent 55%),
-    radial-gradient(900px 380px at 90% 20%, rgba(59,130,246,0.22), transparent 60%),
-    linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  border:1px solid var(--border);
   padding: 18px;
   display:grid;
   grid-template-columns: 1.5fr 1fr;
   gap: 14px;
-  box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+  box-shadow: var(--shadow-md);
   position: relative;
   overflow:hidden;
-}
-
-.hero::before{
-  content:"";
-  position:absolute;
-  inset:-2px;
-  background:
-    radial-gradient(300px 180px at 10% 0%, rgba(255,255,255,0.10), transparent 65%),
-    radial-gradient(240px 180px at 85% 20%, rgba(255,255,255,0.08), transparent 70%);
-  pointer-events:none;
 }
 
 /* Badge */
@@ -116,10 +104,7 @@
   font-size: 12px;
   padding: 7px 12px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(0,0,0,0.22);
   width: fit-content;
-  backdrop-filter: blur(10px);
 }
 
 /* Hero text */
@@ -145,13 +130,10 @@
   margin-top: 14px;
   padding: 14px;
   border-radius: 24px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(0,0,0,0.25);
+  border:1px solid var(--border);
   display:flex;
   gap: 12px;
   align-items:flex-start;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.25);
-  backdrop-filter: blur(10px);
   transition: transform .15s ease;
 }
 
@@ -200,10 +182,8 @@
   gap: 10px;
   padding: 14px;
   border-radius: 22px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(0,0,0,0.25);
-  box-shadow: 0 18px 55px rgba(0,0,0,0.25);
-  backdrop-filter: blur(10px);
+  border:1px solid var(--border);
+  box-shadow: var(--shadow-md);
 }
 
 .bubble{
@@ -233,10 +213,9 @@
   margin-top: 12px;
   padding: 14px;
   border-radius: 22px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(0,0,0,0.22);
+  border:1px solid var(--border);
+  background: white;
   box-shadow: 0 18px 55px rgba(0,0,0,0.22);
-  backdrop-filter: blur(10px);
 }
 
 .goalTop{
@@ -280,9 +259,9 @@
   display:grid;
   place-items:center;
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(0,0,0,0.18);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  border:1px solid var(--border);
+  background:#f1f5f9;
+  box-shadow: var(--shadow-md);
 }
 
 /* =======================
@@ -296,8 +275,8 @@
 
 .stackItem{
   border-radius: 24px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  background: white;
   padding: 14px;
   box-shadow: 0 18px 55px rgba(0,0,0,0.22);
   transition: transform .15s ease, border-color .15s ease;
@@ -332,8 +311,8 @@
 
 .card{
   border-radius: 24px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  background: white;
   padding: 14px;
   box-shadow: 0 18px 55px rgba(0,0,0,0.22);
   transition: transform .15s ease, border-color .15s ease;
@@ -358,9 +337,9 @@
   place-items:center;
   border-radius: 16px;
   font-size: 18px;
-  background: rgba(0,0,0,0.20);
-  border: 1px solid rgba(255,255,255,0.12);
-  box-shadow: 0 10px 26px rgba(0,0,0,0.25);
+  background:#ecfdf5;
+  border:1px solid var(--border);
+  box-shadow: var(--shadow-md);
 }
 
 .card h3{
@@ -377,12 +356,12 @@
 }
 
 /* =======================
-   ✅ FOOTER
+   ✅ FOOTERbackground: rgba(255,255,255,0.05);
 ======================= */
 .footer{
   margin-top: 18px;
   padding-top: 14px;
-  border-top: 1px solid rgba(255,255,255,0.10);
+  border-top:1px solid var(--border);
   display:flex;
   align-items:center;
   justify-content: space-between;
@@ -429,3 +408,150 @@
   .stack{ grid-template-columns: 1fr; }
   .header{ align-items:flex-start; flex-direction: column; }
 }
+/* =====================================
+   🍃 CHATLOOP ABOUT – MINT CRYSTAL MODE
+   SAFE COLOR OVERRIDES ONLY
+===================================== */
+
+.page{
+  background: var(--bg);
+
+}
+
+/* header text */
+.title h1,
+.sub{
+  color:#0f172a;
+}
+
+/* hero glass */
+.hero{
+  background: var(--card);
+  border:1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+/* creator + cards */
+.creatorCard,
+.logoCard,
+.goalCard,
+.stackItem,
+.card{
+  background: white;
+  border:1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+
+/* icons */
+.creatorAvatar,
+.bubble,
+.secIcon,
+.icon{
+  background: linear-gradient(135deg,#10b981,#06b6d4);
+  border-color: rgba(15,23,42,.12);
+  box-shadow: 0 14px 36px rgba(16,185,129,.35);
+  color:white;
+}
+
+/* buttons */
+.btn{
+  background: linear-gradient(135deg,#10b981,#06b6d4);
+  box-shadow: 0 14px 40px rgba(16,185,129,.45);
+}
+
+.btn.ghost{
+  background: rgba(15,23,42,.05);
+  border-color: rgba(15,23,42,.14);
+  color:#0f172a;
+}
+
+/* section titles */
+.secTitle{
+  color:#0f172a;
+}
+
+/* footer */
+.footer{
+  border-top-color: rgba(15,23,42,.12);
+}
+
+.link{
+  color:#0f172a;
+}
+
+.link:hover{
+  color:#10b981;
+}
+
+:host, .page {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+@supports not (backdrop-filter: blur(10px)) {
+  .hero,
+  .creatorCard,
+  .logoCard,
+  .goalCard {
+    backdrop-filter: none;
+    background: rgba(255,255,255,0.95);
+     contain: paint;
+  }
+}
+@media (max-width:600px){
+  .hero{
+    padding:14px;
+    border-radius:22px;
+  }
+
+  .title h1{
+    font-size:24px;
+  }
+
+  .card,
+  .stackItem{
+    padding:12px;
+  }
+}
+@media (max-width:380px){
+  .title h1{
+    font-size:21px;
+  }
+  .badge{
+    font-size:11px;
+  }
+}
+/* ===============================
+   🔧 Final Stability Polish
+=============================== */
+
+/* prevent flex overflow bugs */
+.page > * {
+  min-width: 0;
+}
+
+/* smoother GPU animations */
+.hero,
+.creatorCard,
+.stackItem,
+.card,
+.logoCard {
+  backface-visibility: hidden;
+}
+
+/* iOS momentum scroll fix */
+.page {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* stop scroll chaining on mobile */
+body {
+  overscroll-behavior: contain;
+}
+.hero,
+.creatorCard,
+.stackItem,
+.card,
+.logoCard{
+  box-shadow: var(--shadow-md);
+}
+

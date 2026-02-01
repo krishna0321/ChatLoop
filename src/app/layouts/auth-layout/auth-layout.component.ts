@@ -22,18 +22,23 @@ import { RouterOutlet } from '@angular/router';
     </div>
   `,
   styles: [`
-/*     =======
-   ✅ Chatloop Auth Layout – ULTRA PREMIUM ✅ FIXED
-   - Login / Register pages
-   - Allows big login shell width (1080px+)
-   - No squeezed UI issue
-    ======= */
+/* =========================================================
+   🍃 Chatloop Auth Layout – PREMIUM MINT THEME
+========================================================= */
 
 :host{
-  display:block;
-  width:100%;
-  height:100dvh;
-  min-height:0;
+  display:flex;
+  flex:1;
+  min-height:100dvh;
+
+  --mint:#34d399;
+  --mint-soft:#a7f3d0;
+  --aqua:#67e8f9;
+  --sky:#93c5fd;
+
+  --bg:#f4fffb;
+  --text:#0f172a;
+  --border:rgba(0,0,0,0.06);
 }
 
 /* fallback */
@@ -41,21 +46,12 @@ import { RouterOutlet } from '@angular/router';
   :host{ height:100vh; }
 }
 
-/*     =======
-   THEME FALLBACKS
-    ======= */
-:host{
-  --theme: var(--app-theme, #7c3aed);
-  --theme-2: var(--app-theme-2, #3b82f6);
-  --bg: var(--app-bg, #050816);
-  --text: rgba(255,255,255,0.92);
-}
-
 *{ box-sizing:border-box; }
 
-/*     =======
-   ROOT SHELL
-    ======= */
+/* =========================================================
+   📦 ROOT SHELL
+========================================================= */
+
 .authShell{
   position:relative;
   width:100%;
@@ -64,20 +60,18 @@ import { RouterOutlet } from '@angular/router';
 
   display:grid;
   place-items:center;
-
-  padding: 20px;
+  padding:20px;
 
   background: var(--bg);
   color: var(--text);
-
   overflow:hidden;
   isolation:isolate;
 }
+/* =========================================================
+   🌤 SOFT MINT BACKGROUND
+========================================================= */
 
-/*     =======
-   🌌 BACKGROUND EFFECTS
-    ======= */
-.bg, .orb, .grain{ pointer-events:none; }
+.bg,.orb,.grain{ pointer-events:none; }
 
 .bg{
   position:absolute;
@@ -85,12 +79,16 @@ import { RouterOutlet } from '@angular/router';
   z-index:0;
 
   background:
-    radial-gradient(900px 620px at 20% 10%, rgba(124,58,237,0.22), transparent 55%),
-    radial-gradient(900px 620px at 80% 90%, rgba(59,130,246,0.18), transparent 60%);
+    radial-gradient(900px 620px at 15% 10%, rgba(52,211,153,.35), transparent 60%),
+    radial-gradient(900px 620px at 85% 90%, rgba(103,232,249,.30), transparent 65%),
+    radial-gradient(700px 500px at 50% 50%, rgba(167,243,208,.35), transparent 65%);
 
-  filter: blur(90px);
-  opacity:.95;
+  filter: blur(95px);
 }
+
+/* =========================================================
+   💫 FLOATING MINT ORBS
+========================================================= */
 
 .orb{
   position:absolute;
@@ -98,69 +96,77 @@ import { RouterOutlet } from '@angular/router';
   height:420px;
   border-radius:999px;
 
-  filter: blur(140px);
+  filter: blur(150px);
   opacity:.35;
   z-index:0;
 
-  animation: floatOrb 14s ease-in-out infinite;
-  will-change: transform;
+  animation: floatOrb 15s ease-in-out infinite;
 }
 
 .orb1{
-  top:-140px;
-  left:-140px;
-  background: var(--theme);
+  top:-160px;
+  left:-160px;
+  background: var(--mint);
 }
 
 .orb2{
-  bottom:-140px;
-  right:-140px;
-  background: var(--theme-2);
-  animation-delay: 6s;
+  bottom:-160px;
+  right:-160px;
+  background: var(--aqua);
+  animation-delay:5s;
 }
 
 @keyframes floatOrb{
   0%,100%{ transform: translate(0,0); }
-  50%{ transform: translate(30px,-40px); }
+  50%{ transform: translate(40px,-45px); }
 }
 
-/* Grain */
+/* =========================================================
+   🌾 SUPER LIGHT TEXTURE
+========================================================= */
+
 .grain{
   position:absolute;
   inset:0;
-  z-index:1;
-  opacity:.06;
-  mix-blend-mode: overlay;
+  opacity:.025;
+  mix-blend-mode: soft-light;
 
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
-  background-size: 180px 180px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='2'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E");
 }
 
-/*     =======
-   ✅ AUTH CONTAINER (FIXED HERE ✅)
-    ======= */
+/* =========================================================
+   📑 AUTH CONTENT WRAPPER
+========================================================= */
+
 .authInner{
   position:relative;
   z-index:2;
 
-  width: 100%;
-  max-width: min(1180px, 100%);  /* ✅ allow big login layout */
-  display: flex;
-  justify-content: center;
+  width:100%;
+  max-width: min(1180px, 100%);
+  display:flex;
+  justify-content:center;
 }
 
-/* mobile tweak */
+/* =========================================================
+   📱 MOBILE TWEAK
+========================================================= */
+
 @media (max-width:480px){
   .authShell{
     place-items:start center;
-    padding: 14px;
+    padding:14px;
   }
 }
 
-/* reduced motion */
+/* =========================================================
+   🧘 REDUCED MOTION
+========================================================= */
+
 @media (prefers-reduced-motion: reduce){
   .orb{ animation:none !important; }
 }
-  `]
+`]
+
 })
 export class AuthLayoutComponent {}
