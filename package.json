@@ -20,6 +20,7 @@
     "@angular/platform-browser-dynamic": "^17.3.0",
     "@angular/router": "^17.3.0",
     "axios": "^1.13.4",
+    "browser-image-compression": "^2.0.2",
     "firebase": "^10.14.1",
     "firebase-admin": "^13.6.0",
     "html5-qrcode": "^2.3.8",
