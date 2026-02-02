@@ -1,20 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Auth, authState, signOut } from '@angular/fire/auth';
-import {
-  Firestore,
-  doc,
-  docData,
-  updateDoc,
-  serverTimestamp,
-} from '@angular/fire/firestore';
-import {
-  Storage,
-  ref,
-  uploadBytes,
-  getDownloadURL,
-} from '@angular/fire/storage';
+import { Firestore,doc,docData,updateDoc,serverTimestamp,} from '@angular/fire/firestore';
 import { Observable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { ImageUploadService } from './image-upload.service';
 
 export interface ProfileUser {
   uid: string;
@@ -35,11 +24,11 @@ export interface ProfileUser {
 
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
-  constructor(
-    private auth: Auth,
-    private firestore: Firestore,
-    private storage: Storage
-  ) {}
+ constructor(
+  private auth: Auth,
+  private firestore: Firestore,
+  private uploader: ImageUploadService
+) {}
 
   // 🔥 REALTIME profile (NO REFRESH EVER)
   getMyProfile(): Observable<ProfileUser | null> {
@@ -66,26 +55,22 @@ export class ProfileService {
   }
 
   async updateAvatar(file: File) {
-    const uid = this.auth.currentUser?.uid;
-    if (!uid) throw new Error('Not logged in');
 
-    const clean = file.name.replace(/[^\w.\-]+/g, '_');
-    const path = `avatars/${uid}/${Date.now()}_${clean}`;
+  const uid = this.auth.currentUser?.uid;
+  if (!uid) throw new Error('Not logged in');
 
-    const fileRef = ref(this.storage, path);
+  // 🚀 upload to Cloudinary
+  const res = await this.uploader.uploadImage(file);
 
-    await uploadBytes(fileRef, file);
+  const refDoc = doc(this.firestore, `users/${uid}`);
 
-    const url = await getDownloadURL(fileRef);
+  await updateDoc(refDoc, {
+    photoURL: res.url,
+    updatedAt: serverTimestamp(),
+  });
 
-    const refDoc = doc(this.firestore, `users/${uid}`);
-    await updateDoc(refDoc, {
-      photoURL: url,
-      updatedAt: serverTimestamp(),
-    });
-
-    return url;
-  }
+  return res.url;
+}
 
   async logout() {
     await signOut(this.auth);

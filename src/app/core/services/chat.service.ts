@@ -19,6 +19,8 @@ import {
 } from '@angular/fire/firestore';
 
 export type ChatMessageType = 'text' | 'image' | 'file' | 'link';
+export type MessageStatus = 'sent' | 'delivered' | 'seen';
+
 
 export interface ChatMessage {
   id?: string;
@@ -27,6 +29,9 @@ export interface ChatMessage {
   senderId: string;
   receiverId?: string;
   createdAt: any;
+
+  status?: MessageStatus;   // ✅ ADD THIS LINE
+
   editedAt?: any;
   isDeleted?: boolean;
   deletedAt?: any;
@@ -54,30 +59,41 @@ export class ChatService {
 // =====================
 // CLOUDINARY UPLOAD
 // =====================
-private async uploadToCloudinary(file: File): Promise<string> {
+private uploadToCloudinary(
+  file: File,
+  onProgress: (p: number) => void
+): Promise<string> {
 
-  const form = new FormData();
-  form.append('file', file);
-  form.append('upload_preset', this.UPLOAD_PRESET);
+  return new Promise((resolve, reject) => {
 
-  const url = `${this.BASE_URL}/${this.CLOUD_NAME}/auto/upload`;
+    const form = new FormData();
+    form.append('file', file);
+    form.append('upload_preset', this.UPLOAD_PRESET);
 
-  const res = await fetch(url, {
-    method: 'POST',
-    body: form
+    const xhr = new XMLHttpRequest();
+    xhr.open(
+      'POST',
+      `${this.BASE_URL}/${this.CLOUD_NAME}/auto/upload`
+    );
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        const percent = Math.round((e.loaded / e.total) * 100);
+        onProgress(percent);
+      }
+    };
+
+    xhr.onload = () => {
+      const data = JSON.parse(xhr.responseText);
+      if (data?.secure_url) resolve(data.secure_url);
+      else reject('Upload failed');
+    };
+
+    xhr.onerror = () => reject('Upload error');
+
+    xhr.send(form);
   });
-
-  const data = await res.json();
-
-  console.log('Cloudinary response:', data); // debug (optional)
-
-  if (!data?.secure_url) {
-    throw new Error(data?.error?.message || 'Upload failed');
-  }
-
-  return data.secure_url;
 }
-
 
   // =====================
   // CHAT ID
@@ -161,7 +177,14 @@ private async uploadToCloudinary(file: File): Promise<string> {
   // =====================
   // TEXT MESSAGE
   // =====================
-  async sendMessage(chatId: string, text: string, senderId: string, receiverId: string) {
+  async sendMessage(
+  chatId: string,
+  text: string,
+  senderId: string,
+  receiverId: string,
+  status: MessageStatus = 'sent'
+
+){
     const value = text.trim();
     if (!value) return;
 
@@ -172,11 +195,15 @@ private async uploadToCloudinary(file: File): Promise<string> {
       text: value,
       senderId,
       receiverId,
+
+      status: 'sent',   // ✅ ADD THIS
+
       createdAt: serverTimestamp(),
       editedAt: null,
       isDeleted: false,
       deletedAt: null,
     });
+
 
     await updateDoc(doc(this.firestore, `chats/${chatId}`), {
       lastMessage: value,
@@ -191,13 +218,15 @@ private async uploadToCloudinary(file: File): Promise<string> {
   // FILE / IMAGE MESSAGE (CLOUDINARY)
   // =====================
   async sendFileMessage(
-    chatId: string,
-    file: File,
-    senderId: string,
-    receiverId: string,
-    type: 'image' | 'file',
-    caption = ''
-  ) {
+  chatId: string,
+  file: File,
+  senderId: string,
+  receiverId: string,
+  type: 'image' | 'file',
+  progress: (p:number)=>void,
+  caption = ''
+)
+{
 
     if (type === 'image' && !file.type.startsWith('image/'))
       throw new Error('Only images allowed');
@@ -208,8 +237,7 @@ private async uploadToCloudinary(file: File): Promise<string> {
       if (!allowed.includes(ext)) throw new Error('Invalid file type');
     }
 
-    const url = await this.uploadToCloudinary(file);
-
+    const url = await this.uploadToCloudinary(file, progress);
 
     const msgText = type === 'image' ? caption : `📎 ${file.name}`;
     const preview = type === 'image' ? '📷 Photo' : `📎 ${file.name}`;
@@ -221,15 +249,20 @@ private async uploadToCloudinary(file: File): Promise<string> {
       text: msgText,
       senderId,
       receiverId,
+
+      status: 'sent',   // ✅ ADD THIS
+
       createdAt: serverTimestamp(),
       editedAt: null,
       isDeleted: false,
       deletedAt: null,
+
       fileUrl: url,
       fileName: file.name,
       mimeType: file.type,
       fileSize: file.size,
     });
+
 
     await updateDoc(doc(this.firestore, `chats/${chatId}`), {
       lastMessage: preview,
@@ -282,6 +315,24 @@ private async uploadToCloudinary(file: File): Promise<string> {
       cb(snap.docs.map(d => ({ id: d.id, ...(d.data() as any) })));
     });
   }
+// =====================
+// 🟢 ONLINE STATUS
+// =====================
+setOnline(uid: string, online: boolean) {
+  return updateDoc(doc(this.firestore, `users/${uid}`), {
+    online,
+    lastSeen: serverTimestamp()
+  });
+}
+
+// =====================
+// ⌨ TYPING INDICATOR
+// =====================
+setTyping(uid: string, chatId: string | null) {
+  return updateDoc(doc(this.firestore, `users/${uid}`), {
+    typingIn: chatId
+  });
+}
 
   // =====================
   // HELPERS

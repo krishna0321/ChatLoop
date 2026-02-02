@@ -46,7 +46,17 @@
         (click)="openRoom(r)"
       >
         <div class="avatar" [ngStyle]="getAvatarStyleForRoom(r)">
-          {{ (getRoomTitle(r)[0] || 'U').toUpperCase() }}
+
+          <img
+            *ngIf="usersMap.get(getOtherUid(r))?.photoURL"
+            [src]="usersMap.get(getOtherUid(r))?.photoURL"
+            class="avatarImg"
+          />
+
+          <span *ngIf="!usersMap.get(getOtherUid(r))?.photoURL">
+            {{ (getRoomTitle(r)[0] || 'U').toUpperCase() }}
+          </span>
+
         </div>
 
         <div class="info">
@@ -84,9 +94,20 @@
         <div class="people-list">
           <div class="chat-item" *ngFor="let u of filteredUsers">
 
-            <div class="avatar small" [ngStyle]="getAvatarStyleForUser(u)">
+           <div class="avatar small" [ngStyle]="getAvatarStyleForUser(u)">
+
+            <img
+              *ngIf="u.photoURL"
+              [src]="u.photoURL"
+              class="avatarImgSmall"
+            />
+
+            <span *ngIf="!u.photoURL">
               {{ (u.name || u.email || '?').slice(0,1).toUpperCase() }}
-            </div>
+            </span>
+
+          </div>
+
 
             <div class="meta" (click)="startDmWithUser(u)">
               <div class="title">{{ u.name || u.email || 'Unknown' }}</div>

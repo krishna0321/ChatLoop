@@ -13,6 +13,7 @@ import { ContactService } from '../../core/services/contact.service';
 type ProfileTab = 'media' | 'files' | 'links';
 type AttachType = 'image' | 'document';
 
+
 @Component({
   selector: 'app-chat',
   standalone: true,
@@ -21,7 +22,9 @@ type AttachType = 'image' | 'document';
   styleUrls: ['./chat.component.css'],
 })
 export class ChatComponent
+
   implements OnInit, OnChanges, OnDestroy, AfterViewChecked
+  
 {
   @Input() user!: AppUser;
   @Output() back = new EventEmitter<void>(); // ✅ mobile back
@@ -30,6 +33,10 @@ export class ChatComponent
   goBack() {
   this.back.emit();
 }
+  isOnline = false;
+  lastSeen: any = null;
+  isTyping = false;
+  fullImage: string | null = null;
 
   myUid = '';
   chatId = '';
@@ -69,6 +76,8 @@ export class ChatComponent
   // upload
   sendingFile = false;
   fileError = '';
+  uploadPercent = 0;
+
 
   // attach menu
   showAttachMenu = false;
@@ -100,6 +109,14 @@ export class ChatComponent
     private contactService: ContactService
   ) {}
 
+    openImage(url: string) {
+    this.fullImage = url;
+    }
+
+    closeImage() {
+    this.fullImage = null;
+    }
+
   // ✅ keyboard open/close
   @HostListener('window:focusin', ['$event'])
   onFocusIn(e: any) {
@@ -130,7 +147,20 @@ export class ChatComponent
         this.isBlocked = !!this.user?.uid && blocked.includes(this.user.uid);
       });
 
+      this.chatService.setOnline(this.myUid, true);
+
+      window.addEventListener('beforeunload', () => {
+        this.chatService.setOnline(this.myUid, false);
+      });
+
       await this.loadChat();
+      docData(doc(this.firestore, `users/${this.user.uid}`))
+      .subscribe((u:any) => {
+        this.isOnline = !!u?.online;
+        this.lastSeen = u?.lastSeen;
+        this.isTyping = u?.typingIn === this.chatId;
+      });
+
     });
   }
 
@@ -322,14 +352,16 @@ export class ChatComponent
 
         await this.chatService.ensureChat(this.chatId, [this.myUid, this.user.uid]);
 
-        await this.chatService.sendFileMessage(
+       await this.chatService.sendFileMessage(
           this.chatId,
           this.selectedFile,
           this.myUid,
           this.user.uid,
           this.attachType === 'image' ? 'image' : 'file',
+          p => this.uploadPercent = p,
           (this.text || '').trim()
         );
+
 
         this.text = '';
         this.clearSelectedFile();
@@ -440,57 +472,48 @@ export class ChatComponent
     }
   }
 
-  // =====================
-  // PROFILE DRAWER
-  // =====================
-  async openProfileDrawer() {
-    if (!this.user?.uid) return;
+// PROFILE DRAWER
 
-    this.showUserProfile = true;
-    this.profileTab = 'media';
+profileUser: AppUser | null = null;
 
-    this.profileLink = `chatloop://user/${this.user.uid}`;
+async openProfileDrawer() {
+  if (!this.user?.uid) return;
 
-    try {
-      this.qrDataUrl = await QRCode.toDataURL(this.profileLink, {
-        width: 240,
-        margin: 1,
-      });
-    } catch {
-      this.qrDataUrl = '';
+  this.showUserProfile = true;
+  this.profileTab = 'media';
+
+  // 🔥 Load real Firestore profile
+  this.userService.getUser(this.user.uid).subscribe(u => {
+    this.profileUser = u as AppUser;
+  });
+
+  this.profileLink = `chatloop://user/${this.user.uid}`;
+
+  try {
+    this.qrDataUrl = await QRCode.toDataURL(this.profileLink, {
+      width: 240,
+      margin: 1,
+    });
+  } catch {
+    this.qrDataUrl = '';
+  }
+
+  this.contactUnsub?.();
+  this.contactUnsub = this.contactService.listenContacts(
+    this.myUid,
+    list => {
+      this.isContact = !!(list || []).find(
+        (c: any) => c.uid === this.user.uid
+      );
     }
+  );
+}
 
-    this.contactUnsub?.();
-    this.contactUnsub = this.contactService.listenContacts(this.myUid, (list) => {
-      this.isContact = !!(list || []).find((c: any) => c.uid === this.user.uid);
-    });
-  }
+closeProfileDrawer() {
+  this.showUserProfile = false;
+  this.profileUser = null;
+}
 
-  closeProfileDrawer() {
-    this.showUserProfile = false;
-  }
-
-  setTab(t: ProfileTab) {
-    this.profileTab = t;
-  }
-
-  copyText(t: string) {
-    navigator.clipboard.writeText(t || '');
-    alert('✅ Copied');
-  }
-
-  async addToContacts() {
-    if (this.isContact) return;
-
-    await this.contactService.addContact(this.myUid, {
-      uid: this.user.uid,
-      name: this.user.name || 'Friend',
-      phone: this.user.phone || '',
-    });
-
-    this.isContact = true;
-    alert('✅ Added');
-  }
 
   // =====================
   // FILE PICK
@@ -535,6 +558,19 @@ export class ChatComponent
     setTimeout(() => this.scrollBottom(), 80);
   }
 
+    // =====================
+    // IMAGE ZOOM
+    // =====================
+    zoomImage: string | null = null;
+
+    openZoom(url: string) {
+      this.zoomImage = url;
+    }
+
+    closeZoom() {
+      this.zoomImage = null;
+    }
+
   // =====================
   // SHARED TABS
   // =====================
@@ -575,6 +611,17 @@ export class ChatComponent
     this.chatDocSub?.unsubscribe?.();
     this.meSub?.unsubscribe?.();
     this.contactUnsub?.();
+    this.chatService.setOnline(this.myUid, false);
   }
-  
+  typing() {
+  if (!this.chatId) return;
+
+  this.chatService.setTyping(this.myUid, this.chatId);
+
+  clearTimeout((this as any)._typingTimer);
+  (this as any)._typingTimer = setTimeout(() => {
+    this.chatService.setTyping(this.myUid, null);
+  }, 1200);
+}
+
 }

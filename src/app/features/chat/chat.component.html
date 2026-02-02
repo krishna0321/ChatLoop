@@ -5,34 +5,69 @@
   (click)="closeAllMenus()"
 >
 
-  <!-- ================= HEADER ================= -->
-  <header class="header" (click)="$event.stopPropagation()">
-    <div class="left" (click)="openProfileDrawer()">
-      <div class="avatar">{{ (user.name || 'U')[0] }}</div>
+<!-- ================= HEADER ================= -->
+<header class="header" (click)="$event.stopPropagation()">
 
-      <div class="info">
-        <div class="title">{{ user.name || 'User' }}</div>
-        <div class="sub">
+  <div class="left" (click)="openProfileDrawer()">
+    <div class="avatar">
+
+  <img
+    *ngIf="user.photoURL"
+    [src]="user.photoURL"
+    class="avatarImgSmall"
+    alt="avatar"
+  />
+
+  <span *ngIf="!user.photoURL">
+    {{ (user.name || 'U')[0] }}
+  </span>
+
+</div>
+
+    <div class="info">
+      <div class="title">
+        {{ user.name || 'User' }}
+      </div>
+
+      <div class="sub">
+
+        <span class="status" *ngIf="isTyping">⌨ typing...</span>
+
+        <span class="status online" *ngIf="!isTyping && isOnline">
+          🟢 online
+        </span>
+
+        <span class="status lastseen" *ngIf="!isTyping && !isOnline && lastSeen">
+          last seen {{ formatTime(lastSeen) }}
+        </span>
+
+        <div class="contactInfo">
           {{ user.phone || user.email || 'No info' }}
-          <span *ngIf="isBlocked" class="pill danger">Blocked</span>
         </div>
+
+        <span *ngIf="isBlocked" class="pill danger">Blocked</span>
+
       </div>
     </div>
+  </div>
 
-    <button class="iconBtn" (click)="toggleHeaderMenu($event)">⋮</button>
+  <button class="iconBtn" (click)="toggleHeaderMenu($event)">⋮</button>
 
-    <div class="dropdown" *ngIf="showHeaderMenu" (click)="$event.stopPropagation()">
-      <button (click)="toggleMute()">
-        {{ isMuted ? '🔔 Unmute' : '🔕 Mute' }}
-      </button>
-      <button (click)="togglePin()">
-        {{ isPinned ? '📌 Unpin' : '📌 Pin' }}
-      </button>
-      <button class="danger" (click)="toggleBlock()">
-        {{ isBlocked ? '✅ Unblock' : '⛔ Block' }}
-      </button>
-    </div>
-  </header>
+  <div class="dropdown" *ngIf="showHeaderMenu" (click)="$event.stopPropagation()">
+    <button (click)="toggleMute()">
+      {{ isMuted ? '🔔 Unmute' : '🔕 Mute' }}
+    </button>
+
+    <button (click)="togglePin()">
+      {{ isPinned ? '📌 Unpin' : '📌 Pin' }}
+    </button>
+
+    <button class="danger" (click)="toggleBlock()">
+      {{ isBlocked ? '✅ Unblock' : '⛔ Block' }}
+    </button>
+  </div>
+
+</header>
 
   <!-- ================= MESSAGES ================= -->
   <div class="messages" #messagesBox>
@@ -47,7 +82,9 @@
 
         <!-- IMAGE -->
         <ng-container *ngIf="m.type === 'image' && m.fileUrl && !m.isDeleted">
-          <img class="imgMsg" [src]="m.fileUrl" />
+          <img class="imgMsg" [src]="m.fileUrl"(click)="openImage(m.fileUrl); $event.stopPropagation()"/>
+
+
           <div class="caption" *ngIf="m.text">{{ m.text }}</div>
         </ng-container>
 
@@ -83,7 +120,13 @@
 
       <!-- ✅ META (TIME + EDITED) -->
       <div class="meta" *ngIf="!m.isDeleted">
-        <span class="time">{{ formatTime(m.createdAt) }}</span>
+      <span class="time">
+      {{ formatTime(m.createdAt) }}
+      <span *ngIf="m.senderId === myUid">
+      {{ m.status === 'seen' ? '✔✔' : '✔' }}
+      </span>
+     </span>
+
         <span *ngIf="m.editedAt"> · edited</span>
       </div>
     </div>
@@ -151,6 +194,7 @@
 
     <input
       [(ngModel)]="text"
+      (input)="typing()"
       placeholder="Message..."
       [disabled]="isBlocked || sendingFile"
       (keydown.enter)="send()"
@@ -165,6 +209,10 @@
       {{ sendingFile ? 'Uploading...' : 'Send' }}
     </button>
   </div>
+  
+  <div class="progressBar" *ngIf="uploadPercent > 0 && uploadPercent < 100">
+  <div class="fill" [style.width.%]="uploadPercent"></div>
+  </div>
 
   <!-- ================= PROFILE DRAWER ================= -->
   <div
@@ -175,29 +223,50 @@
     <div class="drawer" (click)="$event.stopPropagation()">
       <button class="closeBtn" (click)="closeProfileDrawer()">✖</button>
 
-      <div class="avatarLarge">{{ (user.name || 'U')[0] }}</div>
+        <div class="avatarLarge">
 
-      <div class="infoSection">
-        <div class="label">Name</div>
-        <div class="value">{{ user.name || 'User' }}</div>
-      </div>
+          <img
+            *ngIf="profileUser?.photoURL"
+            [src]="profileUser?.photoURL"
+            class="avatarBigImg"
+            alt="avatar"
+          />
 
-      <div class="infoSection">
-        <div class="label">Email</div>
-        <div class="value">{{ user.email || 'No email' }}</div>
-      </div>
+          <span *ngIf="!profileUser?.photoURL">
+            {{ (profileUser?.name || 'U')[0] }}
+          </span>
 
-      <div class="infoSection">
-        <div class="label">Phone</div>
-        <div class="value">{{ user.phone || 'No phone' }}</div>
-      </div>
-
-      <div class="infoSection">
-        <div class="label">Joined</div>
-        <div class="value">
-          {{ user.createdAt | date: 'mediumDate' }}
         </div>
-      </div>
+
+
+        <div class="infoSection">
+          <div class="label">Name</div>
+          <div class="value">
+            {{ profileUser?.name || 'User' }}
+          </div>
+        </div>
+
+        <div class="infoSection">
+          <div class="label">Email</div>
+          <div class="value">
+            {{ profileUser?.email || 'No email' }}
+          </div>
+        </div>
+
+        <div class="infoSection">
+          <div class="label">Phone</div>
+          <div class="value">
+            {{ profileUser?.phone || 'No phone' }}
+          </div>
+        </div>
+
+        <div class="infoSection">
+          <div class="label">Joined</div>
+          <div class="value">
+            {{ profileUser?.createdAt | date:'mediumDate' }}
+          </div>
+        </div>
+
     </div>
   </div>
 </div>
