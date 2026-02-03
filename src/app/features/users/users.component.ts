@@ -47,7 +47,12 @@ export class UsersComponent implements OnInit, OnDestroy {
       this.usersSub = this.userService.getUsers().subscribe({
         next: (list) => {
           // ✅ show everyone except me
-          this.users = (list || []).filter((x) => x.uid !== this.myUid);
+          this.users = (list || []).filter(u => {
+          if (u.uid === this.myUid) return false;
+          if (u.blocked?.includes(this.myUid)) return false;
+          return true;
+        });
+
 
           // ✅ default filtered list
           this.onSearch();

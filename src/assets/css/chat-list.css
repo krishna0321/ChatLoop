@@ -1,9 +1,9 @@
-.chat-list-header-text{
-    background-color:#242f3d; 
+﻿.chat-list-header-text{
+    background-color:var(--legacy-color-219); 
     padding: 1% 0.5%;
     margin: 3%;  
     border-width: 0;
-    border-radius: 3px;
+    border-radius: var(--legacy-radius-018);
     resize: none;   
     color: white;
     width: 94%;
@@ -44,13 +44,13 @@
 /*hover and click*/
 .chat-list-body-element:hover{    
     transition: background-color 0.3s;
-    background-color: #25303e; 
+    background-color: var(--legacy-color-220); 
     outline: 0px solid transparent;   
     cursor: pointer;
 }
 .chat-list-body-element:focus {    
     transition: background-color 1s;
-    background-color: #2b5278; 
+    background-color: var(--legacy-color-221); 
     outline: 0px solid transparent;   
     color: white;   
 }
@@ -94,7 +94,7 @@
     padding-top: 0.5vh;
     padding-bottom: 0.5vh;
     align-self: flex-start;
-    color: #7f91a4;
+    color: var(--legacy-color-217);
 }
 
 /* date-unread */
@@ -112,7 +112,7 @@
 .chat-list-body-element-date{
     align-self: flex-end;
     padding-right: 1em;
-    color: #7f91a4;  
+    color: var(--legacy-color-217);  
     display: flex;
     word-wrap: break-word;
 }
@@ -121,8 +121,8 @@
     width: fit-content;
     height: fit-content;
     padding: 5% 7%;
-    background-color: #38485e;
-    border-radius: 100%;
+    background-color: var(--legacy-color-222);
+    border-radius: var(--legacy-radius-019);
 } 
 .chat-list-body-element-unread{   
     display: flex;

@@ -1,4 +1,4 @@
-.messages {
+﻿.messages {
   padding-top: 1%; 
   align-self: center;
   width: 100%;
@@ -19,8 +19,8 @@
   max-width: 85%;
   align-self: flex-start;  
   margin-left: 9px;
-  background-color: #182533;
-  border-radius: 5px;
+  background-color: var(--legacy-color-231);
+  border-radius: var(--legacy-radius-023);
   display: inline-block;
   padding: 10px 18px;
   position: relative;
@@ -30,7 +30,7 @@
   width: 0; height: 0; left: -7px;
   bottom: 3%;
   border-top: 4px solid transparent;
-  border-right: 8px solid #182533;
+  border-right: 8px solid var(--legacy-color-231);
   border-bottom: 4px solid transparent;   
 }
 .message-right {  
@@ -39,8 +39,8 @@
   max-width: 85%;
   align-self: flex-end;
   margin-right: 9px;
-  background-color: #2b5278;
-  border-radius: 5px;
+  background-color: var(--legacy-color-221);
+  border-radius: var(--legacy-radius-023);
   display: inline-block;
   padding: 10px 18px;
   position: relative;
@@ -51,7 +51,7 @@
   width: 0; height: 0; right: -7px;
   bottom: 3%;
   border-top: 4px solid transparent;
-  border-left: 8px solid #2b5278;
+  border-left: 8px solid var(--legacy-color-221);
   border-bottom: 4px solid transparent;  
 }
 .message-image{
@@ -82,7 +82,7 @@
  padding-top: 10%;
  padding-right: 5px;
   font-size: 0.8em;
-  color: #7f91a4;
+  color: var(--legacy-color-217);
 }
 .message-body-seen{  
   align-self: flex-end;

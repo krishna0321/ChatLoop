@@ -1,4 +1,4 @@
-
+﻿
 .chat-header-name-date{
     width: 85%;
     display: flex;
@@ -15,7 +15,7 @@
 }   
 .chat-header-date{    
     padding-top: 1%;
-    color: #7f91a4;
+    color: var(--legacy-color-217);
    
 }
 .chat-header-buttons{    
@@ -37,7 +37,7 @@
     align-self: center;
     align-items: center;
     justify-content: center;
-    background-color:#17212b;
+    background-color:var(--legacy-color-218);
 }
 .chat-header-button-image{   
     width: 65%;
@@ -47,3 +47,4 @@
     color: white;
     cursor: pointer;    
 }
+

@@ -1,4 +1,4 @@
-.left-menu{
+﻿.left-menu{
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -7,7 +7,7 @@
     -khtml-user-select: none;
     -webkit-user-select: none;
     user-select: none;    
-    color: #7f91a4;
+    color: var(--legacy-color-217);
 }
 .left-menu-list{
     overflow-y: auto;
@@ -27,10 +27,10 @@ cursor: pointer;
 }
 .left-menu-element:focus{    
     transition: background-color 0.7s;
-    background-color: #25303e; 
+    background-color: var(--legacy-color-220); 
     outline: 0px solid transparent;
     transition: color 0.8s;
-    color: #5eb5f7;
+    color: var(--legacy-color-230);
 
 }
 .left-menu-element-text{

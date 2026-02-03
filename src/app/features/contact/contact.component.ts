@@ -71,12 +71,24 @@ export class ContactComponent implements OnInit, OnDestroy {
       this.unsubContacts = this.contactService.listenContacts(
         this.myUid,
         (list) => {
-          this.contacts = (list || []).sort((a, b) =>
+
+          this.contacts = (list || []).map(c => {
+
+            const user = this.users.find(u => u.uid === c.uid);
+
+            return {
+              ...c,
+              photoURL: user?.photoURL || ''   // ✅ inject real avatar
+            };
+
+          }).sort((a, b) =>
             (a.name || '').localeCompare(b.name || '')
           );
+
           this.applyFilter();
         }
       );
+
     });
   }
 

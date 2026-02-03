@@ -1,4 +1,4 @@
-@import "reset.css";
+﻿@import "reset.css";
 @import "message.css";
 @import "header.css";
 @import "left-menu.css";
@@ -23,7 +23,7 @@ body{
 .header{
     display: flex;
     justify-content:flex-end;  
-    background-color: #242f3d;  
+    background-color: var(--legacy-color-219);  
     height: 20px;
 }
 .main-window{    
@@ -43,7 +43,7 @@ body{
 .chat-list{
     display: flex;
     flex-direction: column;
-    background-color:#17212b;
+    background-color:var(--legacy-color-218);
     width: 31%;
     font-size: 70%;
     height: 100%;
@@ -51,7 +51,7 @@ body{
     min-width: 290px;
 }
 .left-menu{
-    background-color:#0e1621;
+    background-color:var(--legacy-color-223);
     font-size: 50%;
     width: 4%;
     min-width: 70px;    
@@ -61,7 +61,7 @@ body{
 .chat-header{
     height: 55px;
     min-height: 3em;
-    background-color:#17212b;
+    background-color:var(--legacy-color-218);
     font-size: 65%;
     display: flex;
     justify-content:flex-start;

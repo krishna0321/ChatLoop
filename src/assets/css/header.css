@@ -1,4 +1,4 @@
-
+﻿
 .header-item{
     height: 100%;
    /* width: 2%;   */
@@ -23,7 +23,7 @@
 }
 .header-item-icon:active{
     transition: background-color 0.2s;
-    background-color:rgb(75, 74, 74); 
+    background-color:var(--legacy-color-228); 
     outline: 0px solid transparent;
 }
 .header-item-icon-close:hover{
@@ -33,6 +33,6 @@
 }
 .header-item-icon-close:active{
     transition: background-color 0.3s;
-    background-color: rgb(167, 1, 1); 
+    background-color: var(--legacy-color-229); 
     outline: 0px solid transparent;
 }

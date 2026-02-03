@@ -28,7 +28,20 @@
   <!-- ✅ Contact List -->
   <div class="list" *ngIf="filtered.length > 0; else emptyTpl">
     <div class="item" *ngFor="let c of filtered">
-      <div class="avatar">{{ (c.name || 'C')[0] }}</div>
+      <div class="avatar">
+
+  <img
+    *ngIf="c.photoURL"
+    [src]="c.photoURL"
+    class="avatar-img"
+  />
+
+  <span *ngIf="!c.photoURL">
+    {{ (c.name || 'C')[0] }}
+  </span>
+
+</div>
+
 
       <div class="info">
         <div class="name">{{ c.name || 'Unknown' }}</div>

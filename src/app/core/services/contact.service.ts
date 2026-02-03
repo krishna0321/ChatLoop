@@ -14,6 +14,7 @@ export interface Contact {
   name: string;
   phone: string;
   uid?: string;
+  photoURL?: string;  
   createdAt?: any;
 }
 

@@ -49,30 +49,39 @@
         <div class="userList">
 
           <div class="userRow" *ngFor="let u of filtered">
-            <div class="left" (click)="openDetails(u)">
-              <div class="avatar">
-                {{ (u.name || u.email || 'U').slice(0,1).toUpperCase() }}
-              </div>
 
-              <div class="info">
-                <div class="name">{{ u.name || 'Unnamed' }}</div>
-                <div class="sub2">{{ u.email || u.phone || 'No Email / Phone' }}</div>
-              </div>
+          <div class="left" (click)="openDetails(u)">
+
+            <!-- AVATAR -->
+            <div class="avatar">
+
+              <img
+                *ngIf="u.photoURL"
+                [src]="u.photoURL"
+                class="avatar-img"
+              />
+
+              <span *ngIf="!u.photoURL">
+                {{ (u.name || u.email || 'U')[0] | uppercase }}
+              </span>
+
             </div>
 
-            <!-- ✅ Only chat button -->
-            <div class="actions">
-              <button class="btn primary" (click)="startChat(u)">💬 Chat</button>
+            <!-- INFO -->
+            <div class="info">
+              <div class="name">{{ u.name || 'Unnamed' }}</div>
+              <div class="sub2">{{ u.email || u.phone || 'No Email / Phone' }}</div>
             </div>
+
           </div>
 
-          <div class="empty" *ngIf="filtered.length === 0">
-            <div class="emoji">👤</div>
-            <div class="t1">No users found</div>
-            <div class="t2">Try another search keyword</div>
-          </div>
+  <!-- CHAT BUTTON -->
+  <div class="actions">
+    <button class="btn primary" (click)="startChat(u)">💬 Chat</button>
+  </div>
 
-        </div>
+</div>
+
       </div>
 
       <!-- DETAILS -->

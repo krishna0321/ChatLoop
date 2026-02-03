@@ -1,557 +1,365 @@
-:host{
+﻿:host{
   display:flex;
-  flex-direction: column;
+  flex-direction:column;
   min-height:0;
 }
 
+*{ box-sizing:border-box }
 
+/* =======================
+   ðŸ“„ PAGE
+======================= */
 
-/* About page scroll container */
-.page {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 18px;
+.page{
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:18px;
+
   background: var(--bg);
   color: var(--text);
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: auto;
-  contain: layout paint;
+
+  scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;
 }
 
 /* =======================
-   ✅ HEADER
+   ðŸ“Œ HEADER
 ======================= */
+
 .header{
   display:flex;
-  align-items:flex-end;
   justify-content:space-between;
-  gap: 16px;
-  margin-bottom: 14px;
+  gap:16px;
+  margin-bottom:14px;
+  flex-wrap:wrap;
 }
 
 .title h1{
   margin:0;
-  font-size: 30px;
-  font-weight: 1100;
-  letter-spacing: 0.4px;
+  font-size:30px;
+  font-weight:1100;
 }
 
 .sub{
-  margin: 6px 0 0;
-  font-size: 14px;
-  opacity: .82;
-  font-weight: 800;
+  margin-top:6px;
+  font-size:14px;
+  color: var(--muted);
+  font-weight:800;
 }
 
-/* ✅ Buttons */
-.actions{
-  display:flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
+.actions{ display:flex; gap:10px; flex-wrap:wrap; }
+
+/* buttons */
 
 .btn{
-  text-decoration:none;
-  border: none;
-  border-radius:14px;
-  padding: 10px 16px;
-  font-weight: 1000;
-  font-size: 13px;
+  border-radius: var(--legacy-radius-001);
+  padding:10px 16px;
+  font-weight:1000;
+  font-size:13px;
   cursor:pointer;
-  color: white;
-  background: linear-gradient(135deg,var(--primary),var(--primary-2));
-  box-shadow: 0 10px 24px rgba(0,0,0,0.35);
-  transition: transform .15s ease, opacity .15s ease;
+  border:0;
+  transition:.15s ease;
 }
 
-.btn:hover{
-  transform: translateY(-1px);
-  opacity: 0.96;
+.btn.primary{
+  background: var(--theme);
+  color:white;
+  box-shadow: var(--legacy-shadow-001);
+}
+
+.btn.primary:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.06);
 }
 
 .btn.ghost{
-  background:#f1f5f9;
-  border: 1px solid var(--border);
+  background: var(--card);
+  border:1px solid var(--border);
   color: var(--text);
-  box-shadow: none;
 }
 
 /* =======================
-   ✅ HERO (UPGRADED)
+   ðŸŒŸ HERO
 ======================= */
+
 .hero{
-  margin-top: 10px;
-  border-radius: 28px;
+  margin-top:10px;
+  border-radius: var(--legacy-radius-002);
   border:1px solid var(--border);
-  padding: 18px;
+  padding:18px;
+
   display:grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 14px;
-  box-shadow: var(--shadow-md);
-  position: relative;
-  overflow:hidden;
+  grid-template-columns:1.5fr 1fr;
+  gap:14px;
+
+  background: var(--panel);
+  box-shadow: var(--legacy-shadow-002);
 }
 
-/* Badge */
+/* badge */
+
 .badge{
   display:inline-flex;
-  gap: 8px;
+  gap:8px;
   align-items:center;
-  font-weight: 1000;
-  font-size: 12px;
-  padding: 7px 12px;
-  border-radius: 999px;
-  width: fit-content;
+  font-weight:1000;
+  font-size:12px;
+  padding:7px 12px;
+  border-radius: var(--legacy-radius-003);
+
+  background: color-mix(in srgb,var(--theme) 20%,transparent);
+  color: var(--theme);
 }
 
-/* Hero text */
+/* hero text */
+
 .hero h2{
-  margin: 12px 0 6px;
-  font-size: 24px;
-  font-weight: 1200;
-  letter-spacing: 0.2px;
+  margin:12px 0 6px;
+  font-size:24px;
+  font-weight:1200;
 }
 
 .hero p{
-  margin: 0;
-  opacity: .86;
-  font-size: 14px;
-  line-height: 1.7;
-  font-weight: 800;
+  margin:0;
+  color: var(--muted);
+  font-size:14px;
+  line-height:1.7;
+  font-weight:800;
 }
 
 /* =======================
-   ✅ CREATOR CARD (MORE PREMIUM)
+   ðŸ‘¤ CREATOR
 ======================= */
+
 .creatorCard{
-  margin-top: 14px;
-  padding: 14px;
-  border-radius: 24px;
+  margin-top:14px;
+  padding:14px;
+  border-radius: var(--legacy-radius-004);
   border:1px solid var(--border);
+  background: var(--card);
+  box-shadow: var(--legacy-shadow-002);
+
   display:flex;
-  gap: 12px;
-  align-items:flex-start;
-  transition: transform .15s ease;
+  gap:12px;
+  transition:.15s ease;
 }
 
-.creatorCard:hover{
-  transform: translateY(-2px);
-}
+.creatorCard:hover{ transform:translateY(-2px); }
 
 .creatorAvatar{
-  width: 52px;
-  height: 52px;
-  border-radius: 18px;
+  width:52px;
+  height:52px;
+  border-radius: var(--legacy-radius-005);
   display:grid;
   place-items:center;
-  font-size: 24px;
-  background: linear-gradient(135deg, var(--theme), var(--theme-2));
-  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+  font-size:24px;
+
+  background: var(--legacy-gradient-001),var(--accent));
+  color:white;
+  box-shadow: var(--legacy-shadow-002);
 }
 
 .creatorTitle{
-  font-size: 12px;
-  opacity: .72;
-  font-weight: 900;
+  font-size:12px;
+  color: var(--muted);
+  font-weight:900;
 }
 
 .creatorName{
-  margin-top: 2px;
-  font-size: 16px;
-  font-weight: 1200;
-  letter-spacing: 0.2px;
+  font-size:16px;
+  font-weight:1200;
 }
 
 .creatorDesc{
-  margin-top: 6px;
-  font-size: 13px;
-  opacity: .86;
-  line-height: 1.7;
-  font-weight: 800;
+  margin-top:6px;
+  font-size:13px;
+  color: var(--muted);
+  line-height:1.7;
+  font-weight:800;
 }
 
 /* =======================
-   ✅ RIGHT SIDE
+   ðŸ“¦ RIGHT SIDE
 ======================= */
+
+.logoCard,
+.goalCard{
+  padding:14px;
+  border-radius: var(--legacy-radius-006);
+  border:1px solid var(--border);
+  background: var(--card);
+  box-shadow: var(--legacy-shadow-002);
+}
+
 .logoCard{
   display:flex;
+  gap:10px;
   align-items:center;
-  gap: 10px;
-  padding: 14px;
-  border-radius: 22px;
-  border:1px solid var(--border);
-  box-shadow: var(--shadow-md);
 }
 
 .bubble{
-  width: 50px;
-  height: 50px;
+  width:50px;
+  height:50px;
+  border-radius: var(--legacy-radius-005);
   display:grid;
   place-items:center;
-  border-radius: 18px;
-  font-size: 22px;
-  background: linear-gradient(135deg, var(--theme), var(--theme-2));
-  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+  font-size:22px;
+
+  background: var(--legacy-gradient-001),var(--accent));
+  color:white;
+  box-shadow: var(--legacy-shadow-002);
 }
 
-.name{
-  font-weight: 1200;
-  font-size: 16px;
-}
-
-.tag{
-  font-size: 12px;
-  opacity: .75;
-  font-weight: 900;
-}
-
-/* Goal */
-.goalCard{
-  margin-top: 12px;
-  padding: 14px;
-  border-radius: 22px;
-  border:1px solid var(--border);
-  background: white;
-  box-shadow: 0 18px 55px rgba(0,0,0,0.22);
-}
+.name{ font-weight:1200;font-size:16px }
+.tag{ font-size:12px;color:var(--muted);font-weight:900 }
 
 .goalTop{
   display:flex;
-  align-items:center;
-  gap: 8px;
-  font-weight: 1200;
-  font-size: 13px;
-  margin-bottom: 8px;
-  opacity: .95;
+  gap:8px;
+  font-weight:1200;
+  font-size:13px;
+  margin-bottom:8px;
 }
 
 .goalCard p{
-  margin: 0;
-  opacity: .9;
-  font-size: 13px;
-  line-height: 1.7;
-  font-weight: 800;
+  margin:0;
+  color: var(--muted);
+  font-size:13px;
+  line-height:1.7;
+  font-weight:800;
 }
 
 /* =======================
-   ✅ SECTION TITLE
+   ðŸ“‚ SECTIONS
 ======================= */
-.section{
-  margin-top: 18px;
-}
+
+.section{ margin-top:18px }
 
 .secTitle{
   display:flex;
+  gap:10px;
   align-items:center;
-  gap: 10px;
-  padding: 8px 2px 12px;
-  font-size: 15px;
-  font-weight: 1200;
-  opacity: .96;
+  padding-bottom:12px;
+  font-size:15px;
+  font-weight:1200;
 }
 
 .secIcon{
-  width: 38px;
-  height: 38px;
+  width:38px;
+  height:38px;
+  border-radius: var(--legacy-radius-007);
   display:grid;
   place-items:center;
-  border-radius: 16px;
+
+  background: var(--card);
   border:1px solid var(--border);
-  background:#f1f5f9;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--legacy-shadow-002);
 }
 
 /* =======================
-   ✅ TECH STACK (UPGRADED)
+   ðŸ§± STACK
 ======================= */
+
 .stack{
   display:grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
 }
 
 .stackItem{
-  border-radius: 24px;
+  padding:14px;
+  border-radius: var(--legacy-radius-004);
   border:1px solid var(--border);
-  background: white;
-  padding: 14px;
-  box-shadow: 0 18px 55px rgba(0,0,0,0.22);
-  transition: transform .15s ease, border-color .15s ease;
+  background: var(--card);
+  box-shadow: var(--legacy-shadow-002);
+  transition:.15s ease;
 }
 
-.stackItem:hover{
-  transform: translateY(-2px);
-  border-color: rgba(255,255,255,0.18);
-}
+.stackItem:hover{ transform:translateY(-2px); }
 
-.stackLabel{
-  font-size: 12px;
-  opacity: .7;
-  font-weight: 900;
-}
-
-.stackValue{
-  margin-top: 7px;
-  font-size: 13px;
-  font-weight: 1100;
-  opacity: .95;
-}
+.stackLabel{ font-size:12px;color:var(--muted);font-weight:900 }
+.stackValue{ margin-top:7px;font-size:13px;font-weight:1100 }
 
 /* =======================
-   ✅ HIGHLIGHTS (BETTER)
+   ðŸ“Š HIGHLIGHTS
 ======================= */
+
 .grid{
   display:grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
 }
 
 .card{
-  border-radius: 24px;
+  padding:14px;
+  border-radius: var(--legacy-radius-004);
   border:1px solid var(--border);
-  background: white;
-  padding: 14px;
-  box-shadow: 0 18px 55px rgba(0,0,0,0.22);
-  transition: transform .15s ease, border-color .15s ease;
+  background: var(--card);
+  box-shadow: var(--legacy-shadow-002);
+  transition:.15s ease;
 }
 
-.card:hover{
-  transform: translateY(-2px);
-  border-color: rgba(255,255,255,0.20);
-}
+.card:hover{ transform:translateY(-2px); }
 
 .cardTop{
   display:flex;
-  align-items:center;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap:10px;
+  margin-bottom:10px;
 }
 
 .icon{
-  width: 42px;
-  height: 42px;
+  width:42px;
+  height:42px;
+  border-radius: var(--legacy-radius-007);
   display:grid;
   place-items:center;
-  border-radius: 16px;
-  font-size: 18px;
-  background:#ecfdf5;
+
+  background: color-mix(in srgb,var(--theme) 18%,transparent);
   border:1px solid var(--border);
-  box-shadow: var(--shadow-md);
 }
 
-.card h3{
-  margin:0;
-  font-size: 15px;
-  font-weight: 1200;
-}
-
-.card p{
-  margin:0;
-  opacity: .86;
-  font-size: 14px;
-  line-height: 1.7;
-}
+.card h3{ font-size:15px;font-weight:1200;margin:0 }
+.card p{ margin:0;color:var(--muted);font-size:14px;line-height:1.7 }
 
 /* =======================
-   ✅ FOOTERbackground: rgba(255,255,255,0.05);
+   ðŸ¦¶ FOOTER
 ======================= */
+
 .footer{
-  margin-top: 18px;
-  padding-top: 14px;
+  margin-top:18px;
+  padding-top:14px;
   border-top:1px solid var(--border);
+
   display:flex;
-  align-items:center;
-  justify-content: space-between;
-  gap: 14px;
-}
-
-.small{
-  font-size: 13px;
-  font-weight: 1100;
-  opacity: .92;
-}
-
-.muted{
-  font-size: 12px;
-  opacity: .62;
-  font-weight: 800;
-}
-
-.right{
-  display:flex;
-  gap: 14px;
+  justify-content:space-between;
+  gap:14px;
   flex-wrap:wrap;
 }
 
+.small{ font-size:13px;font-weight:1100 }
+.muted{ font-size:12px;color:var(--muted);font-weight:800 }
+
+.right{ display:flex; gap:14px; flex-wrap:wrap }
+
 .link{
-  text-decoration:none;
   color: var(--text);
-  opacity: .76;
-  font-weight: 1000;
-  font-size: 13px;
-  transition: opacity .15s ease;
+  opacity:.76;
+  font-weight:1000;
+  font-size:13px;
+  text-decoration:none;
 }
 
-.link:hover{
-  opacity: 1;
-}
+.link:hover{ opacity:1 }
 
 /* =======================
-   ✅ RESPONSIVE
+   ðŸ“± RESPONSIVE
 ======================= */
-@media (max-width: 900px){
-  .hero{ grid-template-columns: 1fr; }
-  .grid{ grid-template-columns: 1fr; }
-  .stack{ grid-template-columns: 1fr; }
-  .header{ align-items:flex-start; flex-direction: column; }
-}
-/* =====================================
-   🍃 CHATLOOP ABOUT – MINT CRYSTAL MODE
-   SAFE COLOR OVERRIDES ONLY
-===================================== */
 
-.page{
-  background: var(--bg);
-
-}
-
-/* header text */
-.title h1,
-.sub{
-  color:#0f172a;
-}
-
-/* hero glass */
-.hero{
-  background: var(--card);
-  border:1px solid var(--border);
-  box-shadow: var(--shadow-md);
-}
-/* creator + cards */
-.creatorCard,
-.logoCard,
-.goalCard,
-.stackItem,
-.card{
-  background: white;
-  border:1px solid var(--border);
-  box-shadow: var(--shadow-md);
-}
-
-
-/* icons */
-.creatorAvatar,
-.bubble,
-.secIcon,
-.icon{
-  background: linear-gradient(135deg,#10b981,#06b6d4);
-  border-color: rgba(15,23,42,.12);
-  box-shadow: 0 14px 36px rgba(16,185,129,.35);
-  color:white;
-}
-
-/* buttons */
-.btn{
-  background: linear-gradient(135deg,#10b981,#06b6d4);
-  box-shadow: 0 14px 40px rgba(16,185,129,.45);
-}
-
-.btn.ghost{
-  background: rgba(15,23,42,.05);
-  border-color: rgba(15,23,42,.14);
-  color:#0f172a;
-}
-
-/* section titles */
-.secTitle{
-  color:#0f172a;
-}
-
-/* footer */
-.footer{
-  border-top-color: rgba(15,23,42,.12);
-}
-
-.link{
-  color:#0f172a;
-}
-
-.link:hover{
-  color:#10b981;
-}
-
-:host, .page {
-  max-width: 100%;
-  overflow-x: hidden;
-}
-@supports not (backdrop-filter: blur(10px)) {
-  .hero,
-  .creatorCard,
-  .logoCard,
-  .goalCard {
-    backdrop-filter: none;
-    background: rgba(255,255,255,0.95);
-     contain: paint;
-  }
-}
-@media (max-width:600px){
-  .hero{
-    padding:14px;
-    border-radius:22px;
-  }
-
-  .title h1{
-    font-size:24px;
-  }
-
-  .card,
-  .stackItem{
-    padding:12px;
-  }
-}
-@media (max-width:380px){
-  .title h1{
-    font-size:21px;
-  }
-  .badge{
-    font-size:11px;
-  }
-}
-/* ===============================
-   🔧 Final Stability Polish
-=============================== */
-
-/* prevent flex overflow bugs */
-.page > * {
-  min-width: 0;
-}
-
-/* smoother GPU animations */
-.hero,
-.creatorCard,
-.stackItem,
-.card,
-.logoCard {
-  backface-visibility: hidden;
-}
-
-/* iOS momentum scroll fix */
-.page {
-  -webkit-overflow-scrolling: touch;
-}
-
-/* stop scroll chaining on mobile */
-body {
-  overscroll-behavior: contain;
-}
-.hero,
-.creatorCard,
-.stackItem,
-.card,
-.logoCard{
-  box-shadow: var(--shadow-md);
+@media(max-width:900px){
+  .hero{ grid-template-columns:1fr }
+  .grid,.stack{ grid-template-columns:1fr }
+  .header{ flex-direction:column }
 }
 
